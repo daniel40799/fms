@@ -1,0 +1,9 @@
+export { default as WithAlternatingSections } from './WithAlternatingSections';
+export { default as WithFadingImage } from './WithFadingImage';
+export { default as WithHeaderImagesAndDescriptions } from './WithHeaderImagesAndDescriptions';
+export { default as WithImageGrid } from './WithImageGrid';
+export { default as WithSplitImage } from './WithSplitImage';
+export { default as WithSquareImages } from './WithSquareImages';
+export { default as WithTabs } from './WithTabs';
+export { default as WithTieredImages } from './WithTieredImages';
+export { default as WithWideImages } from './WithWideImages';

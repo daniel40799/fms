@@ -1,0 +1,12 @@
+export { default as Grid } from './Grid';
+export { default as GridOnDark } from './GridOnDark';
+export { default as LogoCloud } from './LogoCloud';
+export { default as SimpleLeftAligned } from './SimpleLeftAligned';
+export { default as SimpleLeftAlignedOnDark } from './SimpleLeftAlignedOnDark';
+export { default as SimpleOnDark } from './SimpleOnDark';
+export { default as SimpleWithCallToAction } from './SimpleWithCallToAction';
+export { default as SimpleWithCallToActionOnDark } from './SimpleWithCallToActionOnDark';
+export { default as SimpleWithHeading } from './SimpleWithHeading';
+export { default as SimpleWithHeadingOnDark } from './SimpleWithHeadingOnDark';
+export { default as SplitWithLogosOnRight } from './SplitWithLogosOnRight';
+export { default as SplitWithLogosOnRightOnDark } from './SplitWithLogosOnRightOnDark';

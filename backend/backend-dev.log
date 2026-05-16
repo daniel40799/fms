@@ -1,0 +1,78 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------------< com.fapor7:fms >---------------------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.0.6:run (default-cli) > test-compile @ fms >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ fms ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 8 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ fms ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ fms ---
+[INFO] skip non existing resourceDirectory C:\Users\Daniel Dalaota\IdeaProjects\fms\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ fms ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:4.0.6:run (default-cli) < test-compile @ fms <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.6:run (default-cli) @ fms ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.6)
+
+2026-05-17T05:44:14.279+08:00  INFO 46304 --- [fms] [           main] com.fapor7.fms.FmsApplication            : Starting FmsApplication using Java 21.0.9 with PID 46304 (C:\Users\Daniel Dalaota\IdeaProjects\fms\backend\target\classes started by Daniel Dalaota in C:\Users\Daniel Dalaota\IdeaProjects\fms\backend)
+2026-05-17T05:44:14.286+08:00  INFO 46304 --- [fms] [           main] com.fapor7.fms.FmsApplication            : No active profile set, falling back to 1 default profile: "default"
+2026-05-17T05:44:15.567+08:00  INFO 46304 --- [fms] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-17T05:44:15.692+08:00  INFO 46304 --- [fms] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 110 ms. Found 6 JPA repository interfaces.
+2026-05-17T05:44:16.770+08:00  INFO 46304 --- [fms] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-05-17T05:44:16.792+08:00  INFO 46304 --- [fms] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-17T05:44:16.794+08:00  INFO 46304 --- [fms] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-05-17T05:44:16.920+08:00  INFO 46304 --- [fms] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2549 ms
+2026-05-17T05:44:17.640+08:00  INFO 46304 --- [fms] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-17T05:44:17.937+08:00  INFO 46304 --- [fms] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@e7b0bec
+2026-05-17T05:44:17.942+08:00  INFO 46304 --- [fms] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-17T05:44:18.018+08:00  INFO 46304 --- [fms] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/fms_dev (PostgreSQL 16.14)
+2026-05-17T05:44:18.190+08:00  INFO 46304 --- [fms] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 8 migrations (execution time 00:00.089s)
+2026-05-17T05:44:18.237+08:00  INFO 46304 --- [fms] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 8
+2026-05-17T05:44:18.246+08:00  INFO 46304 --- [fms] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-17T05:44:18.423+08:00  INFO 46304 --- [fms] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-05-17T05:44:18.545+08:00  INFO 46304 --- [fms] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-05-17T05:44:19.345+08:00  INFO 46304 --- [fms] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-17T05:44:19.488+08:00  INFO 46304 --- [fms] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/fms_dev]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.14
+	Default catalog/schema: fms_dev/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-05-17T05:44:21.254+08:00  INFO 46304 --- [fms] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-17T05:44:21.336+08:00  INFO 46304 --- [fms] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-17T05:44:21.447+08:00  INFO 46304 --- [fms] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-17T05:44:22.263+08:00  WARN 46304 --- [fms] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-17T05:44:22.469+08:00  INFO 46304 --- [fms] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-05-17T05:44:23.104+08:00  INFO 46304 --- [fms] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-05-17T05:44:23.599+08:00  INFO 46304 --- [fms] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-05-17T05:44:23.611+08:00  INFO 46304 --- [fms] [           main] com.fapor7.fms.FmsApplication            : Started FmsApplication in 10.087 seconds (process running for 10.834)
+2026-05-17T05:44:23.848+08:00  INFO 46304 --- [fms] [nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-17T05:44:23.850+08:00  INFO 46304 --- [fms] [nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-17T05:44:23.853+08:00  INFO 46304 --- [fms] [nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms

@@ -1,0 +1,11 @@
+export { default as AvatarGroupBottomToTop } from './AvatarGroupBottomToTop';
+export { default as AvatarGroupTopToBottom } from './AvatarGroupTopToBottom';
+export { default as AvatarWithText } from './AvatarWithText';
+export { default as CircularAvatar } from './CircularAvatar';
+export { default as CircularAvatarInitials } from './CircularAvatarInitials';
+export { default as CircularAvatarPlaceholder } from './CircularAvatarPlaceholder';
+export { default as CircularAvatarWithBottomBadge } from './CircularAvatarWithBottomBadge';
+export { default as CircularAvatarWithTopBadge } from './CircularAvatarWithTopBadge';
+export { default as RoundedAvatar } from './RoundedAvatar';
+export { default as RoundedAvatarWithBottomBadge } from './RoundedAvatarWithBottomBadge';
+export { default as RoundedAvatarWithTopBadge } from './RoundedAvatarWithTopBadge';

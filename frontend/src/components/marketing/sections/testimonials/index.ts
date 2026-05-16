@@ -1,0 +1,9 @@
+export { default as CenteredTestimonial } from './CenteredTestimonial';
+export { default as DarkSideBySideTestimonials } from './DarkSideBySideTestimonials';
+export { default as Grid } from './Grid';
+export { default as OffWhiteGrid } from './OffWhiteGrid';
+export { default as SideBySide } from './SideBySide';
+export { default as TestimonialWithLargeAvatar } from './TestimonialWithLargeAvatar';
+export { default as TestimonialWithOverlappingImage } from './TestimonialWithOverlappingImage';
+export { default as WithBackgroundImage } from './WithBackgroundImage';
+export { default as WithStarRating } from './WithStarRating';

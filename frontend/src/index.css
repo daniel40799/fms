@@ -3,113 +3,209 @@
 @tailwind utilities;
 
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
 }
 
 body {
   margin: 0;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+@layer components {
+  .input {
+    @apply block w-full rounded-md border-0 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm ring-1 ring-inset ring-slate-300 transition-all duration-200 ease-out placeholder:text-slate-400 hover:ring-slate-400 focus:ring-2 focus:ring-inset focus:ring-sky-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500 motion-reduce:transition-none;
+  }
+
+  .link {
+    @apply font-semibold text-sky-700 transition-colors duration-200 ease-out hover:text-sky-900 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 motion-reduce:transition-none;
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+
+.react-datepicker-wrapper,
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.fms-datepicker {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgb(15 23 42 / 0.12);
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.fms-datepicker .react-datepicker__header {
+  background: #f8fafc;
+  border-bottom-color: #e2e8f0;
+}
+
+.fms-datepicker .react-datepicker__current-month,
+.fms-datepicker .react-datepicker-time__header,
+.fms-datepicker .react-datepicker-year-header {
+  color: #0f172a;
+}
+
+.fms-datepicker .react-datepicker__day--selected,
+.fms-datepicker .react-datepicker__day--keyboard-selected,
+.fms-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected {
+  background: #0369a1;
+  color: #fff;
+}
+
+.fms-datepicker .react-datepicker__day:hover,
+.fms-datepicker .react-datepicker__month-text:hover,
+.fms-datepicker .react-datepicker__quarter-text:hover,
+.fms-datepicker .react-datepicker__year-text:hover {
+  background: #e0f2fe;
+}
+
+.fms-datepicker select {
+  border-radius: 0.375rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 0.125rem 1.5rem 0.125rem 0.375rem;
+  font-size: 0.875rem;
+  transition:
+    border-color 140ms ease-out,
+    box-shadow 140ms ease-out,
+    background-color 140ms ease-out;
+}
+
+.fms-datepicker select:hover {
+  border-color: #94a3b8;
+}
+
+.fms-datepicker select:focus-visible {
+  outline: 2px solid #0369a1;
+  outline-offset: 2px;
+}
+
+.fms-datepicker-popper {
+  animation: pickerPopperIn 160ms ease-out;
+  will-change: opacity;
+}
+
+.fms-datepicker-popper .fms-datepicker {
+  animation: pickerSurfaceIn 160ms ease-out;
+  transform-origin: top left;
+  will-change: opacity, transform;
+}
+
+.fms-datepicker-popper[data-placement^="top"] .fms-datepicker {
+  transform-origin: bottom left;
+}
+
+.fms-datepicker-popper--closing {
+  animation: pickerPopperOut 120ms ease-in forwards;
+  pointer-events: none;
+}
+
+.fms-datepicker-popper--closing .fms-datepicker {
+  animation: pickerSurfaceOut 120ms ease-in forwards;
+}
+
+.fms-datepicker .react-datepicker__month-dropdown,
+.fms-datepicker .react-datepicker__year-dropdown,
+.fms-datepicker .react-datepicker__month-year-dropdown {
+  animation: pickerDropdownIn 140ms ease-out;
+  transform-origin: top center;
+}
+
+.fms-datepicker .react-datepicker__time-container {
+  animation: pickerPanelIn 160ms ease-out;
+  transform-origin: top right;
+}
+
+@keyframes pickerPopperIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
-p {
-  margin: 0;
+
+@keyframes pickerPopperOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+@keyframes pickerSurfaceIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+@keyframes pickerSurfaceOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+@keyframes pickerDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-3px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pickerPanelIn {
+  from {
+    opacity: 0;
+    transform: translateX(-3px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fms-datepicker-popper,
+  .fms-datepicker-popper--closing,
+  .fms-datepicker-popper .fms-datepicker,
+  .fms-datepicker-popper--closing .fms-datepicker,
+  .fms-datepicker .react-datepicker__month-dropdown,
+  .fms-datepicker .react-datepicker__year-dropdown,
+  .fms-datepicker .react-datepicker__month-year-dropdown,
+  .fms-datepicker .react-datepicker__time-container {
+    animation: none;
+    transition: none;
+  }
+
+  .fms-datepicker select {
+    transition: none;
+  }
 }

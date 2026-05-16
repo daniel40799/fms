@@ -1,0 +1,50 @@
+import { ApproveForm } from '../components/forms/ApproveForm'
+import { Page } from '../components/layout/Page'
+import { InlineError } from '../components/ui/Alert'
+import { StatusBadge } from '../components/ui/Badge'
+import { Button } from '../components/ui/Button'
+import { Panel } from '../components/ui/Panel'
+import { Table } from '../components/ui/Table'
+import { useAsyncAction } from '../hooks/useAsyncAction'
+import type { Registration } from '../types'
+
+function PaymentProofButton({ registration, onViewPaymentProof }: { registration: Registration; onViewPaymentProof: (registrationId: string) => Promise<void> }) {
+  const action = useAsyncAction(() => onViewPaymentProof(registration.id))
+  if (!registration.paymentFilePath) return <>No file</>
+
+  return (
+    <div className="space-y-2">
+      <Button type="button" variant="secondary" loading={action.loading} onClick={() => void action.run()}>
+        Proof
+      </Button>
+      {action.error && <InlineError message={action.error} />}
+    </div>
+  )
+}
+
+export function RegistrationReviewPage({
+  registrations,
+  onApprove,
+  onViewPaymentProof,
+}: {
+  registrations: Registration[]
+  onApprove: (registrationId: string, remarks: string) => Promise<void>
+  onViewPaymentProof: (registrationId: string) => Promise<void>
+}) {
+  const rows = registrations.map((registration) => [
+    registration.userFullName,
+    registration.eventTitle,
+    <StatusBadge key={registration.id} value={registration.status} />,
+    registration.paymentReference ?? 'None',
+    <PaymentProofButton key={registration.id} registration={registration} onViewPaymentProof={onViewPaymentProof} />,
+    <ApproveForm key={registration.id} registration={registration} onApprove={onApprove} />,
+  ])
+
+  return (
+    <Page title="Payment Review" description="Validate manual payment uploads and confirm registrations to generate attendance QR tokens.">
+      <Panel>
+        <Table columns={['Participant', 'Event', 'Status', 'Reference', 'File', 'Action']} rows={rows} empty="No registrations to review." />
+      </Panel>
+    </Page>
+  )
+}

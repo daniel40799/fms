@@ -1,0 +1,33 @@
+// @ts-nocheck
+import React from 'react';
+
+export interface InputWithCornerHintProps {
+  className?: string;
+}
+
+export function InputWithCornerHint({ className }: InputWithCornerHintProps) {
+  return (
+    <div>
+      <div className="flex justify-between">
+        <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+          Email
+        </label>
+        <span id="email-optional" className="text-sm leading-6 text-gray-500">
+          Optional
+        </span>
+      </div>
+      <div className="mt-2">
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="you@example.com"
+          aria-describedby="email-optional"
+          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        />
+      </div>
+    </div>
+  );
+}
+
+export default InputWithCornerHint;

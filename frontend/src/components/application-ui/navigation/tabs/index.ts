@@ -1,0 +1,9 @@
+export { default as BrandPillTabs } from './BrandPillTabs';
+export { default as FullWidthTabsWithUnderline } from './FullWidthTabsWithUnderline';
+export { default as PillTabs } from './PillTabs';
+export { default as SimpleOnDark } from './SimpleOnDark';
+export { default as TabBarWithUnderline } from './TabBarWithUnderline';
+export { default as TabsInPillsOnGray } from './TabsInPillsOnGray';
+export { default as TabsWithUnderlineAndBadges } from './TabsWithUnderlineAndBadges';
+export { default as UnderlineTabs } from './UnderlineTabs';
+export { default as UnderlineTabsWithIcons } from './UnderlineTabsWithIcons';

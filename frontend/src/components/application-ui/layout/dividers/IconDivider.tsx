@@ -1,0 +1,24 @@
+// @ts-nocheck
+import React from 'react';
+import { PlusIcon } from '@heroicons/react/20/solid'
+
+export interface IconDividerProps {
+  className?: string;
+}
+
+export function IconDivider({ className }: IconDividerProps) {
+  return (
+    <div className="relative">
+      <div aria-hidden="true" className="absolute inset-0 flex items-center">
+        <div className="w-full border-t border-gray-300" />
+      </div>
+      <div className="relative flex justify-center">
+        <span className="bg-white px-2 text-gray-500">
+          <PlusIcon aria-hidden="true" className="h-5 w-5 text-gray-500" />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default IconDivider;
