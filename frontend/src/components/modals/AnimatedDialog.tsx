@@ -1,5 +1,5 @@
-import { useEffect, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, type ReactNode } from 'react'
 
 export function AnimatedDialog({
   title,

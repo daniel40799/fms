@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FlatBadgeProps {
   className?: string;
 }
 
 export function FlatBadge({ className }: FlatBadgeProps) {
+  void className;
   return (
     <>
       <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">

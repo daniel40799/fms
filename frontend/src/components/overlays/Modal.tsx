@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import React from 'react';
 
 export interface ModalProps {
   open: boolean;
@@ -33,6 +33,7 @@ export function Modal({
   size = 'md',
   className = '',
 }: ModalProps) {
+  void className;
   return (
     <Dialog open={open} onClose={onClose} className="relative z-10">
       <DialogBackdrop

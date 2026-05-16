@@ -1,15 +1,16 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface WithStickyFooterProps {
   className?: string;
 }
 
 export function WithStickyFooter({ className }: WithStickyFooterProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   return (

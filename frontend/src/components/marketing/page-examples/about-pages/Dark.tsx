@@ -1,18 +1,12 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogPanel } from '@headlessui/react';
 import {
-  AcademicCapIcon,
-  CheckCircleIcon,
-  HandRaisedIcon,
-  RocketLaunchIcon,
-  SparklesIcon,
-  SunIcon,
-  UserGroupIcon,
-} from '@heroicons/react/20/solid'
+CheckCircleIcon
+} from '@heroicons/react/20/solid';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -71,6 +65,7 @@ export function Dark({
   footerNavigation,
   className,
 }: DarkProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (

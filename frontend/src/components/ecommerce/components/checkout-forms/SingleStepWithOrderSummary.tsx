@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react'
-import { CheckCircleIcon, TrashIcon } from '@heroicons/react/20/solid'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { CheckCircleIcon, TrashIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface ProductItem {
   id: number;
@@ -39,6 +39,7 @@ export function SingleStepWithOrderSummary({
   paymentMethods = [],
   className,
 }: SingleStepWithOrderSummaryProps) {
+  void className;
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(deliveryMethods[0]);
 
   return (

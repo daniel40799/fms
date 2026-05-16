@@ -1,17 +1,13 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel } from '@headlessui/react'
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { CheckIcon } from '@heroicons/react/20/solid';
 import {
-  ArrowPathIcon,
-  Bars3Icon,
-  CloudArrowUpIcon,
-  FingerPrintIcon,
-  LockClosedIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { CheckIcon } from '@heroicons/react/20/solid'
+Bars3Icon,
+XMarkIcon
+} from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -65,6 +61,7 @@ export function WithLargeScreenshotAndTestimonial({
   footerNavigation,
   className,
 }: WithLargeScreenshotAndTestimonialProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   function classNames(...classes: string[]): string {

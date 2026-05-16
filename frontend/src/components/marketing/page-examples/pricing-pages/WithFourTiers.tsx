@@ -1,18 +1,18 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Radio,
-  RadioGroup,
-} from '@headlessui/react'
-import { Bars3Icon, MinusSmallIcon, PlusSmallIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { CheckIcon } from '@heroicons/react/20/solid'
+Dialog,
+DialogPanel,
+Disclosure,
+DisclosureButton,
+DisclosurePanel,
+Radio,
+RadioGroup,
+} from '@headlessui/react';
+import { CheckIcon } from '@heroicons/react/20/solid';
+import { Bars3Icon, MinusSmallIcon, PlusSmallIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -66,6 +66,7 @@ export function WithFourTiers({
   footerNavigation,
   className,
 }: WithFourTiersProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [frequency, setFrequency] = useState(pricing.frequencies[0]);
 

@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,17 +37,18 @@ public class UserController {
     public Map<String, Object> me(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         UserEntity user = authenticatedUser.getUser();
 
-        return Map.of(
-                "id", user.getId(),
-                "email", user.getEmail(),
-                "fullName", user.getFullName(),
-                "status", user.getStatus(),
-                "organization", user.getOrganization() != null ? user.getOrganization().getName() : null,
-                "roles", user.getRoles()
-                        .stream()
-                        .map(role -> role.getName().name())
-                        .toList()
-        );
+        Map<String, Object> profile = new LinkedHashMap<>();
+        profile.put("id", user.getId());
+        profile.put("email", user.getEmail());
+        profile.put("fullName", user.getFullName());
+        profile.put("status", user.getStatus());
+        profile.put("organization", user.getOrganization() != null ? user.getOrganization().getName() : null);
+        profile.put("roles", user.getRoles()
+                .stream()
+                .map(role -> role.getName().name())
+                .toList());
+
+        return profile;
     }
 
     /**

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface AvatarGroupBottomToTopProps {
   className?: string;
 }
 
 export function AvatarGroupBottomToTop({ className }: AvatarGroupBottomToTopProps) {
+  void className;
   return (
     <>
       <div className="flex -space-x-1 overflow-hidden">

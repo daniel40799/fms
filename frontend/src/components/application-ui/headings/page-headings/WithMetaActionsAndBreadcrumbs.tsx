@@ -1,23 +1,23 @@
 // @ts-nocheck
-import React from 'react';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
-  BriefcaseIcon,
-  CalendarIcon,
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronRightIcon,
-  CurrencyDollarIcon,
-  LinkIcon,
-  MapPinIcon,
-  PencilIcon,
-} from '@heroicons/react/20/solid'
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+BriefcaseIcon,
+CalendarIcon,
+CheckIcon,
+ChevronDownIcon,
+ChevronRightIcon,
+CurrencyDollarIcon,
+LinkIcon,
+MapPinIcon,
+PencilIcon,
+} from '@heroicons/react/20/solid';
 
 export interface WithMetaActionsAndBreadcrumbsProps {
   className?: string;
 }
 
 export function WithMetaActionsAndBreadcrumbs({ className }: WithMetaActionsAndBreadcrumbsProps) {
+  void className;
   return (
     <div className="lg:flex lg:items-center lg:justify-between">
       <div className="min-w-0 flex-1">

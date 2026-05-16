@@ -1,9 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -19,6 +19,7 @@ export function FullWidth({
   navigation = [],
   className,
 }: FullWidthProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (

@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 
 export interface TwoColumnCardFormLayoutProps {
   className?: string;
 }
 
 export function TwoColumnCardFormLayout({ className }: TwoColumnCardFormLayoutProps) {
+  void className;
   return (
     <div className="space-y-10 divide-y divide-gray-900/10">
       <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">

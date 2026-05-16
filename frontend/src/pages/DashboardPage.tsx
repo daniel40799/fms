@@ -1,8 +1,5 @@
-import { Page } from '../components/layout/Page'
-import { Panel } from '../components/ui/Panel'
-import { Stat } from '../components/ui/Stat'
-import { StatusBadge } from '../components/ui/Badge'
-import { Table } from '../components/ui/Table'
+import { Page } from '../components/layout'
+import { Panel, Stat, StatusBadge, Table } from '../components/ui'
 import { formatDateTime } from '../lib/datetime'
 import type { AttendanceLog, EventRecord, FmsUser, Registration } from '../types'
 

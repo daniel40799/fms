@@ -1,10 +1,10 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel, DialogTitle, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { Dialog, DialogPanel, DialogTitle, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface TabItem {
   name: string;
@@ -31,6 +31,7 @@ export function ContactListExample({
   team = [],
   className,
 }: ContactListExampleProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   function classNames(...classes: string[]): string {

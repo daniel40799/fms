@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface RoundedAvatarWithTopBadgeProps {
   className?: string;
 }
 
 export function RoundedAvatarWithTopBadge({ className }: RoundedAvatarWithTopBadgeProps) {
+  void className;
   return (
     <>
       <span className="relative inline-block">

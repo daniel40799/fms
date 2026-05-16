@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StatItem {
   id: number;
@@ -16,6 +15,7 @@ export function SimpleGridOnDark({
   stats = [],
   className,
 }: SimpleGridOnDarkProps) {
+  void className;
   return (
     <div className="bg-gray-900 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ArrowLongLeftIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid'
+import { ArrowLongLeftIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid';
 
 export interface CenteredPaginationProps {
   className?: string;
 }
 
 export function CenteredPagination({ className }: CenteredPaginationProps) {
+  void className;
   return (
     <nav className="flex items-center justify-between border-t border-gray-200 px-4 sm:px-0">
       <div className="-mt-px flex w-0 flex-1">

@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
+import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid';
 
 export interface StatItem {
   name: string;
@@ -19,6 +18,7 @@ export function StatsWithSharedBorders({
   stats = [],
   className,
 }: StatsWithSharedBordersProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

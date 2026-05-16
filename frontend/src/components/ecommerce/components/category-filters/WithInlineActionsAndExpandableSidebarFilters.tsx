@@ -1,19 +1,19 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-} from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Disclosure,
+DisclosureButton,
+DisclosurePanel,
+Menu,
+MenuButton,
+MenuItem,
+MenuItems,
+} from '@headlessui/react';
+import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface SortoptionItem {
   name: string;
@@ -48,6 +48,7 @@ export function WithInlineActionsAndExpandableSidebarFilters({
   filters = [],
   className,
 }: WithInlineActionsAndExpandableSidebarFiltersProps) {
+  void className;
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   function classNames(...classes: string[]): string {

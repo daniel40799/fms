@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FullWidthWithOverlappingImageTilesProps {
   className?: string;
 }
 
 export function FullWidthWithOverlappingImageTiles({ className }: FullWidthWithOverlappingImageTilesProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="overflow-hidden pt-32 sm:pt-14">

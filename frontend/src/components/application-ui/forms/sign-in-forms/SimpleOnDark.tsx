@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SimpleOnDarkProps {
   className?: string;
 }
 
 export function SimpleOnDark({ className }: SimpleOnDarkProps) {
+  void className;
   return (
     <>
       

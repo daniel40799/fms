@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -17,6 +16,8 @@ export function HorizontalLinkCards({
   people = [],
   className,
 }: HorizontalLinkCardsProps) {
+  void className;
+  void people;
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {people.map((person) => (

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithBackgroundImageProps {
   className?: string;
 }
 
 export function WithBackgroundImage({ className }: WithBackgroundImageProps) {
+  void className;
   return (
     <>
       

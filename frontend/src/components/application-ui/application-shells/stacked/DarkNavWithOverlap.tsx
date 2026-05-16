@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export interface UserProfile {
   name: string;
@@ -28,6 +27,8 @@ export function DarkNavWithOverlap({
   userNavigation = [],
   className,
 }: DarkNavWithOverlapProps) {
+  void className;
+  void userNavigation;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

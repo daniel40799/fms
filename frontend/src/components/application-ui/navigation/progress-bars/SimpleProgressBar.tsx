@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StepItem {
   id: number;
@@ -17,6 +16,7 @@ export function SimpleProgressBar({
   steps = [],
   className,
 }: SimpleProgressBarProps) {
+  void className;
   return (
     <nav aria-label="Progress">
       <ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">

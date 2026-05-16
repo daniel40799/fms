@@ -1,18 +1,13 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel, Field, Label, Switch } from '@headlessui/react'
-import { Bars3Icon } from '@heroicons/react/20/solid'
+import { Dialog, DialogPanel, Field, Label, Switch } from '@headlessui/react';
+import { Bars3Icon } from '@heroicons/react/20/solid';
 import {
-  BellIcon,
-  CreditCardIcon,
-  CubeIcon,
-  FingerPrintIcon,
-  UserCircleIcon,
-  UsersIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+BellIcon,
+XMarkIcon
+} from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -30,6 +25,7 @@ export function StackedSettingsScreen({
   secondaryNavigation = [],
   className,
 }: StackedSettingsScreenProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [automaticTimezoneEnabled, setAutomaticTimezoneEnabled] = useState(true);
 

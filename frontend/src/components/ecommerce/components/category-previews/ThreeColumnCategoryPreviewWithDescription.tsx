@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CategoryItem {
   name: string;
@@ -18,6 +17,7 @@ export function ThreeColumnCategoryPreviewWithDescription({
   categories = [],
   className,
 }: ThreeColumnCategoryPreviewWithDescriptionProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">

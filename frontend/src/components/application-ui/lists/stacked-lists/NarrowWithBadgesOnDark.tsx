@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export interface StatuseItem {
   offline: string;
@@ -36,6 +35,7 @@ export function NarrowWithBadgesOnDark({
   deployments = [],
   className,
 }: NarrowWithBadgesOnDarkProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

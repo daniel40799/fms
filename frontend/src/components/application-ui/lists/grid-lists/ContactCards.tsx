@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid'
+import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid';
 
 export interface PersonItem {
   name: string;
@@ -20,6 +19,8 @@ export function ContactCards({
   people = [],
   className,
 }: ContactCardsProps) {
+  void className;
+  void people;
   return (
     <ul role="list" className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {people.map((person) => (

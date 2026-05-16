@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronRightIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
-import { Popover, PopoverBackdrop, PopoverButton, PopoverPanel } from '@headlessui/react'
+import { Popover, PopoverBackdrop, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { ChevronRightIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
 
 export interface StepItem {
   name: string;
@@ -31,6 +30,7 @@ export function CheckoutPageMobileOverlay({
   products = [],
   className,
 }: CheckoutPageMobileOverlayProps) {
+  void className;
   return (
     <div className="bg-white">
       {/* Background color split screen for large screens */}

@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { LifebuoyIcon, NewspaperIcon, PhoneIcon } from '@heroicons/react/20/solid'
 
 export interface CardItem {
   name: string;
@@ -17,6 +16,7 @@ export function WithCards({
   cards = [],
   className,
 }: WithCardsProps) {
+  void className;
   return (
     <div className="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
       <img

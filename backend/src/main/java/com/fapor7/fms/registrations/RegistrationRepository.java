@@ -1,6 +1,7 @@
 package com.fapor7.fms.registrations;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -11,7 +12,7 @@ import java.util.UUID;
  * <p>Includes lookups needed to prevent duplicate registrations and to resolve
  * QR tokens during attendance check-in.</p>
  */
-public interface RegistrationRepository extends JpaRepository<RegistrationEntity, UUID> {
+public interface RegistrationRepository extends JpaRepository<@NonNull RegistrationEntity, @NonNull UUID> {
 
     /**
      * Finds a registration for a specific event and user pair.
@@ -20,7 +21,7 @@ public interface RegistrationRepository extends JpaRepository<RegistrationEntity
      * @param userId user id
      * @return matching registration when the user already registered
      */
-    Optional<RegistrationEntity> findByEventIdAndUserId(UUID eventId, UUID userId);
+    Optional<@NonNull RegistrationEntity> findByEventIdAndUserId(UUID eventId, UUID userId);
 
     /**
      * Finds a confirmed registration by QR token.
@@ -28,5 +29,5 @@ public interface RegistrationRepository extends JpaRepository<RegistrationEntity
      * @param qrToken token generated during registration approval
      * @return registration that owns the token, when present
      */
-    Optional<RegistrationEntity> findByQrToken(String qrToken);
+    Optional<@NonNull RegistrationEntity> findByQrToken(String qrToken);
 }

@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { BuildingOfficeIcon, CreditCardIcon, UserIcon, UsersIcon } from '@heroicons/react/20/solid'
 
 export interface TabItem {
   name: string;
@@ -18,6 +17,7 @@ export function UnderlineTabsWithIcons({
   tabs = [],
   className,
 }: UnderlineTabsWithIconsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

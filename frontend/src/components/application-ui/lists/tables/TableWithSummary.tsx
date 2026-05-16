@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ProjectItem {
   id: number;
@@ -19,6 +18,8 @@ export function TableWithSummary({
   projects = [],
   className,
 }: TableWithSummaryProps) {
+  void className;
+  void projects;
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">

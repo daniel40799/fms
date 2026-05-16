@@ -1,9 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface PersonItem {
   name: string;
@@ -19,6 +19,8 @@ export function SelectMenuWithSecondaryText({
   people = [],
   className,
 }: SelectMenuWithSecondaryTextProps) {
+  void className;
+  void people;
   const [selected, setSelected] = useState(people[3]);
 
   return (

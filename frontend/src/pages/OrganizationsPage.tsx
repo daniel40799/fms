@@ -1,11 +1,8 @@
 import { useState } from 'react'
-import { OrganizationCreateForm } from '../components/forms/OrganizationCreateForm'
-import { Page } from '../components/layout/Page'
-import { FormModal } from '../components/modals/FormModal'
-import { StatusBadge } from '../components/ui/Badge'
-import { Button } from '../components/ui/Button'
-import { Panel } from '../components/ui/Panel'
-import { Table } from '../components/ui/Table'
+import { OrganizationCreateForm } from '../components/forms'
+import { Page } from '../components/layout'
+import { FormModal } from '../components/modals'
+import { Button, Panel, StatusBadge, Table } from '../components/ui'
 import type { Organization } from '../types'
 
 export function OrganizationsPage({

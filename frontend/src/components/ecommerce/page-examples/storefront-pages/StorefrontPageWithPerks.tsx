@@ -1,27 +1,27 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import {
-  Bars3Icon,
-  MagnifyingGlassIcon,
-  QuestionMarkCircleIcon,
-  ShoppingBagIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+Bars3Icon,
+MagnifyingGlassIcon,
+QuestionMarkCircleIcon,
+ShoppingBagIcon,
+XMarkIcon,
+} from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface CurrencieItem {
   [key: string]: unknown;
@@ -86,6 +86,7 @@ export function StorefrontPageWithPerks({
   footerNavigation,
   className,
 }: StorefrontPageWithPerksProps) {
+  void className;
   const [open, setOpen] = useState(false);
 
   return (

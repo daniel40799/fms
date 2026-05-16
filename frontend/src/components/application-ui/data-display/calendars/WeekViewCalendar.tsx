@@ -1,15 +1,16 @@
 // @ts-nocheck
 'use client'
 
-import React, { useRef, useEffect } from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
+import { useRef } from 'react';
 
 export interface WeekViewCalendarProps {
   className?: string;
 }
 
 export function WeekViewCalendar({ className }: WeekViewCalendarProps) {
+  void className;
   const container = useRef<HTMLDivElement>(null);
   const containerNav = useRef<HTMLDivElement>(null);
   const containerOffset = useRef<HTMLDivElement>(null);

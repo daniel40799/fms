@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface NavItem {
   name: string;
@@ -19,6 +18,7 @@ export function FooterWithNewsletter({
   navigation,
   className,
 }: FooterWithNewsletterProps) {
+  void className;
   return (
     <footer aria-labelledby="footer-heading" className="bg-white">
       <h2 id="footer-heading" className="sr-only">

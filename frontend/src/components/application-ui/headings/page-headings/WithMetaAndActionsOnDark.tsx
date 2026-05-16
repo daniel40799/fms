@@ -1,22 +1,22 @@
 // @ts-nocheck
-import React from 'react';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
-  BriefcaseIcon,
-  CalendarIcon,
-  CheckIcon,
-  ChevronDownIcon,
-  CurrencyDollarIcon,
-  LinkIcon,
-  MapPinIcon,
-  PencilIcon,
-} from '@heroicons/react/20/solid'
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+BriefcaseIcon,
+CalendarIcon,
+CheckIcon,
+ChevronDownIcon,
+CurrencyDollarIcon,
+LinkIcon,
+MapPinIcon,
+PencilIcon,
+} from '@heroicons/react/20/solid';
 
 export interface WithMetaAndActionsOnDarkProps {
   className?: string;
 }
 
 export function WithMetaAndActionsOnDark({ className }: WithMetaAndActionsOnDarkProps) {
+  void className;
   return (
     <div className="lg:flex lg:items-center lg:justify-between">
       <div className="min-w-0 flex-1">

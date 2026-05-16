@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithBackgroundImageProps {
   className?: string;
 }
 
 export function WithBackgroundImage({ className }: WithBackgroundImageProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithHiddenLabelProps {
   className?: string;
 }
 
 export function InputWithHiddenLabel({ className }: InputWithHiddenLabelProps) {
+  void className;
   return (
     <div>
       <label htmlFor="email" className="sr-only">

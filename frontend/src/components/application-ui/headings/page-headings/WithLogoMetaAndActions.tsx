@@ -1,13 +1,13 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 
 export interface WithLogoMetaAndActionsProps {
   className?: string;
 }
 
 export function WithLogoMetaAndActions({ className }: WithLogoMetaAndActionsProps) {
+  void className;
   return (
     <div className="px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex items-center justify-between gap-x-8 lg:mx-0">

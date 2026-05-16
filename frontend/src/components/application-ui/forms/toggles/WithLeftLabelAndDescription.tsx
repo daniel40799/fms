@@ -1,14 +1,15 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Description, Field, Label, Switch } from '@headlessui/react'
+import { Description, Field, Label, Switch } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface WithLeftLabelAndDescriptionProps {
   className?: string;
 }
 
 export function WithLeftLabelAndDescription({ className }: WithLeftLabelAndDescriptionProps) {
+  void className;
   const [enabled, setEnabled] = useState(false);
 
   return (

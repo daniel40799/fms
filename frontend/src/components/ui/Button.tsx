@@ -19,6 +19,7 @@ export function Button({
   rightIcon,
   ...props
 }: ButtonProps) {
+  void className;
   const styles: Record<ButtonVariant, string> = {
     primary: 'bg-sky-700 text-white shadow-sm hover:bg-sky-800 hover:shadow-md focus-visible:outline-sky-700',
     secondary: 'border border-slate-300 bg-white text-slate-800 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:shadow-md focus-visible:outline-sky-700',

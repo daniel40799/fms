@@ -1,15 +1,15 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Dialog,
-  DialogPanel,
-  DialogBackdrop,
-} from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+Combobox,
+ComboboxInput,
+ComboboxOption,
+ComboboxOptions,
+Dialog,
+DialogBackdrop,
+DialogPanel,
+} from '@headlessui/react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface PersonItem {
   id: number;
@@ -26,6 +26,8 @@ export function CommandPalette({
   people = [],
   className,
 }: CommandPaletteProps) {
+  void className;
+  void people;
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(true);
 

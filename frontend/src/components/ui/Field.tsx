@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 export function Field({ label, children, className = '', error }: { label: string; children: ReactNode; className?: string; error?: string }) {
+  void className;
   return (
     <label className={`block ${className}`}>
       <span className="text-sm font-medium text-slate-800">{label}</span>

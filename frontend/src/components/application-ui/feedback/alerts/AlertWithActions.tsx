@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
 
 export interface AlertWithActionsProps {
   className?: string;
 }
 
 export function AlertWithActions({ className }: AlertWithActionsProps) {
+  void className;
   return (
     <div className="rounded-md bg-green-50 p-4">
       <div className="flex">

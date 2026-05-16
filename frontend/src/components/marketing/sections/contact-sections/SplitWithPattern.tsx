@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { BuildingOffice2Icon, EnvelopeIcon, PhoneIcon } from '@heroicons/react/24/outline'
+import { BuildingOffice2Icon, EnvelopeIcon, PhoneIcon } from '@heroicons/react/24/outline';
 
 export interface SplitWithPatternProps {
   className?: string;
 }
 
 export function SplitWithPattern({ className }: SplitWithPatternProps) {
+  void className;
   return (
     <div className="relative isolate bg-white">
       <div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">

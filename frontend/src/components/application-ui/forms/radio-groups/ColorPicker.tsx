@@ -1,8 +1,8 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface OptionItem {
   name: string;
@@ -18,6 +18,7 @@ export function ColorPicker({
   options = [],
   className,
 }: ColorPickerProps) {
+  void className;
   const [selectedColor, setSelectedColor] = useState(options[1]);
 
   function classNames(...classes: string[]): string {

@@ -1,13 +1,14 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { Field, Label, Switch } from '@headlessui/react'
+import { Field, Label, Switch } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface CenteredProps {
   className?: string;
 }
 
 export function Centered({ className }: CenteredProps) {
+  void className;
   const [agreed, setAgreed] = useState(false);
 
   return (

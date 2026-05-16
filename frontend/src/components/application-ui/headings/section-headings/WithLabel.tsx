@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithLabelProps {
   className?: string;
 }
 
 export function WithLabel({ className }: WithLabelProps) {
+  void className;
   return (
     <div className="border-b border-gray-200 pb-5">
       <div className="-ml-2 -mt-2 flex flex-wrap items-baseline">

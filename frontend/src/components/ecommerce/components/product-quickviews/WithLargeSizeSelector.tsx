@@ -1,8 +1,8 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, Radio, RadioGroup } from '@headlessui/react'
-import { ShieldCheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { CheckIcon, QuestionMarkCircleIcon, StarIcon } from '@heroicons/react/20/solid'
+import { Dialog, DialogBackdrop, DialogPanel, Radio, RadioGroup } from '@headlessui/react';
+import { CheckIcon, QuestionMarkCircleIcon, StarIcon } from '@heroicons/react/20/solid';
+import { ShieldCheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface ProductItem {
   name: string;
@@ -24,6 +24,7 @@ export function WithLargeSizeSelector({
   product,
   className,
 }: WithLargeSizeSelectorProps) {
+  void className;
   const [open, setOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
 

@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { CheckIcon } from '@heroicons/react/24/outline';
 
 export interface OrderItem {
   number: string;
@@ -24,6 +23,7 @@ export function OrderHistoryInvoiceList({
   orders = [],
   className,
 }: OrderHistoryInvoiceListProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-4xl py-16 sm:px-6 sm:py-24">

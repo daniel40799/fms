@@ -1,15 +1,16 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface SimpleAlertProps {
   className?: string;
 }
 
 export function SimpleAlert({ className }: SimpleAlertProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   return (

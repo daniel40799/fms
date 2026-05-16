@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PrivacyNoticeCenteredProps {
   className?: string;
 }
 
 export function PrivacyNoticeCentered({ className }: PrivacyNoticeCenteredProps) {
+  void className;
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 px-6 pb-6">
       <div className="pointer-events-auto mx-auto max-w-xl rounded-xl bg-white p-6 shadow-lg ring-1 ring-gray-900/10">

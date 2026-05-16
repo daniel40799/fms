@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { CheckIcon } from '@heroicons/react/20/solid';
 
 export interface FeatureItem {
   name: string;
@@ -16,6 +15,7 @@ export function OffsetWithFeatureList({
   features = [],
   className,
 }: OffsetWithFeatureListProps) {
+  void className;
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

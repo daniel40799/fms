@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -17,6 +16,8 @@ export function NarrowStackedList({
   people = [],
   className,
 }: NarrowStackedListProps) {
+  void className;
+  void people;
   return (
     <div>
       <ul role="list" className="divide-y divide-gray-100">

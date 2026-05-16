@@ -25,6 +25,7 @@ export function Checkbox({
   disabled = false,
   className = '',
 }: CheckboxProps) {
+  void className;
   const inputId = id ?? (label ? label.toLowerCase().replace(/\s+/g, '-') : 'checkbox');
   const descriptionId = description ? `${inputId}-description` : undefined;
 
@@ -78,6 +79,7 @@ export function CheckboxGroup({
   onChange,
   className = '',
 }: CheckboxGroupProps) {
+  void className;
   const toggle = (id: string) => {
     const next = values.includes(id)
       ? values.filter((v) => v !== id)

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ActivityitemItem {
   user: string;
@@ -21,6 +20,7 @@ export function NarrowWithSmallAvatarsOnDark({
   activityItems = [],
   className,
 }: NarrowWithSmallAvatarsOnDarkProps) {
+  void className;
   return (
     <ul role="list" className="divide-y divide-white/5">
       {activityItems.map((item) => (

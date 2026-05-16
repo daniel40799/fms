@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SplitWithImageProps {
   className?: string;
 }
 
 export function SplitWithImage({ className }: SplitWithImageProps) {
+  void className;
   return (
     <>
       

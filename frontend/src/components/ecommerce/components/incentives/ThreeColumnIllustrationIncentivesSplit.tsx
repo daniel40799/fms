@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface IncentiveItem {
   name: string;
@@ -16,6 +15,7 @@ export function ThreeColumnIllustrationIncentivesSplit({
   incentives = [],
   className,
 }: ThreeColumnIllustrationIncentivesSplitProps) {
+  void className;
   return (
     <div className="bg-gray-50">
       <div className="mx-auto max-w-7xl py-24 sm:px-2 sm:py-32 lg:px-4">

@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { HomeIcon } from '@heroicons/react/20/solid'
+import { HomeIcon } from '@heroicons/react/20/solid';
 
 export interface PageItem {
   name: string;
@@ -17,6 +16,7 @@ export function FullWidthBreadcrumb({
   pages = [],
   className,
 }: FullWidthBreadcrumbProps) {
+  void className;
   return (
     <nav aria-label="Breadcrumb" className="flex border-b border-gray-200 bg-white">
       <ol role="list" className="mx-auto flex w-full max-w-screen-xl space-x-4 px-4 sm:px-6 lg:px-8">

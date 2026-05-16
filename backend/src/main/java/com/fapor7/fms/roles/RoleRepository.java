@@ -1,6 +1,7 @@
 package com.fapor7.fms.roles;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -11,7 +12,7 @@ import java.util.UUID;
  * <p>Role lookup by name is used during user creation to attach requested
  * authorities or the default end-user role.</p>
  */
-public interface RoleRepository extends JpaRepository<RoleEntity, UUID> {
+public interface RoleRepository extends JpaRepository<@NonNull RoleEntity, @NonNull UUID> {
 
     /**
      * Finds a role by enum name.
@@ -19,5 +20,5 @@ public interface RoleRepository extends JpaRepository<RoleEntity, UUID> {
      * @param name role name
      * @return matching role when seeded in the database
      */
-    Optional<RoleEntity> findByName(RoleName name);
+    Optional<@NonNull RoleEntity> findByName(RoleName name);
 }

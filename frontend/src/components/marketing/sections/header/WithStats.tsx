@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface LinkItem {
   name: string;
@@ -22,6 +21,7 @@ export function WithStats({
   stats = [],
   className,
 }: WithStatsProps) {
+  void className;
   return (
     <div className="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
       <img

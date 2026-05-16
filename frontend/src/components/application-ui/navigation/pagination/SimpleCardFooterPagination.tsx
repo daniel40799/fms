@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ListItem {
   id: number;
@@ -17,6 +16,8 @@ export function SimpleCardFooterPagination({
   items = [],
   className,
 }: SimpleCardFooterPaginationProps) {
+  void className;
+  void items;
   return (
     <nav
       aria-label="Pagination"

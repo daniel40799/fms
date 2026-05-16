@@ -1,13 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import {
-  AcademicCapIcon,
-  BanknotesIcon,
-  CheckBadgeIcon,
-  ClockIcon,
-  ReceiptRefundIcon,
-  UsersIcon,
-} from '@heroicons/react/24/outline'
 
 export interface ActionItem {
   title: string;
@@ -26,6 +18,7 @@ export function ActionsWithSharedBorders({
   actions = [],
   className,
 }: ActionsWithSharedBordersProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

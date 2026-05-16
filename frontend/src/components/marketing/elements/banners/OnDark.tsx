@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon } from '@heroicons/react/20/solid';
 
 export interface OnDarkProps {
   className?: string;
 }
 
 export function OnDark({ className }: OnDarkProps) {
+  void className;
   return (
     <div className="flex items-center gap-x-6 bg-gray-900 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
       <p className="text-sm leading-6 text-white">

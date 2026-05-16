@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ListItem {
   id: number;
@@ -14,6 +13,8 @@ export function FlatCardWithDividers({
   items = [],
   className,
 }: FlatCardWithDividersProps) {
+  void className;
+  void items;
   return (
     <div className="overflow-hidden rounded-md border border-gray-300 bg-white">
       <ul role="list" className="divide-y divide-gray-300">

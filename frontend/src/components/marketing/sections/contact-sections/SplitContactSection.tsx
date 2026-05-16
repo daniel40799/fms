@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SplitContactSectionProps {
   className?: string;
 }
 
 export function SplitContactSection({ className }: SplitContactSectionProps) {
+  void className;
   return (
     <div className="relative bg-white">
       <div className="lg:absolute lg:inset-0 lg:left-1/2">

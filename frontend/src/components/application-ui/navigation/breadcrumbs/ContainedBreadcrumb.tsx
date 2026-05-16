@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { HomeIcon } from '@heroicons/react/20/solid'
+import { HomeIcon } from '@heroicons/react/20/solid';
 
 export interface PageItem {
   name: string;
@@ -17,6 +16,7 @@ export function ContainedBreadcrumb({
   pages = [],
   className,
 }: ContainedBreadcrumbProps) {
+  void className;
   return (
     <nav aria-label="Breadcrumb" className="flex">
       <ol role="list" className="flex space-x-4 rounded-md bg-white px-6 shadow">

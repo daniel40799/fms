@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ListItem {
   id: number;
@@ -14,6 +13,8 @@ export function CardWithDividers({
   items = [],
   className,
 }: CardWithDividersProps) {
+  void className;
+  void items;
   return (
     <div className="overflow-hidden rounded-md bg-white shadow">
       <ul role="list" className="divide-y divide-gray-200">

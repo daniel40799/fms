@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
 import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
+import type { NavItem } from './Sidebar';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
-import type { NavItem } from './Sidebar';
 
 export interface AppShellProps {
   navigation?: NavItem[];
@@ -24,6 +24,7 @@ export function AppShell({
   children,
   className = '',
 }: AppShellProps) {
+  void className;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (

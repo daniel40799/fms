@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -19,6 +18,8 @@ export function WithVerticalImages({
   people = [],
   className,
 }: WithVerticalImagesProps) {
+  void className;
+  void people;
   return (
     <div className="bg-white py-24 md:py-32">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-x-8 gap-y-20 px-6 lg:px-8 xl:grid-cols-5">

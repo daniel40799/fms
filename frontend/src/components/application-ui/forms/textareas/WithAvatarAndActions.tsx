@@ -1,15 +1,10 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import {
-  FaceFrownIcon,
-  FaceSmileIcon,
-  FireIcon,
-  HandThumbUpIcon,
-  HeartIcon,
-  PaperClipIcon,
-  XMarkIcon,
-} from '@heroicons/react/20/solid'
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
+FaceSmileIcon,
+PaperClipIcon
+} from '@heroicons/react/20/solid';
+import React,{ useState } from 'react';
 
 export interface MoodItem {
   name: string;
@@ -28,6 +23,7 @@ export function WithAvatarAndActions({
   moods = [],
   className,
 }: WithAvatarAndActionsProps) {
+  void className;
   const [selected, setSelected] = useState(moods[5]);
 
   function classNames(...classes: string[]): string {

@@ -26,6 +26,7 @@ export function RadioGroup({
   orientation = 'vertical',
   className = '',
 }: RadioGroupProps) {
+  void className;
   return (
     <fieldset className={className}>
       {legend && (

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface TitledDividerProps {
   className?: string;
 }
 
 export function TitledDivider({ className }: TitledDividerProps) {
+  void className;
   return (
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 flex items-center">

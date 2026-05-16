@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Popover, PopoverButton, PopoverGroup, PopoverPanel } from '@headlessui/react'
-import { MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
+import { Popover, PopoverButton, PopoverGroup, PopoverPanel } from '@headlessui/react';
+import { MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 
 export interface NavItem {
   name: string;
@@ -21,6 +20,7 @@ export function WithDoubleColumnAndPersistentMobileNav({
   navigation,
   className,
 }: WithDoubleColumnAndPersistentMobileNavProps) {
+  void className;
   return (
     <div className="bg-white">
       <header className="relative bg-white">

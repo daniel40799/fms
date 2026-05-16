@@ -2,6 +2,7 @@ package com.fapor7.fms.auth;
 
 import com.fapor7.fms.roles.RoleEntity;
 import com.fapor7.fms.users.UserEntity;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,7 +39,7 @@ public class AuthenticatedUser implements UserDetails {
      * @return authorities in the {@code ROLE_<ROLE_NAME>} format
      */
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
         return user.getRoles()
                 .stream()
                 .map(RoleEntity::getName)
@@ -52,7 +53,7 @@ public class AuthenticatedUser implements UserDetails {
      * @return encoded password hash from the user record
      */
     @Override
-    public String getPassword() {
+    public @NonNull String getPassword() {
         return user.getPasswordHash();
     }
 
@@ -62,7 +63,7 @@ public class AuthenticatedUser implements UserDetails {
      * @return user's email address
      */
     @Override
-    public String getUsername() {
+    public @NonNull String getUsername() {
         return user.getEmail();
     }
 }

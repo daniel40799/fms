@@ -13,6 +13,7 @@ export interface TabsProps {
 }
 
 export function Tabs({ tabs, className = '' }: TabsProps) {
+  void className;
   return (
     <div className={className}>
       <div className="sm:hidden">

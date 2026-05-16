@@ -1,10 +1,6 @@
-import { ApproveForm } from '../components/forms/ApproveForm'
-import { Page } from '../components/layout/Page'
-import { InlineError } from '../components/ui/Alert'
-import { StatusBadge } from '../components/ui/Badge'
-import { Button } from '../components/ui/Button'
-import { Panel } from '../components/ui/Panel'
-import { Table } from '../components/ui/Table'
+import { ApproveForm } from '../components/forms'
+import { Page } from '../components/layout'
+import { Button, InlineError, Panel, StatusBadge, Table } from '../components/ui'
 import { useAsyncAction } from '../hooks/useAsyncAction'
 import type { Registration } from '../types'
 

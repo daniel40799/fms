@@ -6,6 +6,7 @@ import com.fapor7.fms.events.EventRepository;
 import com.fapor7.fms.registrations.dto.RegistrationCreateRequest;
 import com.fapor7.fms.registrations.dto.RegistrationResponse;
 import com.fapor7.fms.users.UserEntity;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -156,7 +157,7 @@ public class RegistrationService {
      * @return response containing the uploaded file resource
      * @throws RuntimeException when no proof exists or the file cannot be read
      */
-    public ResponseEntity<Resource> downloadPaymentProof(UUID registrationId) {
+    public ResponseEntity<@NonNull Resource> downloadPaymentProof(UUID registrationId) {
         RegistrationEntity registration = registrationRepository.findById(registrationId)
                 .orElseThrow(() -> new RuntimeException("Registration not found"));
 

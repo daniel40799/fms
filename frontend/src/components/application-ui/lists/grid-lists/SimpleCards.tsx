@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 
 export interface ProjectItem {
   name: string;
@@ -19,6 +18,8 @@ export function SimpleCards({
   projects = [],
   className,
 }: SimpleCardsProps) {
+  void className;
+  void projects;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

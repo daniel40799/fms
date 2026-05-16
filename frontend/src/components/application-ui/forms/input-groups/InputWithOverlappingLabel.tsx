@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithOverlappingLabelProps {
   className?: string;
 }
 
 export function InputWithOverlappingLabel({ className }: InputWithOverlappingLabelProps) {
+  void className;
   return (
     <div className="relative">
       <label

@@ -1,18 +1,12 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react'
+import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react';
 import {
-  Bars3Icon,
-  CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+Bars3Icon,
+XMarkIcon
+} from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -30,6 +24,7 @@ export function FullWidthNarrowSidebar({
   navigation = [],
   className,
 }: FullWidthNarrowSidebarProps) {
+  void className;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function classNames(...classes: string[]): string {

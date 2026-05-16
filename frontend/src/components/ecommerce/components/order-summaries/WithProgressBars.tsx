@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ProductItem {
   id: number;
@@ -27,6 +26,7 @@ export function WithProgressBars({
   products = [],
   className,
 }: WithProgressBarsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SimpleNoLabelsProps {
   className?: string;
 }
 
 export function SimpleNoLabels({ className }: SimpleNoLabelsProps) {
+  void className;
   return (
     <>
       

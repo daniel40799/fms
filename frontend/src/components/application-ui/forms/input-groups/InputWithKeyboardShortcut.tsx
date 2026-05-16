@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithKeyboardShortcutProps {
   className?: string;
 }
 
 export function InputWithKeyboardShortcut({ className }: InputWithKeyboardShortcutProps) {
+  void className;
   return (
     <div>
       <label htmlFor="search" className="block text-sm font-medium leading-6 text-gray-900">

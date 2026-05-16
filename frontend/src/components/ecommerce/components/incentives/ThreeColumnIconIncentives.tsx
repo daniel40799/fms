@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { CalendarIcon, CheckBadgeIcon, TruckIcon } from '@heroicons/react/24/outline'
 
 export interface IncentiveItem {
   name: string;
@@ -16,6 +15,7 @@ export function ThreeColumnIconIncentives({
   incentives = [],
   className,
 }: ThreeColumnIconIncentivesProps) {
+  void className;
   return (
     <div className="bg-white">
       <h2 className="sr-only">Why you should buy from us</h2>

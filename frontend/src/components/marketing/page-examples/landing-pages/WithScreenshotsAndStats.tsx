@@ -1,15 +1,8 @@
 // @ts-nocheck
-import React from 'react';
 import {
-  ArrowPathIcon,
-  ChevronRightIcon,
-  CloudArrowUpIcon,
-  Cog6ToothIcon,
-  FingerPrintIcon,
-  LockClosedIcon,
-  ServerIcon,
-} from '@heroicons/react/20/solid'
-import { BoltIcon, CalendarDaysIcon, UsersIcon } from '@heroicons/react/24/outline'
+ChevronRightIcon
+} from '@heroicons/react/20/solid';
+import React from 'react';
 
 export interface PrimaryfeatureItem {
   name: string;
@@ -56,6 +49,7 @@ export function WithScreenshotsAndStats({
   footerNavigation,
   className,
 }: WithScreenshotsAndStatsProps) {
+  void className;
   return (
     <div className="bg-gray-900">
       <main>

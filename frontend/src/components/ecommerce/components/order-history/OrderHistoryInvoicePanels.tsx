@@ -1,8 +1,7 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { EllipsisVerticalIcon } from '@heroicons/react/24/outline'
-import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
+import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 
 export interface OrderItem {
   number: string;
@@ -31,6 +30,7 @@ export function OrderHistoryInvoicePanels({
   orders = [],
   className,
 }: OrderHistoryInvoicePanelsProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="py-16 sm:py-24">

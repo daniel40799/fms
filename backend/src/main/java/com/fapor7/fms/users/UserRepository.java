@@ -1,6 +1,7 @@
 package com.fapor7.fms.users;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -11,7 +12,7 @@ import java.util.UUID;
  * <p>Provides standard CRUD operations plus email lookup for authentication
  * and duplicate-account checks.</p>
  */
-public interface UserRepository extends JpaRepository<UserEntity, UUID> {
+public interface UserRepository extends JpaRepository<@NonNull UserEntity, @NonNull UUID> {
 
     /**
      * Finds a user by login email.
@@ -19,5 +20,5 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
      * @param email email address to search for
      * @return matching user when present
      */
-    Optional<UserEntity> findByEmail(String email);
+    Optional<@NonNull UserEntity> findByEmail(String email);
 }

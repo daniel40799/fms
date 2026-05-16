@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { ChatBubbleLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 export interface DiscussionItem {
   id: number;
@@ -25,6 +24,7 @@ export function WithInlineLinksAndAvatarGroup({
   discussions = [],
   className,
 }: WithInlineLinksAndAvatarGroupProps) {
+  void className;
   return (
     <ul role="list" className="divide-y divide-gray-100">
       {discussions.map((discussion) => (

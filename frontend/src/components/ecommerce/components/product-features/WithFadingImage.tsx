@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FeatureItem {
   name: string;
@@ -15,6 +14,7 @@ export function WithFadingImage({
   features = [],
   className,
 }: WithFadingImageProps) {
+  void className;
   return (
     <div className="bg-white">
       <div aria-hidden="true" className="relative">

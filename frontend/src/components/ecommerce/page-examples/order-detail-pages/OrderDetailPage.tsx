@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ProductItem {
   id: number;
@@ -21,6 +20,7 @@ export function OrderDetailPage({
   products = [],
   className,
 }: OrderDetailPageProps) {
+  void className;
   return (
     <main className="bg-white px-4 pb-24 pt-16 sm:px-6 sm:pt-24 lg:px-8 lg:py-32">
       <div className="mx-auto max-w-3xl">

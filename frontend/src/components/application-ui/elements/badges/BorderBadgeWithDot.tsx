@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface BorderBadgeWithDotProps {
   className?: string;
 }
 
 export function BorderBadgeWithDot({ className }: BorderBadgeWithDotProps) {
+  void className;
   return (
     <>
       <span className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">

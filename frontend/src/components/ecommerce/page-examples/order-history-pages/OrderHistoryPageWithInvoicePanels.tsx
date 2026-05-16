@@ -1,17 +1,16 @@
 // @ts-nocheck
-import React from 'react';
 import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-} from '@headlessui/react'
-import { EllipsisVerticalIcon, MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
-import { CheckCircleIcon } from '@heroicons/react/20/solid'
+Menu,
+MenuButton,
+MenuItem,
+MenuItems,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+} from '@headlessui/react';
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
+import { EllipsisVerticalIcon, MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 
 export interface NavItem {
   name: string;
@@ -61,6 +60,7 @@ export function OrderHistoryPageWithInvoicePanels({
   footerNavigation,
   className,
 }: OrderHistoryPageWithInvoicePanelsProps) {
+  void className;
   return (
     <div className="bg-gray-50">
       <header className="relative bg-white shadow-sm">

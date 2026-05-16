@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { HomeIcon } from '@heroicons/react/20/solid'
+import { HomeIcon } from '@heroicons/react/20/solid';
 
 export interface PageItem {
   name: string;
@@ -17,6 +16,7 @@ export function BreadcrumbWithSlashes({
   pages = [],
   className,
 }: BreadcrumbWithSlashesProps) {
+  void className;
   return (
     <nav aria-label="Breadcrumb" className="flex">
       <ol role="list" className="flex items-center space-x-4">

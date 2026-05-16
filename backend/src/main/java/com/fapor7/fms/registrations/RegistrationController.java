@@ -3,6 +3,7 @@ package com.fapor7.fms.registrations;
 import com.fapor7.fms.auth.AuthenticatedUser;
 import com.fapor7.fms.registrations.dto.RegistrationCreateRequest;
 import com.fapor7.fms.registrations.dto.RegistrationResponse;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -115,7 +116,7 @@ public class RegistrationController {
      */
     @GetMapping("/{id}/payment-proof")
     @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN')")
-    public ResponseEntity<Resource> downloadPaymentProof(@PathVariable UUID id) {
+    public ResponseEntity<@NonNull Resource> downloadPaymentProof(@PathVariable UUID id) {
         return registrationService.downloadPaymentProof(id);
     }
 }

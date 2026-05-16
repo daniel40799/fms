@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon, ClockIcon, QuestionMarkCircleIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import { CheckIcon, ClockIcon, QuestionMarkCircleIcon, XMarkIcon } from '@heroicons/react/20/solid';
 
 export interface ProductItem {
   id: number;
@@ -23,6 +22,7 @@ export function TwoColumnWithQuantityDropdown({
   products = [],
   className,
 }: TwoColumnWithQuantityDropdownProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">

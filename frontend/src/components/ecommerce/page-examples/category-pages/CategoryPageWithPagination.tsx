@@ -1,28 +1,28 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
-import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, FunnelIcon, StarIcon } from '@heroicons/react/20/solid'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Disclosure,
+DisclosureButton,
+DisclosurePanel,
+Menu,
+MenuButton,
+MenuItem,
+MenuItems,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { ChevronDownIcon, FunnelIcon, StarIcon } from '@heroicons/react/20/solid';
+import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -86,6 +86,7 @@ export function CategoryPageWithPagination({
   footerNavigation,
   className,
 }: CategoryPageWithPaginationProps) {
+  void className;
   const [open, setOpen] = useState(false);
 
   function classNames(...classes: string[]): string {

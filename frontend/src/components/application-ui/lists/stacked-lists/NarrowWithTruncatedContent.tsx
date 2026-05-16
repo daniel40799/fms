@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CommentItem {
   id: number;
@@ -19,6 +18,7 @@ export function NarrowWithTruncatedContent({
   comments = [],
   className,
 }: NarrowWithTruncatedContentProps) {
+  void className;
   return (
     <ul role="list" className="divide-y divide-gray-100">
       {comments.map((comment) => (

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface NestedProps {
   className?: string;
 }
 
 export function Nested({ className }: NestedProps) {
+  void className;
   return (
     <div className="flex">
       <div className="mr-4 flex-shrink-0">

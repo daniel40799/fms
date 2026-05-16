@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export interface WithActionsAndBreadcrumbsOnDarkProps {
   className?: string;
 }
 
 export function WithActionsAndBreadcrumbsOnDark({ className }: WithActionsAndBreadcrumbsOnDarkProps) {
+  void className;
   return (
     <div>
       <div>

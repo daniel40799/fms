@@ -1,8 +1,7 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import { EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
+import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 
 export interface CalendarDay {
   date: string;
@@ -32,6 +31,7 @@ export function SideBySideCalendar({
   meetings = [],
   className,
 }: SideBySideCalendarProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

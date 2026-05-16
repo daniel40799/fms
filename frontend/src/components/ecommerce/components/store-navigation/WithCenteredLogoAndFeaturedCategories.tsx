@@ -1,20 +1,20 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
-import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -34,6 +34,7 @@ export function WithCenteredLogoAndFeaturedCategories({
   navigation,
   className,
 }: WithCenteredLogoAndFeaturedCategoriesProps) {
+  void className;
   const [open, setOpen] = useState(false);
 
   function classNames(...classes: string[]): string {

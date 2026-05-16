@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon } from '@heroicons/react/20/solid';
 
 export interface BannerWithLinkProps {
   className?: string;
 }
 
 export function BannerWithLink({ className }: BannerWithLinkProps) {
+  void className;
   return (
     <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
       <div

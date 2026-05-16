@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   id: number;
@@ -15,6 +14,8 @@ export function CheckboxListWithHeading({
   people = [],
   className,
 }: CheckboxListWithHeadingProps) {
+  void className;
+  void people;
   return (
     <fieldset>
       <legend className="text-base font-semibold leading-6 text-gray-900">Members</legend>

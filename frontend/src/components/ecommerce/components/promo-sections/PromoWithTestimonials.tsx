@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface TestimonialItem {
   id: number;
@@ -16,6 +15,7 @@ export function PromoWithTestimonials({
   testimonials = [],
   className,
 }: PromoWithTestimonialsProps) {
+  void className;
   return (
     <div className="relative overflow-hidden bg-white">
       {/* Decorative background image and gradient */}

@@ -1,23 +1,23 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-} from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Disclosure,
+DisclosureButton,
+DisclosurePanel,
+Menu,
+MenuButton,
+MenuItem,
+MenuItems,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+} from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface SortoptionItem {
   name: string;
@@ -43,6 +43,7 @@ export function WithCenteredTextAndDropdownProductFilters({
   filters = [],
   className,
 }: WithCenteredTextAndDropdownProductFiltersProps) {
+  void className;
   const [open, setOpen] = useState(false);
 
   return (

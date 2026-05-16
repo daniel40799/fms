@@ -1,16 +1,17 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Transition } from '@headlessui/react'
-import { CheckCircleIcon } from '@heroicons/react/24/outline'
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/20/solid';
+import { CheckCircleIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NotificationToastProps {
   className?: string;
 }
 
 export function NotificationToast({ className }: NotificationToastProps) {
+  void className;
   const [show, setShow] = useState(true);
 
   return (

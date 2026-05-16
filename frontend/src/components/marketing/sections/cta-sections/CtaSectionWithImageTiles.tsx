@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CtaSectionWithImageTilesProps {
   className?: string;
 }
 
 export function CtaSectionWithImageTiles({ className }: CtaSectionWithImageTilesProps) {
+  void className;
   return (
     <div className="overflow-hidden bg-white py-32">
       <div className="mx-auto max-w-7xl px-6 lg:flex lg:px-8">

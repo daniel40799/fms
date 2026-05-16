@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
 
 export interface ButtonWithTrailingIconProps {
   className?: string;
 }
 
 export function ButtonWithTrailingIcon({ className }: ButtonWithTrailingIconProps) {
+  void className;
   return (
     <>
       <button

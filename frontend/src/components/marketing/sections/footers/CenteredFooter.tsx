@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface NavItem {
   name: string;
@@ -19,6 +18,7 @@ export function CenteredFooter({
   navigation,
   className,
 }: CenteredFooterProps) {
+  void className;
   return (
     <footer className="bg-white">
       <div className="mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8">

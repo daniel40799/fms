@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SignInFormProps {
   className?: string;
 }
 
 export function SignInForm({ className }: SignInFormProps) {
+  void className;
   return (
     <>
       

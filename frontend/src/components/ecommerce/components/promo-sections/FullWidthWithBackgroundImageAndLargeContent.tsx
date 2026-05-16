@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FullWidthWithBackgroundImageAndLargeContentProps {
   className?: string;
 }
 
 export function FullWidthWithBackgroundImageAndLargeContent({ className }: FullWidthWithBackgroundImageAndLargeContentProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="relative bg-gray-900">

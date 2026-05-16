@@ -1,15 +1,7 @@
 // @ts-nocheck
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import React from 'react';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
-import {
-  CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
-} from '@heroicons/react/24/outline'
 
 export interface NavItem {
   name: string;
@@ -28,6 +20,7 @@ export function WithSecondaryNavigation({
   navigation = [],
   className,
 }: WithSecondaryNavigationProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

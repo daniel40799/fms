@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface JobopeningItem {
   id: number;
@@ -19,6 +18,7 @@ export function WithPhotoAndList({
   jobOpenings = [],
   className,
 }: WithPhotoAndListProps) {
+  void className;
   return (
     <div className="bg-white py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

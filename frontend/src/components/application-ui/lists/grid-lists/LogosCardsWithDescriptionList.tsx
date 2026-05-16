@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
 
 export interface StatuseItem {
   [key: string]: unknown;
@@ -29,6 +28,7 @@ export function LogosCardsWithDescriptionList({
   clients = [],
   className,
 }: LogosCardsWithDescriptionListProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

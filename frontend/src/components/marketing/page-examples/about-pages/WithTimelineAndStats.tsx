@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Dialog, DialogPanel } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -50,6 +50,7 @@ export function WithTimelineAndStats({
   footerNavigation,
   className,
 }: WithTimelineAndStatsProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (

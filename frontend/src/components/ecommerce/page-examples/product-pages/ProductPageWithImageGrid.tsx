@@ -1,23 +1,23 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Radio,
-  RadioGroup,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
-import { Bars3Icon, MagnifyingGlassIcon, ShoppingCartIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, StarIcon } from '@heroicons/react/20/solid'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Radio,
+RadioGroup,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { ChevronDownIcon, StarIcon } from '@heroicons/react/20/solid';
+import { Bars3Icon, MagnifyingGlassIcon, ShoppingCartIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface CurrencieItem {
   [key: string]: unknown;
@@ -91,6 +91,7 @@ export function ProductPageWithImageGrid({
   footerNavigation,
   className,
 }: ProductPageWithImageGridProps) {
+  void className;
   const [open, setOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);

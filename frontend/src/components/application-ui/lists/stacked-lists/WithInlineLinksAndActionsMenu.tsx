@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 
 export interface PersonItem {
   name: string;
@@ -22,6 +21,8 @@ export function WithInlineLinksAndActionsMenu({
   people = [],
   className,
 }: WithInlineLinksAndActionsMenuProps) {
+  void className;
+  void people;
   return (
     <ul role="list" className="divide-y divide-gray-100">
       {people.map((person) => (

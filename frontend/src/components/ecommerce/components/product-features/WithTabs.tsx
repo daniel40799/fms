@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 
 export interface TabItem {
   name: string;
@@ -19,6 +18,7 @@ export function WithTabs({
   tabs = [],
   className,
 }: WithTabsProps) {
+  void className;
   return (
     <div className="bg-white">
       <section aria-labelledby="features-heading" className="mx-auto max-w-7xl py-32 sm:px-2 lg:px-8">

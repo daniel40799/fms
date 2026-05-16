@@ -1,21 +1,21 @@
-import { useEffect, useState, type ReactElement } from 'react'
 import { AnimatePresence, MotionConfig } from 'framer-motion'
-import { AppLayout } from './components/layout/AppLayout'
-import { Alert } from './components/ui/Alert'
+import { useEffect, useState, type ReactElement } from 'react'
+import { AppLayout } from './components/layout'
+import { Alert } from './components/ui'
 import { api, tokenStore } from './lib/api'
 import { getErrorMessage } from './lib/errors'
-import type { AttendanceLog, EventRecord, FmsUser, Me, Organization, Registration, View } from './types'
 import {
-  AttendancePage,
-  DashboardPage,
-  EventsPage,
-  LoginPage,
-  MyRegistrationsPage,
-  OrganizationsPage,
-  RegistrationReviewPage,
-  ReportsPage,
-  UsersPage,
+AttendancePage,
+DashboardPage,
+EventsPage,
+LoginPage,
+MyRegistrationsPage,
+OrganizationsPage,
+RegistrationReviewPage,
+ReportsPage,
+UsersPage,
 } from './pages'
+import type { AttendanceLog, EventRecord, FmsUser, Me, Organization, Registration, View } from './types'
 
 function App() {
   const [token, setToken] = useState(tokenStore.get())

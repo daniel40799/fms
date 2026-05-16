@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithTestimonialProps {
   className?: string;
 }
 
 export function WithTestimonial({ className }: WithTestimonialProps) {
+  void className;
   return (
     <div className="overflow-hidden bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

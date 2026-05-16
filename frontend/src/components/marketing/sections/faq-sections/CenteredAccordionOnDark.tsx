@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import { MinusSmallIcon, PlusSmallIcon } from '@heroicons/react/24/outline'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
+import { MinusSmallIcon, PlusSmallIcon } from '@heroicons/react/24/outline';
 
 export interface FaqItem {
   question: string;
@@ -16,6 +15,7 @@ export function CenteredAccordionOnDark({
   faqs = [],
   className,
 }: CenteredAccordionOnDarkProps) {
+  void className;
   return (
     <div className="bg-gray-900">
       <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-40">

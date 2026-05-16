@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CircularAvatarProps {
   className?: string;
 }
 
 export function CircularAvatar({ className }: CircularAvatarProps) {
+  void className;
   return (
     <>
       <img

@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export interface ListItem {
   name: string;
@@ -17,6 +16,8 @@ export function ButtonGroupWithDropdown({
   items = [],
   className,
 }: ButtonGroupWithDropdownProps) {
+  void className;
+  void items;
   return (
     <div className="inline-flex rounded-md shadow-sm">
       <button

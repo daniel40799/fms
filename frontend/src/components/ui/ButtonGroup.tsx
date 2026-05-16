@@ -14,6 +14,8 @@ export interface ButtonGroupProps {
 }
 
 export function ButtonGroup({ items, className = '' }: ButtonGroupProps) {
+  void className;
+  void items;
   return (
     <span className={`isolate inline-flex rounded-md shadow-sm ${className}`}>
       {items.map((item, index) => {

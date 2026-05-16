@@ -1,13 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import {
-  CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
-} from '@heroicons/react/24/outline'
 
 export interface NavItem {
   name: string;
@@ -26,6 +18,7 @@ export function VerticalNavWithIconsAndBadges({
   navigation = [],
   className,
 }: VerticalNavWithIconsAndBadgesProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

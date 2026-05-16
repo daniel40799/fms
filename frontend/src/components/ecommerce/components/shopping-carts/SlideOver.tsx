@@ -1,9 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface ProductItem {
   id: number;
@@ -25,6 +25,7 @@ export function SlideOver({
   products = [],
   className,
 }: SlideOverProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   return (

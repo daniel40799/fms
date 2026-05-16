@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CardEdgeToEdgeOnMobileProps {
   className?: string;
 }
 
 export function CardEdgeToEdgeOnMobile({ className }: CardEdgeToEdgeOnMobileProps) {
+  void className;
   return (
     <>
       {/* Be sure to use this with a layout container that is full-width on mobile */}

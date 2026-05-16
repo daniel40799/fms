@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface AlignedToCenterProps {
   className?: string;
 }
 
 export function AlignedToCenter({ className }: AlignedToCenterProps) {
+  void className;
   return (
     <div className="flex">
       <div className="mr-4 flex-shrink-0 self-center">

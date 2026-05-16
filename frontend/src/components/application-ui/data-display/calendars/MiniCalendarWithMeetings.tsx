@@ -1,13 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
-  CalendarIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  EllipsisHorizontalIcon,
-  MapPinIcon,
-} from '@heroicons/react/20/solid'
+CalendarIcon,
+ChevronLeftIcon,
+ChevronRightIcon,
+EllipsisHorizontalIcon,
+MapPinIcon,
+} from '@heroicons/react/20/solid';
 
 export interface MeetingItem {
   id: number;
@@ -37,6 +36,7 @@ export function MiniCalendarWithMeetings({
   days = [],
   className,
 }: MiniCalendarWithMeetingsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

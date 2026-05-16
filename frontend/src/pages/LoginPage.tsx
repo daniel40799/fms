@@ -1,8 +1,7 @@
-import { api } from '../lib/api'
-import { useAsyncAction } from '../hooks/useAsyncAction'
-import { Button } from '../components/ui/Button'
-import { Field } from '../components/ui/Field'
-import { useState } from 'react'
+import { useState } from 'react';
+import { Button, Field } from '../components/ui';
+import { useAsyncAction } from '../hooks/useAsyncAction';
+import { api } from '../lib/api';
 
 export function LoginPage({ loading, notice, onLoggedIn }: { loading: boolean; notice: string; onLoggedIn: (token: string) => void }) {
   const [email, setEmail] = useState('daniel@fapor7.org')

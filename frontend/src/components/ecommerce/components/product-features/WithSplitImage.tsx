@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FeatureItem {
   name: string;
@@ -15,6 +14,7 @@ export function WithSplitImage({
   features = [],
   className,
 }: WithSplitImageProps) {
+  void className;
   return (
     <div className="bg-white">
       <section aria-labelledby="features-heading" className="relative">

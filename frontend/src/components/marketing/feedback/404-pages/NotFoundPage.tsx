@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface NotFoundPageProps {
   className?: string;
 }
 
 export function NotFoundPage({ className }: NotFoundPageProps) {
+  void className;
   return (
     <>
       

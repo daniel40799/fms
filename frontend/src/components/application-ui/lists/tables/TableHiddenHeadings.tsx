@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { ArrowDownCircleIcon, ArrowPathIcon, ArrowUpCircleIcon } from '@heroicons/react/20/solid'
 
 export interface StatuseItem {
   [key: string]: unknown;
@@ -32,6 +31,7 @@ export function TableHiddenHeadings({
   days = [],
   className,
 }: TableHiddenHeadingsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WellEdgeToEdgeOnMobileProps {
   className?: string;
 }
 
 export function WellEdgeToEdgeOnMobile({ className }: WellEdgeToEdgeOnMobileProps) {
+  void className;
   return (
     <>
       {/* Be sure to use this with a layout container that is full-width on mobile */}

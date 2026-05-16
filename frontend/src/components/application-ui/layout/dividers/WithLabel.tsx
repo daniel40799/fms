@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithLabelProps {
   className?: string;
 }
 
 export function WithLabel({ className }: WithLabelProps) {
+  void className;
   return (
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 flex items-center">

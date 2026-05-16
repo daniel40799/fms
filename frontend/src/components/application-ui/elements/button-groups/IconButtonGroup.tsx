@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export interface IconButtonGroupProps {
   className?: string;
 }
 
 export function IconButtonGroup({ className }: IconButtonGroupProps) {
+  void className;
   return (
     <span className="isolate inline-flex rounded-md shadow-sm">
       <button

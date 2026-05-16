@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ButtonGroupProps {
   className?: string;
 }
 
 export function ButtonGroup({ className }: ButtonGroupProps) {
+  void className;
   return (
     <span className="isolate inline-flex rounded-md shadow-sm">
       <button

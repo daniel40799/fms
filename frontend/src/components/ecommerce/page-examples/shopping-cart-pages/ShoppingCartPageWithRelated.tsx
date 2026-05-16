@@ -1,26 +1,26 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { CheckIcon, ClockIcon, QuestionMarkCircleIcon, XMarkIcon as XMarkIconMini } from '@heroicons/react/20/solid';
 import {
-  Bars3Icon,
-  MagnifyingGlassIcon,
-  ShoppingBagIcon,
-  XMarkIcon as XMarkIconOutline,
-} from '@heroicons/react/24/outline'
-import { CheckIcon, ClockIcon, QuestionMarkCircleIcon, XMarkIcon as XMarkIconMini } from '@heroicons/react/20/solid'
+Bars3Icon,
+MagnifyingGlassIcon,
+ShoppingBagIcon,
+XMarkIcon as XMarkIconOutline,
+} from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -76,6 +76,7 @@ export function ShoppingCartPageWithRelated({
   footerNavigation,
   className,
 }: ShoppingCartPageWithRelatedProps) {
+  void className;
   const [open, setOpen] = useState(false);
 
   return (

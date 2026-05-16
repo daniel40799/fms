@@ -1,9 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface PersonItem {
   id: number;
@@ -20,6 +20,8 @@ export function SelectMenuWithStatus({
   people = [],
   className,
 }: SelectMenuWithStatusProps) {
+  void className;
+  void people;
   const [selected, setSelected] = useState(people[3]);
 
   function classNames(...classes: string[]): string {

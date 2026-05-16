@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { BookmarkIcon } from '@heroicons/react/20/solid'
+import { BookmarkIcon } from '@heroicons/react/20/solid';
 
 export interface ButtonGroupWithStatProps {
   className?: string;
 }
 
 export function ButtonGroupWithStat({ className }: ButtonGroupWithStatProps) {
+  void className;
   return (
     <span className="isolate inline-flex rounded-md shadow-sm">
       <button

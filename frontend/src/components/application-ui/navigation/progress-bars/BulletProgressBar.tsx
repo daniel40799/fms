@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StepItem {
   name: string;
@@ -16,6 +15,7 @@ export function BulletProgressBar({
   steps = [],
   className,
 }: BulletProgressBarProps) {
+  void className;
   return (
     <nav aria-label="Progress" className="flex items-center justify-center">
       <p className="text-sm font-medium">

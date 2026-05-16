@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithInlineLeadingAddOnAndTrailingDropdownProps {
   className?: string;
 }
 
 export function InputWithInlineLeadingAddOnAndTrailingDropdown({ className }: InputWithInlineLeadingAddOnAndTrailingDropdownProps) {
+  void className;
   return (
     <div>
       <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900">

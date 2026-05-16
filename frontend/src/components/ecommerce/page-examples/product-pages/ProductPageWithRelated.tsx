@@ -1,31 +1,29 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Radio,
-  RadioGroup,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Radio,
+RadioGroup,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { StarIcon } from '@heroicons/react/20/solid';
 import {
-  Bars3Icon,
-  CurrencyDollarIcon,
-  GlobeAmericasIcon,
-  MagnifyingGlassIcon,
-  ShoppingBagIcon,
-  UserIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { StarIcon } from '@heroicons/react/20/solid'
+Bars3Icon,
+MagnifyingGlassIcon,
+ShoppingBagIcon,
+UserIcon,
+XMarkIcon
+} from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -98,6 +96,7 @@ export function ProductPageWithRelated({
   footerNavigation,
   className,
 }: ProductPageWithRelatedProps) {
+  void className;
   const [open, setOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);

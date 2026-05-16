@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 
 export interface AlertWithDescriptionProps {
   className?: string;
 }
 
 export function AlertWithDescription({ className }: AlertWithDescriptionProps) {
+  void className;
   return (
     <div className="rounded-md bg-yellow-50 p-4">
       <div className="flex">

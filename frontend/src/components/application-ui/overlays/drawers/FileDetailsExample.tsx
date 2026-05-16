@@ -1,14 +1,15 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react'
-import { HeartIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { PencilIcon, PlusIcon } from '@heroicons/react/20/solid'
+import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react';
+import { PencilIcon, PlusIcon } from '@heroicons/react/20/solid';
+import { HeartIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface FileDetailsExampleProps {
   className?: string;
 }
 
 export function FileDetailsExample({ className }: FileDetailsExampleProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   return (

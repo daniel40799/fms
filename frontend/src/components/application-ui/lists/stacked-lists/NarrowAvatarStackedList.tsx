@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ActivityitemItem {
   user: string;
@@ -21,6 +20,7 @@ export function NarrowAvatarStackedList({
   activityItems = [],
   className,
 }: NarrowAvatarStackedListProps) {
+  void className;
   return (
     <ul role="list" className="divide-y divide-gray-100">
       {activityItems.map((item) => (

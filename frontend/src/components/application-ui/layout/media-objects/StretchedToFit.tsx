@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StretchedToFitProps {
   className?: string;
 }
 
 export function StretchedToFit({ className }: StretchedToFitProps) {
+  void className;
   return (
     <div className="flex">
       <div className="mr-4 flex-shrink-0">

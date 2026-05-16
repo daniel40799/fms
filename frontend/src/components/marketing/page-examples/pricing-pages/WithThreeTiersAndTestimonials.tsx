@@ -1,8 +1,8 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Dialog, DialogPanel, Radio, RadioGroup } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { Dialog, DialogPanel, Radio, RadioGroup } from '@headlessui/react';
+import { CheckIcon } from '@heroicons/react/20/solid';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -57,6 +57,7 @@ export function WithThreeTiersAndTestimonials({
   footerNavigation,
   className,
 }: WithThreeTiersAndTestimonialsProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [frequency, setFrequency] = useState(pricing.frequencies[0]);
 

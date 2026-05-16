@@ -1,8 +1,7 @@
-import { useState } from 'react'
-import { useAsyncAction } from '../../hooks/useAsyncAction'
-import type { Registration } from '../../types'
-import { InlineError } from '../ui/Alert'
-import { Button } from '../ui/Button'
+import { useState } from 'react';
+import { useAsyncAction } from '../../hooks/useAsyncAction';
+import type { Registration } from '../../types';
+import { Button, InlineError } from '../ui';
 
 export function ApproveForm({ registration, onApprove }: { registration: Registration; onApprove: (registrationId: string, remarks: string) => Promise<void> }) {
   const [remarks, setRemarks] = useState('')

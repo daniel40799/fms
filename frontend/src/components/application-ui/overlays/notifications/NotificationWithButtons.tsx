@@ -1,15 +1,16 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface NotificationWithButtonsProps {
   className?: string;
 }
 
 export function NotificationWithButtons({ className }: NotificationWithButtonsProps) {
+  void className;
   const [show, setShow] = useState(true);
 
   return (

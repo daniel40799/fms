@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -17,6 +16,8 @@ export function StickyHeaderTable({
   people = [],
   className,
 }: StickyHeaderTableProps) {
+  void className;
+  void people;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

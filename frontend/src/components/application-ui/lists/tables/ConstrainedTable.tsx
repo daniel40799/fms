@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -17,6 +16,8 @@ export function ConstrainedTable({
   people = [],
   className,
 }: ConstrainedTableProps) {
+  void className;
+  void people;
   return (
     <div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

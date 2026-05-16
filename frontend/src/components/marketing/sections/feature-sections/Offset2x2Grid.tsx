@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { ChatBubbleOvalLeftEllipsisIcon, HeartIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
 
 export interface FeatureItem {
   name: string;
@@ -17,6 +16,7 @@ export function Offset2x2Grid({
   features = [],
   className,
 }: Offset2x2GridProps) {
+  void className;
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

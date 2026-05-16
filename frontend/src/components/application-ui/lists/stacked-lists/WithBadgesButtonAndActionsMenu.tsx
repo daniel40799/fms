@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 
 export interface StatuseItem {
   [key: string]: unknown;
@@ -28,6 +27,8 @@ export function WithBadgesButtonAndActionsMenu({
   projects = [],
   className,
 }: WithBadgesButtonAndActionsMenuProps) {
+  void className;
+  void projects;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

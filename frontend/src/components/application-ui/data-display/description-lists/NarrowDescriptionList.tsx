@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { CalendarDaysIcon, CreditCardIcon, UserCircleIcon } from '@heroicons/react/20/solid'
+import { CalendarDaysIcon, CreditCardIcon, UserCircleIcon } from '@heroicons/react/20/solid';
 
 export interface NarrowDescriptionListProps {
   className?: string;
 }
 
 export function NarrowDescriptionList({ className }: NarrowDescriptionListProps) {
+  void className;
   return (
     <div className="lg:col-start-3 lg:row-end-1">
       <h2 className="sr-only">Summary</h2>

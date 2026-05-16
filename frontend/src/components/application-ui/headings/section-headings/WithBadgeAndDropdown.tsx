@@ -1,13 +1,13 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 
 export interface WithBadgeAndDropdownProps {
   className?: string;
 }
 
 export function WithBadgeAndDropdown({ className }: WithBadgeAndDropdownProps) {
+  void className;
   return (
     <div className="border-b border-gray-200 pb-5">
       <div className="sm:flex sm:items-baseline sm:justify-between">

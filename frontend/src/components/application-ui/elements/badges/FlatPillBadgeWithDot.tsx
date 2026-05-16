@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FlatPillBadgeWithDotProps {
   className?: string;
 }
 
 export function FlatPillBadgeWithDot({ className }: FlatPillBadgeWithDotProps) {
+  void className;
   return (
     <>
       <span className="inline-flex items-center gap-x-1.5 rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">

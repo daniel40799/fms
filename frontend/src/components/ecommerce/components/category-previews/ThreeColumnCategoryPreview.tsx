@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CalloutItem {
   name: string;
@@ -18,6 +17,7 @@ export function ThreeColumnCategoryPreview({
   callouts = [],
   className,
 }: ThreeColumnCategoryPreviewProps) {
+  void className;
   return (
     <div className="bg-gray-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

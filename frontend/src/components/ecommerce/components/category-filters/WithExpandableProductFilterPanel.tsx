@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon, FunnelIcon } from '@heroicons/react/20/solid'
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { ChevronDownIcon, FunnelIcon } from '@heroicons/react/20/solid';
 
 export interface FilterItem {
   price: string;
@@ -30,6 +29,7 @@ export function WithExpandableProductFilterPanel({
   sortOptions = [],
   className,
 }: WithExpandableProductFilterPanelProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

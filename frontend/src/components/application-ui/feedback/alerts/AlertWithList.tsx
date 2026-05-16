@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { XCircleIcon } from '@heroicons/react/20/solid'
+import { XCircleIcon } from '@heroicons/react/20/solid';
 
 export interface AlertWithListProps {
   className?: string;
 }
 
 export function AlertWithList({ className }: AlertWithListProps) {
+  void className;
   return (
     <div className="rounded-md bg-red-50 p-4">
       <div className="flex">

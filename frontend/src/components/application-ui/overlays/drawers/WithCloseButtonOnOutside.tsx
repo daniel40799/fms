@@ -1,15 +1,16 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface WithCloseButtonOnOutsideProps {
   className?: string;
 }
 
 export function WithCloseButtonOnOutside({ className }: WithCloseButtonOnOutsideProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   return (

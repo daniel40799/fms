@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon } from '@heroicons/react/20/solid';
 
 export interface FloatingAtBottomCenteredProps {
   className?: string;
 }
 
 export function FloatingAtBottomCentered({ className }: FloatingAtBottomCenteredProps) {
+  void className;
   return (
     <>
       {/*

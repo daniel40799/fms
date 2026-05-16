@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CircularAvatarInitialsProps {
   className?: string;
 }
 
 export function CircularAvatarInitials({ className }: CircularAvatarInitialsProps) {
+  void className;
   return (
     <>
       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-500">

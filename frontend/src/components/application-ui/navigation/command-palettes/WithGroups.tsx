@@ -1,16 +1,16 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Dialog,
-  DialogPanel,
-  DialogBackdrop,
-} from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { FaceFrownIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline'
+Combobox,
+ComboboxInput,
+ComboboxOption,
+ComboboxOptions,
+Dialog,
+DialogBackdrop,
+DialogPanel,
+} from '@headlessui/react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { FaceFrownIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface ListItem {
   id: number;
@@ -28,6 +28,8 @@ export function WithGroups({
   items = [],
   className,
 }: WithGroupsProps) {
+  void className;
+  void items;
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(true);
 

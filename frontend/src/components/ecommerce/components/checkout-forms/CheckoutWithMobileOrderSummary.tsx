@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Popover, PopoverBackdrop, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { ChevronUpIcon } from '@heroicons/react/20/solid'
+import { Popover, PopoverBackdrop, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { ChevronUpIcon } from '@heroicons/react/20/solid';
 
 export interface ProductItem {
   id: number;
@@ -23,6 +22,7 @@ export function CheckoutWithMobileOrderSummary({
   products = [],
   className,
 }: CheckoutWithMobileOrderSummaryProps) {
+  void className;
   return (
     <div className="bg-white">
       {/* Background color split screen for large screens */}

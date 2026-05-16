@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export interface SplitWithCodeExampleProps {
   className?: string;
 }
 
 export function SplitWithCodeExample({ className }: SplitWithCodeExampleProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="relative isolate overflow-hidden bg-gradient-to-b from-indigo-100/20">

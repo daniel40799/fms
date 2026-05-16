@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithGrayBackgroundAndBottomBorderProps {
   className?: string;
 }
 
 export function InputWithGrayBackgroundAndBottomBorder({ className }: InputWithGrayBackgroundAndBottomBorderProps) {
+  void className;
   return (
     <div>
       <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">

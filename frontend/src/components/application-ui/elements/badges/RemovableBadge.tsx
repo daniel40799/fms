@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface RemovableBadgeProps {
   className?: string;
 }
 
 export function RemovableBadge({ className }: RemovableBadgeProps) {
+  void className;
   return (
     <>
       <span className="inline-flex items-center gap-x-0.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">

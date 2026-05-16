@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { InformationCircleIcon } from '@heroicons/react/20/solid'
+import { InformationCircleIcon } from '@heroicons/react/20/solid';
 
 export interface AlertWithLinkProps {
   className?: string;
 }
 
 export function AlertWithLink({ className }: AlertWithLinkProps) {
+  void className;
   return (
     <div className="rounded-md bg-blue-50 p-4">
       <div className="flex">

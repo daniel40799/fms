@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputsWithSharedBordersProps {
   className?: string;
 }
 
 export function InputsWithSharedBorders({ className }: InputsWithSharedBordersProps) {
+  void className;
   return (
     <div>
       <fieldset>

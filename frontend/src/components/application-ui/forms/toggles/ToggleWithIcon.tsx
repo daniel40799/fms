@@ -1,14 +1,15 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Switch } from '@headlessui/react'
+import { Switch } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface ToggleWithIconProps {
   className?: string;
 }
 
 export function ToggleWithIcon({ className }: ToggleWithIconProps) {
+  void className;
   const [enabled, setEnabled] = useState(false);
 
   return (

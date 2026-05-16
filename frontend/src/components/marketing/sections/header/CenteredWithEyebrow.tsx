@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CenteredWithEyebrowProps {
   className?: string;
 }
 
 export function CenteredWithEyebrow({ className }: CenteredWithEyebrowProps) {
+  void className;
   return (
     <div className="bg-white px-6 py-24 sm:py-32 lg:px-8">
       <div className="mx-auto max-w-2xl text-center">

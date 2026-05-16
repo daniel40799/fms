@@ -1,7 +1,6 @@
 // @ts-nocheck
+import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid';
 import React from 'react';
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
-import { CursorArrowRaysIcon, EnvelopeOpenIcon, UsersIcon } from '@heroicons/react/24/outline'
 
 export interface StatItem {
   id: number;
@@ -21,6 +20,7 @@ export function StatsWithBrandIcon({
   stats = [],
   className,
 }: StatsWithBrandIconProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

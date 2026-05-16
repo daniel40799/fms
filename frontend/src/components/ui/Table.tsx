@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { listItemMotion } from '../../lib/motion'
+import { AnimatePresence, motion } from 'framer-motion';
+import type { ReactNode } from 'react';
+import { listItemMotion } from '../../lib/motion';
 
 export function Table({ columns, rows, empty }: { columns: string[]; rows: ReactNode[][]; empty: string }) {
   return (

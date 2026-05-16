@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface MediaOnRightProps {
   className?: string;
 }
 
 export function MediaOnRight({ className }: MediaOnRightProps) {
+  void className;
   return (
     <div className="flex">
       <div>

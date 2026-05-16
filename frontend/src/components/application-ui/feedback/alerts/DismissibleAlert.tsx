@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckCircleIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import { CheckCircleIcon, XMarkIcon } from '@heroicons/react/20/solid';
 
 export interface DismissibleAlertProps {
   className?: string;
 }
 
 export function DismissibleAlert({ className }: DismissibleAlertProps) {
+  void className;
   return (
     <div className="rounded-md bg-green-50 p-4">
       <div className="flex">

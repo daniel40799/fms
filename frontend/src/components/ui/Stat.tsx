@@ -1,4 +1,4 @@
-import { statusTone } from '../../lib/status'
+import { statusTone } from '../../lib/status';
 
 export function Stat({ label, value, tone = 'INFORMATION' }: { label: string; value: number; tone?: string }) {
   return (

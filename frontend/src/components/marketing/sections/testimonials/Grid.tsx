@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FeaturedtestimonialItem {
   body: string;
@@ -29,6 +28,7 @@ export function Grid({
   testimonials = [],
   className,
 }: GridProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

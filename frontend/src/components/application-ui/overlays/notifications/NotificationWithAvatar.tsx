@@ -1,14 +1,15 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Transition } from '@headlessui/react'
+import { Transition } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface NotificationWithAvatarProps {
   className?: string;
 }
 
 export function NotificationWithAvatar({ className }: NotificationWithAvatarProps) {
+  void className;
   const [show, setShow] = useState(true);
 
   return (

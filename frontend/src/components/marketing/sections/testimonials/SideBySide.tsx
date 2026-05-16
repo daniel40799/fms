@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SideBySideProps {
   className?: string;
 }
 
 export function SideBySide({ className }: SideBySideProps) {
+  void className;
   return (
     <section className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

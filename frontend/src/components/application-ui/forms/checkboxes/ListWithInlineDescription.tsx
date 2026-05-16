@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ListWithInlineDescriptionProps {
   className?: string;
 }
 
 export function ListWithInlineDescription({ className }: ListWithInlineDescriptionProps) {
+  void className;
   return (
     <fieldset>
       <legend className="sr-only">Notifications</legend>

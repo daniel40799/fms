@@ -1,6 +1,7 @@
 package com.fapor7.fms.organizations;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -10,7 +11,7 @@ import java.util.UUID;
  *
  * <p>Provides CRUD operations plus lookup by short organization code.</p>
  */
-public interface OrganizationRepository extends JpaRepository<OrganizationEntity, UUID> {
+public interface OrganizationRepository extends JpaRepository<@NonNull OrganizationEntity, @NonNull UUID> {
 
     /**
      * Finds an organization by its unique code.
@@ -18,5 +19,5 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
      * @param code organization code
      * @return matching organization when present
      */
-    Optional<OrganizationEntity> findByCode(String code);
+    Optional<@NonNull OrganizationEntity> findByCode(String code);
 }

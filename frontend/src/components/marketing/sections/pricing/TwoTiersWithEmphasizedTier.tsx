@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { CheckIcon } from '@heroicons/react/20/solid';
 
 export interface PricingTier {
   name: string;
@@ -20,6 +19,7 @@ export function TwoTiersWithEmphasizedTier({
   tiers = [],
   className,
 }: TwoTiersWithEmphasizedTierProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ListItem {
   id: number;
@@ -14,6 +13,8 @@ export function SimpleWithDividersFullWidthOnMobile({
   items = [],
   className,
 }: SimpleWithDividersFullWidthOnMobileProps) {
+  void className;
+  void items;
   return (
     <ul role="list" className="divide-y divide-gray-200">
       {items.map((item) => (

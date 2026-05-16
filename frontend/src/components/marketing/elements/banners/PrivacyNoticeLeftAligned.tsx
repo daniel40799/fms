@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PrivacyNoticeLeftAlignedProps {
   className?: string;
 }
 
 export function PrivacyNoticeLeftAligned({ className }: PrivacyNoticeLeftAlignedProps) {
+  void className;
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 px-6 pb-6">
       <div className="pointer-events-auto max-w-xl rounded-xl bg-white p-6 shadow-lg ring-1 ring-gray-900/10">

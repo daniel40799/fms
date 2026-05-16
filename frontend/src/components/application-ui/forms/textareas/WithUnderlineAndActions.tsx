@@ -1,15 +1,7 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { FaceSmileIcon as FaceSmileIconOutline, PaperClipIcon } from '@heroicons/react/24/outline'
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import {
-  FaceFrownIcon,
-  FaceSmileIcon as FaceSmileIconMini,
-  FireIcon,
-  HandThumbUpIcon,
-  HeartIcon,
-  XMarkIcon,
-} from '@heroicons/react/20/solid'
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { FaceSmileIcon as FaceSmileIconOutline, PaperClipIcon } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface MoodItem {
   name: string;
@@ -28,6 +20,7 @@ export function WithUnderlineAndActions({
   moods = [],
   className,
 }: WithUnderlineAndActionsProps) {
+  void className;
   const [selected, setSelected] = useState(moods[5]);
 
   function classNames(...classes: string[]): string {

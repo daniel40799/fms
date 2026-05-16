@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface UserProfile {
   name: string;
@@ -23,6 +22,7 @@ export function PageHeaderWithAvatarAndStats({
   stats = [],
   className,
 }: PageHeaderWithAvatarAndStatsProps) {
+  void className;
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow">
       <h2 id="profile-overview-title" className="sr-only">

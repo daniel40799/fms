@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 
 export interface AlertWithAccentBorderProps {
   className?: string;
 }
 
 export function AlertWithAccentBorder({ className }: AlertWithAccentBorderProps) {
+  void className;
   return (
     <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4">
       <div className="flex">

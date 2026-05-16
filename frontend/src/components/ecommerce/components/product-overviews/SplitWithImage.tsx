@@ -1,8 +1,8 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { CheckIcon, QuestionMarkCircleIcon, StarIcon } from '@heroicons/react/20/solid'
-import { Radio, RadioGroup } from '@headlessui/react'
-import { ShieldCheckIcon } from '@heroicons/react/24/outline'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { CheckIcon, QuestionMarkCircleIcon, StarIcon } from '@heroicons/react/20/solid';
+import { ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface ProductItem {
   name: string;
@@ -27,6 +27,7 @@ export function SplitWithImage({
   reviews = [],
   className,
 }: SplitWithImageProps) {
+  void className;
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
 
   function classNames(...classes: string[]): string {

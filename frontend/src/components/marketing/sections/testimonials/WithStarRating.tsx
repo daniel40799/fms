@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { StarIcon } from '@heroicons/react/20/solid'
+import { StarIcon } from '@heroicons/react/20/solid';
 
 export interface WithStarRatingProps {
   className?: string;
 }
 
 export function WithStarRating({ className }: WithStarRatingProps) {
+  void className;
   return (
     <section className="bg-white px-6 py-24 sm:py-32 lg:px-8">
       <figure className="mx-auto max-w-2xl">

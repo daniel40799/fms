@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -19,6 +18,8 @@ export function SimpleOnDark({
   people = [],
   className,
 }: SimpleOnDarkProps) {
+  void className;
+  void people;
   return (
     <ul role="list" className="divide-y divide-gray-800">
       {people.map((person) => (

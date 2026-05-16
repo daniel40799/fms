@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { BarsArrowUpIcon, ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { BarsArrowUpIcon, ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 
 export interface WithInputGroupProps {
   className?: string;
 }
 
 export function WithInputGroup({ className }: WithInputGroupProps) {
+  void className;
   return (
     <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
       <h3 className="text-base font-semibold leading-6 text-gray-900">Job Postings</h3>

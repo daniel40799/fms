@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PaperClipIcon } from '@heroicons/react/20/solid'
+import { PaperClipIcon } from '@heroicons/react/20/solid';
 
 export interface TwoColumnDescriptionListProps {
   className?: string;
 }
 
 export function TwoColumnDescriptionList({ className }: TwoColumnDescriptionListProps) {
+  void className;
   return (
     <div>
       <div className="px-4 sm:px-0">

@@ -1,27 +1,21 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-} from '@headlessui/react'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Menu,
+MenuButton,
+MenuItem,
+MenuItems,
+TransitionChild,
+} from '@headlessui/react';
+import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import {
-  Bars3Icon,
-  BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+Bars3Icon,
+BellIcon,
+XMarkIcon
+} from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -41,6 +35,8 @@ export function FullWidthNarrowSidebarWithHeader({
   userNavigation = [],
   className,
 }: FullWidthNarrowSidebarWithHeaderProps) {
+  void className;
+  void userNavigation;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function classNames(...classes: string[]): string {

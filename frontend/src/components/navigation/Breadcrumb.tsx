@@ -1,4 +1,4 @@
-import { HomeIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
+import { ChevronRightIcon, HomeIcon } from '@heroicons/react/20/solid';
 
 export interface BreadcrumbItem {
   name: string;
@@ -19,6 +19,8 @@ export function Breadcrumb({
   showHome = true,
   className = '',
 }: BreadcrumbProps) {
+  void className;
+  void items;
   return (
     <nav aria-label="Breadcrumb" className={`flex ${className}`}>
       <ol role="list" className="flex items-center space-x-4">

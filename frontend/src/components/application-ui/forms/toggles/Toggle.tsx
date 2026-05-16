@@ -1,14 +1,15 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Switch } from '@headlessui/react'
+import { Switch } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface ToggleProps {
   className?: string;
 }
 
 export function Toggle({ className }: ToggleProps) {
+  void className;
   const [enabled, setEnabled] = useState(false);
 
   return (

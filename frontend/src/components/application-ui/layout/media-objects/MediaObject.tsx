@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface MediaObjectProps {
   className?: string;
 }
 
 export function MediaObject({ className }: MediaObjectProps) {
+  void className;
   return (
     <div className="flex">
       <div className="mr-4 flex-shrink-0">

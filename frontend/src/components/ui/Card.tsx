@@ -9,6 +9,7 @@ export interface CardProps {
 }
 
 export function Card({ className = '', children, header, footer, padding = true }: CardProps) {
+  void className;
   return (
     <div className={`overflow-hidden rounded-lg bg-white shadow ${className}`}>
       {header && (

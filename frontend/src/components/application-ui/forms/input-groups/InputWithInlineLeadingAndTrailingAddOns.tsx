@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithInlineLeadingAndTrailingAddOnsProps {
   className?: string;
 }
 
 export function InputWithInlineLeadingAndTrailingAddOns({ className }: InputWithInlineLeadingAndTrailingAddOnsProps) {
+  void className;
   return (
     <div>
       <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900">

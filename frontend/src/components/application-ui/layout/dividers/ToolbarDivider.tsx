@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ChatBubbleBottomCenterTextIcon, PaperClipIcon, PencilIcon, TrashIcon } from '@heroicons/react/20/solid'
+import { ChatBubbleBottomCenterTextIcon, PaperClipIcon, PencilIcon, TrashIcon } from '@heroicons/react/20/solid';
 
 export interface ToolbarDividerProps {
   className?: string;
 }
 
 export function ToolbarDivider({ className }: ToolbarDividerProps) {
+  void className;
   return (
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 flex items-center">

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CardWithGrayBodyProps {
   className?: string;
 }
 
 export function CardWithGrayBody({ className }: CardWithGrayBodyProps) {
+  void className;
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow">
       <div className="px-4 py-5 sm:px-6">

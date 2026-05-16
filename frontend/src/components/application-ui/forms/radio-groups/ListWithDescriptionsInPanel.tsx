@@ -1,6 +1,6 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface SettingItem {
   name: string;
@@ -16,6 +16,7 @@ export function ListWithDescriptionsInPanel({
   settings = [],
   className,
 }: ListWithDescriptionsInPanelProps) {
+  void className;
   const [selected, setSelected] = useState(settings[0]);
 
   function classNames(...classes: string[]): string {

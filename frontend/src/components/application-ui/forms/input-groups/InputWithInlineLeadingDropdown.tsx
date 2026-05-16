@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithInlineLeadingDropdownProps {
   className?: string;
 }
 
 export function InputWithInlineLeadingDropdown({ className }: InputWithInlineLeadingDropdownProps) {
+  void className;
   return (
     <div>
       <label htmlFor="phone-number" className="block text-sm font-medium leading-6 text-gray-900">

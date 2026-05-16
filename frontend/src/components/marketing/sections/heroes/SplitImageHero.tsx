@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SplitImageHeroProps {
   className?: string;
 }
 
 export function SplitImageHero({ className }: SplitImageHeroProps) {
+  void className;
   return (
     <div className="relative bg-white">
       <div className="mx-auto max-w-7xl lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface RoundedAvatarProps {
   className?: string;
 }
 
 export function RoundedAvatar({ className }: RoundedAvatarProps) {
+  void className;
   return (
     <>
       <img

@@ -1,14 +1,15 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Transition } from '@headlessui/react'
+import { Transition } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface NotificationWithSplitButtonsProps {
   className?: string;
 }
 
 export function NotificationWithSplitButtons({ className }: NotificationWithSplitButtonsProps) {
+  void className;
   const [show, setShow] = useState(true);
 
   return (

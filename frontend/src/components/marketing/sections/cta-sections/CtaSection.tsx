@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CtaSectionProps {
   className?: string;
 }
 
 export function CtaSection({ className }: CtaSectionProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="px-6 py-24 sm:px-6 sm:py-32 lg:px-8">

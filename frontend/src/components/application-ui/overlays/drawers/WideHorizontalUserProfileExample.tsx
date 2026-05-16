@@ -1,16 +1,17 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel, DialogTitle, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { Dialog, DialogPanel, DialogTitle, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface WideHorizontalUserProfileExampleProps {
   className?: string;
 }
 
 export function WideHorizontalUserProfileExample({ className }: WideHorizontalUserProfileExampleProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   return (

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface AvatarWithTextProps {
   className?: string;
 }
 
 export function AvatarWithText({ className }: AvatarWithTextProps) {
+  void className;
   return (
     <a href="#" className="group block flex-shrink-0">
       <div className="flex items-center">

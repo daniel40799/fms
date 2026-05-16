@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { UserIcon } from '@heroicons/react/24/outline'
+import { UserIcon } from '@heroicons/react/24/outline';
 
 export interface ProductItem {
   id: number;
@@ -16,6 +15,7 @@ export function MultiStepCheckoutPage({
   products = [],
   className,
 }: MultiStepCheckoutPageProps) {
+  void className;
   return (
     <div className="bg-white">
       <header className="flex items-center justify-between px-4 py-10 sm:px-6 sm:py-8 lg:px-8">

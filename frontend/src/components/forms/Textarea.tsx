@@ -16,6 +16,7 @@ export function Textarea({
   rows = 4,
   ...rest
 }: TextareaProps) {
+  void className;
   const textareaId = id ?? (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
   return (

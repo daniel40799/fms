@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PerkItem {
   name: string;
@@ -16,6 +15,7 @@ export function TwoByTwoGridIncentives({
   perks = [],
   className,
 }: TwoByTwoGridIncentivesProps) {
+  void className;
   return (
     <div className="bg-gray-50">
       <h2 className="sr-only">Our perks</h2>

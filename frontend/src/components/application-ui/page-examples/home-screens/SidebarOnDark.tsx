@@ -1,25 +1,19 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-} from '@headlessui/react'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Menu,
+MenuButton,
+MenuItem,
+MenuItems,
+TransitionChild,
+} from '@headlessui/react';
+import { Bars3Icon, ChevronRightIcon, ChevronUpDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import {
-  ChartBarSquareIcon,
-  Cog6ToothIcon,
-  FolderIcon,
-  GlobeAltIcon,
-  ServerIcon,
-  SignalIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { Bars3Icon, ChevronRightIcon, ChevronUpDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+XMarkIcon
+} from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -87,6 +81,7 @@ export function SidebarOnDark({
   activityItems = [],
   className,
 }: SidebarOnDarkProps) {
+  void className;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function classNames(...classes: string[]): string {

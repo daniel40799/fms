@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 
 export interface StackedFormLayoutProps {
   className?: string;
 }
 
 export function StackedFormLayout({ className }: StackedFormLayoutProps) {
+  void className;
   return (
     <form>
       <div className="space-y-12">

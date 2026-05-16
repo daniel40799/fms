@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PaperClipIcon } from '@heroicons/react/20/solid'
+import { PaperClipIcon } from '@heroicons/react/20/solid';
 
 export interface CardDescriptionListProps {
   className?: string;
 }
 
 export function CardDescriptionList({ className }: CardDescriptionListProps) {
+  void className;
   return (
     <div className="overflow-hidden bg-white shadow sm:rounded-lg">
       <div className="px-4 py-6 sm:px-6">

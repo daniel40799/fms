@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ExclamationCircleIcon } from '@heroicons/react/20/solid'
+import { ExclamationCircleIcon } from '@heroicons/react/20/solid';
 
 export interface InputWithValidationErrorProps {
   className?: string;
 }
 
 export function InputWithValidationError({ className }: InputWithValidationErrorProps) {
+  void className;
   return (
     <div>
       <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">

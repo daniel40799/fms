@@ -36,10 +36,9 @@ public class SecurityConfig {
      *
      * @param http Spring Security HTTP builder
      * @return configured security filter chain
-     * @throws Exception when Spring Security cannot build the chain
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)

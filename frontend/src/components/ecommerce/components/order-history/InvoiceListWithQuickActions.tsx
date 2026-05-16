@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface OrderItem {
   number: string;
@@ -25,6 +24,7 @@ export function InvoiceListWithQuickActions({
   orders = [],
   className,
 }: InvoiceListWithQuickActionsProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24">

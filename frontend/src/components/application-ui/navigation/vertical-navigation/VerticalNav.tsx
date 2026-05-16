@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface NavItem {
   name: string;
@@ -16,6 +15,7 @@ export function VerticalNav({
   navigation = [],
   className,
 }: VerticalNavProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

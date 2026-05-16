@@ -1,17 +1,16 @@
 // @ts-nocheck
-import React from 'react';
 import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Popover,
-  PopoverBackdrop,
-  PopoverButton,
-  PopoverPanel,
-} from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+Menu,
+MenuButton,
+MenuItem,
+MenuItems,
+Popover,
+PopoverBackdrop,
+PopoverButton,
+PopoverPanel,
+} from '@headlessui/react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export interface UserProfile {
   name: string;
@@ -38,6 +37,8 @@ export function TwoRowNavWithOverlap({
   userNavigation = [],
   className,
 }: TwoRowNavWithOverlapProps) {
+  void className;
+  void userNavigation;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

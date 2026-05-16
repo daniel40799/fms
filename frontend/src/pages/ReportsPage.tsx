@@ -1,9 +1,6 @@
 import { useMemo } from 'react'
-import { Page } from '../components/layout/Page'
-import { Button } from '../components/ui/Button'
-import { Panel } from '../components/ui/Panel'
-import { Stat } from '../components/ui/Stat'
-import { Table } from '../components/ui/Table'
+import { Page } from '../components/layout'
+import { Button, Panel, Stat, Table } from '../components/ui'
 import { toCsv } from '../lib/csv'
 import type { AttendanceLog, EventRecord, FmsUser, Registration } from '../types'
 

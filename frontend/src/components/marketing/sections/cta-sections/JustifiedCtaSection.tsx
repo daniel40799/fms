@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface JustifiedCtaSectionProps {
   className?: string;
 }
 
 export function JustifiedCtaSection({ className }: JustifiedCtaSectionProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:flex lg:items-center lg:justify-between lg:px-8">

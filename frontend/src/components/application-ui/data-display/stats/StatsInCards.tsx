@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StatItem {
   name: string;
@@ -15,6 +14,7 @@ export function StatsInCards({
   stats = [],
   className,
 }: StatsInCardsProps) {
+  void className;
   return (
     <div>
       <h3 className="text-base font-semibold leading-6 text-gray-900">Last 30 days</h3>

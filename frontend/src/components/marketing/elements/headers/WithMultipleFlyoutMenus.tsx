@@ -1,28 +1,23 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-} from '@headlessui/react'
+Dialog,
+DialogPanel,
+Disclosure,
+DisclosureButton,
+DisclosurePanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+} from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import {
-  ArrowPathIcon,
-  Bars3Icon,
-  ChartPieIcon,
-  CursorArrowRaysIcon,
-  FingerPrintIcon,
-  SquaresPlusIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
+Bars3Icon,
+XMarkIcon
+} from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface ProductItem {
   name: string;
@@ -55,6 +50,7 @@ export function WithMultipleFlyoutMenus({
   company = [],
   className,
 }: WithMultipleFlyoutMenusProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (

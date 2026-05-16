@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { CheckIcon } from '@heroicons/react/20/solid';
 
 export interface PricingTier {
   name: string;
@@ -20,6 +19,7 @@ export function TwoTiersWithExtraTier({
   tiers = [],
   className,
 }: TwoTiersWithExtraTierProps) {
+  void className;
   return (
     <div className="isolate overflow-hidden bg-gray-900">
       <div className="mx-auto max-w-7xl px-6 pb-96 pt-24 text-center sm:pt-32 lg:px-8">

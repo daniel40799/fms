@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FeatureItem {
   name: string;
@@ -15,6 +14,7 @@ export function FeatureSectionsComponent({
   features = [],
   className,
 }: FeatureSectionsComponentProps) {
+  void className;
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

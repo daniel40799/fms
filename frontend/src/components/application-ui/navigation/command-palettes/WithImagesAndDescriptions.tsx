@@ -1,28 +1,18 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Dialog,
-  DialogPanel,
-  DialogBackdrop,
-} from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+Combobox,
+ComboboxInput,
+ComboboxOption,
+ComboboxOptions,
+Dialog,
+DialogBackdrop,
+DialogPanel,
+} from '@headlessui/react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import {
-  Bars4Icon,
-  CalendarIcon,
-  CodeBracketIcon,
-  DocumentIcon,
-  ExclamationCircleIcon,
-  LinkIcon,
-  PencilSquareIcon,
-  PhotoIcon,
-  TableCellsIcon,
-  VideoCameraIcon,
-  ViewColumnsIcon,
-} from '@heroicons/react/24/outline'
+ExclamationCircleIcon
+} from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface ListItem {
   id: number;
@@ -42,6 +32,8 @@ export function WithImagesAndDescriptions({
   items = [],
   className,
 }: WithImagesAndDescriptionsProps) {
+  void className;
+  void items;
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(true);
 

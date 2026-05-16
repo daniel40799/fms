@@ -1,5 +1,5 @@
-import React from 'react';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
+import React from 'react';
 
 export interface PageBreadcrumbItem {
   name: string;
@@ -22,6 +22,8 @@ export function PageHeader({
   actions,
   className = '',
 }: PageHeaderProps) {
+  void className;
+  void breadcrumbs;
   return (
     <div className={className}>
       {breadcrumbs && breadcrumbs.length > 0 && (

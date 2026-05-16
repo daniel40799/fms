@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { BellIcon } from '@heroicons/react/24/outline'
+import { BellIcon } from '@heroicons/react/24/outline';
 
 export interface ConstrainedThreeColumnLayoutProps {
   className?: string;
 }
 
 export function ConstrainedThreeColumnLayout({ className }: ConstrainedThreeColumnLayoutProps) {
+  void className;
   return (
     <>
 

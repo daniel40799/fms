@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface RoundedSecondaryButtonProps {
   className?: string;
 }
 
 export function RoundedSecondaryButton({ className }: RoundedSecondaryButtonProps) {
+  void className;
   return (
     <>
       <button

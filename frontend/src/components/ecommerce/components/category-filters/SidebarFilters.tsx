@@ -1,8 +1,8 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, PlusIcon } from '@heroicons/react/20/solid'
+import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
+import { ChevronDownIcon, PlusIcon } from '@heroicons/react/20/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface FilterItem {
   id: number;
@@ -21,6 +21,7 @@ export function SidebarFilters({
   filters = [],
   className,
 }: SidebarFiltersProps) {
+  void className;
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (

@@ -1,17 +1,14 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
-  ArrowDownCircleIcon,
-  ArrowPathIcon,
-  ArrowUpCircleIcon,
-  Bars3Icon,
-  EllipsisHorizontalIcon,
-  PlusSmallIcon,
-} from '@heroicons/react/20/solid'
-import { BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+Bars3Icon,
+EllipsisHorizontalIcon,
+PlusSmallIcon
+} from '@heroicons/react/20/solid';
+import { BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -74,6 +71,7 @@ export function StackedHomeScreen({
   clients = [],
   className,
 }: StackedHomeScreenProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   function classNames(...classes: string[]): string {

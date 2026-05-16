@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface TextareaProps {
   className?: string;
 }
 
 export function Textarea({ className }: TextareaProps) {
+  void className;
   return (
     <div>
       <label htmlFor="comment" className="block text-sm font-medium leading-6 text-gray-900">

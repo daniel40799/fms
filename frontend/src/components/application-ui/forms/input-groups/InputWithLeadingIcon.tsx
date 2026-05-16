@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { EnvelopeIcon } from '@heroicons/react/20/solid'
+import { EnvelopeIcon } from '@heroicons/react/20/solid';
 
 export interface InputWithLeadingIconProps {
   className?: string;
 }
 
 export function InputWithLeadingIcon({ className }: InputWithLeadingIconProps) {
+  void className;
   return (
     <div>
       <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">

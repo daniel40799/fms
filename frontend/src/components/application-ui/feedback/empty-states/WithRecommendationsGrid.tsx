@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { PlusIcon } from '@heroicons/react/20/solid'
+import { PlusIcon } from '@heroicons/react/20/solid';
 
 export interface PersonItem {
   name: string;
@@ -17,6 +16,8 @@ export function WithRecommendationsGrid({
   people = [],
   className,
 }: WithRecommendationsGridProps) {
+  void className;
+  void people;
   return (
     <div className="mx-auto max-w-md sm:max-w-3xl">
       <div>

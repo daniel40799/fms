@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export interface MonthData {
   name: string;
@@ -27,6 +26,7 @@ export function DoubleCalendar({
   months = [],
   className,
 }: DoubleCalendarProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

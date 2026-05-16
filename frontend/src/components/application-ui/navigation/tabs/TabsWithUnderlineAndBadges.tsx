@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface TabItem {
   name: string;
@@ -17,6 +16,7 @@ export function TabsWithUnderlineAndBadges({
   tabs = [],
   className,
 }: TabsWithUnderlineAndBadgesProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

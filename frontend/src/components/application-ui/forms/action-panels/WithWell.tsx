@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithWellProps {
   className?: string;
 }
 
 export function WithWell({ className }: WithWellProps) {
+  void className;
   return (
     <div className="bg-white shadow sm:rounded-lg">
       <div className="px-4 py-5 sm:p-6">

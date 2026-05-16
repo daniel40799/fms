@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface LocationItem {
   name: string;
@@ -18,6 +17,7 @@ export function GroupedRowsTable({
   locations = [],
   className,
 }: GroupedRowsTableProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

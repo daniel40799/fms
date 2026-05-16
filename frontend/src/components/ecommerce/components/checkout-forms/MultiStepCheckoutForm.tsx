@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ProductItem {
   id: number;
@@ -15,6 +14,7 @@ export function MultiStepCheckoutForm({
   products = [],
   className,
 }: MultiStepCheckoutFormProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-4 sm:px-6 sm:pb-24 sm:pt-8 lg:px-8 xl:px-2 xl:pt-14">

@@ -1,3 +1,5 @@
+export { default as InputsWithInsetLabelsAndSharedBorders } from './InputsWithInsetLabelsAndSharedBorders';
+export { default as InputsWithSharedBorders } from './InputsWithSharedBorders';
 export { default as InputWithAddon } from './InputWithAddon';
 export { default as InputWithCornerHint } from './InputWithCornerHint';
 export { default as InputWithDisabledState } from './InputWithDisabledState';
@@ -17,5 +19,3 @@ export { default as InputWithOverlappingLabel } from './InputWithOverlappingLabe
 export { default as InputWithPillShape } from './InputWithPillShape';
 export { default as InputWithTrailingIcon } from './InputWithTrailingIcon';
 export { default as InputWithValidationError } from './InputWithValidationError';
-export { default as InputsWithInsetLabelsAndSharedBorders } from './InputsWithInsetLabelsAndSharedBorders';
-export { default as InputsWithSharedBorders } from './InputsWithSharedBorders';

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FaqItem {
   id: number;
@@ -15,6 +14,7 @@ export function TwoColumns({
   faqs = [],
   className,
 }: TwoColumnsProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8">

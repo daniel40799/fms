@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SoftButtonProps {
   className?: string;
 }
 
 export function SoftButton({ className }: SoftButtonProps) {
+  void className;
   return (
     <>
       <button

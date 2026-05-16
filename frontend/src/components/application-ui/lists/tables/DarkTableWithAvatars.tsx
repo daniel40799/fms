@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StatuseItem {
   [key: string]: unknown;
@@ -28,6 +27,7 @@ export function DarkTableWithAvatars({
   activityItems = [],
   className,
 }: DarkTableWithAvatarsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

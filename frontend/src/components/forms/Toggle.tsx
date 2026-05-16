@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { Switch } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface ToggleProps {
   label?: string;
@@ -24,6 +24,7 @@ export function Toggle({
   size = 'md',
   className = '',
 }: ToggleProps) {
+  void className;
   const [internalEnabled, setInternalEnabled] = useState(defaultChecked);
   const isControlled = checked !== undefined;
   const enabled = isControlled ? checked : internalEnabled;

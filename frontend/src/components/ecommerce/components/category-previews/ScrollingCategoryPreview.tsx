@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CategoryItem {
   name: string;
@@ -16,6 +15,7 @@ export function ScrollingCategoryPreview({
   categories = [],
   className,
 }: ScrollingCategoryPreviewProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="py-16 sm:py-24 xl:mx-auto xl:max-w-7xl xl:px-8">

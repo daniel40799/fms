@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -19,6 +18,8 @@ export function StackedListsComponent({
   people = [],
   className,
 }: StackedListsComponentProps) {
+  void className;
+  void people;
   return (
     <ul role="list" className="divide-y divide-gray-100">
       {people.map((person) => (

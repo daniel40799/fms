@@ -1,16 +1,16 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Dialog,
-  DialogPanel,
-  DialogBackdrop,
-} from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { ExclamationTriangleIcon, FolderIcon, LifebuoyIcon } from '@heroicons/react/24/outline'
+Combobox,
+ComboboxInput,
+ComboboxOption,
+ComboboxOptions,
+Dialog,
+DialogBackdrop,
+DialogPanel,
+} from '@headlessui/react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { ExclamationTriangleIcon, FolderIcon, LifebuoyIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface ProjectItem {
   id: number;
@@ -37,6 +37,9 @@ export function CommandPaletteWithFooter({
   users = [],
   className,
 }: CommandPaletteWithFooterProps) {
+  void className;
+  void projects;
+  void users;
   const [open, setOpen] = useState(true);
   const [rawQuery, setRawQuery] = useState('');
 

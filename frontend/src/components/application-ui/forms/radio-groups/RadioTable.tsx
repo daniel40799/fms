@@ -1,6 +1,6 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface PlanItem {
   name: string;
@@ -18,6 +18,7 @@ export function RadioTable({
   plans = [],
   className,
 }: RadioTableProps) {
+  void className;
   const [selected, setSelected] = useState(plans[0]);
 
   function classNames(...classes: string[]): string {

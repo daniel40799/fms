@@ -1,7 +1,6 @@
 import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { alertTone } from '../../lib/status'
-import { InlineError } from '../ui/Alert'
-import { Button } from '../ui/Button'
+import { Button, InlineError } from '../ui'
 import { AnimatedDialog } from './AnimatedDialog'
 
 export function ConfirmDeleteModal({

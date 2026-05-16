@@ -1,9 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react'
-import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface MailinglistItem {
   id: number;
@@ -21,6 +21,7 @@ export function Cards({
   mailingLists = [],
   className,
 }: CardsProps) {
+  void className;
   const [selectedMailingLists, setSelectedMailingLists] = useState(mailingLists[0]);
 
   return (

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ProductItem {
   id: number;
@@ -21,6 +20,7 @@ export function SplitCheckoutPage({
   products = [],
   className,
 }: SplitCheckoutPageProps) {
+  void className;
   return (
     <div className="bg-white">
       {/* Background color split screen for large screens */}

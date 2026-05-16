@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -16,6 +15,8 @@ export function TeamGridWithRoundImages({
   people = [],
   className,
 }: TeamGridWithRoundImagesProps) {
+  void className;
+  void people;
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

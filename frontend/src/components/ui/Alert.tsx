@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { alertTone } from '../../lib/status'
+import { motion } from 'framer-motion';
+import { alertTone } from '../../lib/status';
 
 export function Alert({ message, tone = 'INFORMATION', onDismiss }: { message: string; tone?: string; onDismiss: () => void }) {
   return (

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SmallBorderBadgeProps {
   className?: string;
 }
 
 export function SmallBorderBadge({ className }: SmallBorderBadgeProps) {
+  void className;
   return (
     <>
       <span className="inline-flex items-center rounded-md bg-gray-50 px-1.5 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">

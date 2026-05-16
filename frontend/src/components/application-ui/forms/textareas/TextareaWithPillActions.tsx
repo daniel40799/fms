@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import { CalendarIcon, PaperClipIcon, TagIcon, UserCircleIcon } from '@heroicons/react/20/solid'
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { CalendarIcon, PaperClipIcon, TagIcon, UserCircleIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface AssigneeItem {
   name: string;
@@ -32,6 +32,7 @@ export function TextareaWithPillActions({
   dueDates = [],
   className,
 }: TextareaWithPillActionsProps) {
+  void className;
   const [assigned, setAssigned] = useState(assignees[0]);
   const [labelled, setLabelled] = useState(labels[0]);
   const [dated, setDated] = useState(dueDates[0]);

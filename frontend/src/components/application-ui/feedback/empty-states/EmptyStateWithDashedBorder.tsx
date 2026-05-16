@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface EmptyStateWithDashedBorderProps {
   className?: string;
 }
 
 export function EmptyStateWithDashedBorder({ className }: EmptyStateWithDashedBorderProps) {
+  void className;
   return (
     <button
       type="button"

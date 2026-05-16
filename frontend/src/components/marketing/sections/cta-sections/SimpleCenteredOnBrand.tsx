@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SimpleCenteredOnBrandProps {
   className?: string;
 }
 
 export function SimpleCenteredOnBrand({ className }: SimpleCenteredOnBrandProps) {
+  void className;
   return (
     <div className="bg-indigo-700">
       <div className="px-6 py-24 sm:px-6 sm:py-32 lg:px-8">

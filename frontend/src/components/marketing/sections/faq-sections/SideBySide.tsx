@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FaqItem {
   id: number;
@@ -15,6 +14,7 @@ export function SideBySide({
   faqs = [],
   className,
 }: SideBySideProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl divide-y divide-gray-900/10 px-6 py-24 sm:py-32 lg:px-8 lg:py-40">

@@ -22,6 +22,8 @@ export function DescriptionList({
   striped = false,
   className = '',
 }: DescriptionListProps) {
+  void className;
+  void items;
   return (
     <div className={className}>
       {(title || subtitle) && (

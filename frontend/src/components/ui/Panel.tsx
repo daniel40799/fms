@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react'
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
+import type { ReactNode } from 'react';
 
 export function Panel({ title, actions, children, className = '' }: { title?: string; actions?: ReactNode; children?: ReactNode; className?: string }) {
+  void className;
   return (
     <motion.section
       layout

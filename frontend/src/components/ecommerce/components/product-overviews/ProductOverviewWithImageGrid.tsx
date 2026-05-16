@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { StarIcon } from '@heroicons/react/20/solid'
-import { Radio, RadioGroup } from '@headlessui/react'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { StarIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface ProductItem {
   name: string;
@@ -38,6 +38,7 @@ export function ProductOverviewWithImageGrid({
   reviews = [],
   className,
 }: ProductOverviewWithImageGridProps) {
+  void className;
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
 

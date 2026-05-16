@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FaqItem {
   id: number;
@@ -15,6 +14,7 @@ export function ThreeColumnsOnDark({
   faqs = [],
   className,
 }: ThreeColumnsOnDarkProps) {
+  void className;
   return (
     <div className="bg-gray-900">
       <div className="mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8">

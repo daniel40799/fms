@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CenteredOnDarkPanelProps {
   className?: string;
 }
 
 export function CenteredOnDarkPanel({ className }: CenteredOnDarkPanelProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl py-24 sm:px-6 sm:py-32 lg:px-8">

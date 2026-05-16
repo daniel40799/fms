@@ -2,10 +2,7 @@ import { useState } from 'react'
 import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { parseApiDateTime, toLocalDateTimePayload } from '../../lib/datetime'
 import type { EventRecord, Organization } from '../../types'
-import { InlineError } from '../ui/Alert'
-import { Button } from '../ui/Button'
-import { Field } from '../ui/Field'
-import { Select } from '../ui/Select'
+import { Button, Field, InlineError, Select } from '../ui'
 import { DateTimePicker } from './DateTimePicker'
 
 export function EventForm({

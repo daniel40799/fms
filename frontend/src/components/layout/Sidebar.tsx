@@ -20,6 +20,7 @@ function classNames(...classes: string[]) {
 }
 
 export function Sidebar({ navigation = [], logo, footer, className = '' }: SidebarProps) {
+  void className;
   return (
     <div className={`flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 border-r border-gray-200 ${className}`}>
       {logo && (

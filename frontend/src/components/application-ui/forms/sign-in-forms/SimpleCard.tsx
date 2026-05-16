@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SimpleCardProps {
   className?: string;
 }
 
 export function SimpleCard({ className }: SimpleCardProps) {
+  void className;
   return (
     <>
       

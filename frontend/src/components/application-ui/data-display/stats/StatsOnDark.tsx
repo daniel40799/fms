@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StatItem {
   name: string;
@@ -16,6 +15,7 @@ export function StatsOnDark({
   stats = [],
   className,
 }: StatsOnDarkProps) {
+  void className;
   return (
     <div className="bg-gray-900">
       <div className="mx-auto max-w-7xl">

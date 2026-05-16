@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StatItem {
   id: number;
@@ -16,6 +15,7 @@ export function SplitWithImage({
   stats = [],
   className,
 }: SplitWithImageProps) {
+  void className;
   return (
     <div className="relative bg-white">
       <img

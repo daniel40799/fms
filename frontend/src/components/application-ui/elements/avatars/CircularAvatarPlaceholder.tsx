@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CircularAvatarPlaceholderProps {
   className?: string;
 }
 
 export function CircularAvatarPlaceholder({ className }: CircularAvatarPlaceholderProps) {
+  void className;
   return (
     <>
       <span className="inline-block h-6 w-6 overflow-hidden rounded-full bg-gray-100">

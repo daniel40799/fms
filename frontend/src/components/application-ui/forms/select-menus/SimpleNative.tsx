@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SimpleNativeProps {
   className?: string;
 }
 
 export function SimpleNative({ className }: SimpleNativeProps) {
+  void className;
   return (
     <div>
       <label htmlFor="location" className="block text-sm font-medium leading-6 text-gray-900">

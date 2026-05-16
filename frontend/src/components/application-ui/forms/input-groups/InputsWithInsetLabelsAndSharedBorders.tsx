@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputsWithInsetLabelsAndSharedBordersProps {
   className?: string;
 }
 
 export function InputsWithInsetLabelsAndSharedBorders({ className }: InputsWithInsetLabelsAndSharedBordersProps) {
+  void className;
   return (
     <div className="isolate -space-y-px rounded-md shadow-sm">
       <div className="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">

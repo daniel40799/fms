@@ -1,15 +1,16 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface SimpleAlertWithLeftAlignedButtonsProps {
   className?: string;
 }
 
 export function SimpleAlertWithLeftAlignedButtons({ className }: SimpleAlertWithLeftAlignedButtonsProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   return (

@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PlusIcon } from '@heroicons/react/20/solid'
+import { PlusIcon } from '@heroicons/react/20/solid';
 
 export interface CircularButtonProps {
   className?: string;
 }
 
 export function CircularButton({ className }: CircularButtonProps) {
+  void className;
   return (
     <>
       <button

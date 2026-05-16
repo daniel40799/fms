@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon } from '@heroicons/react/24/solid'
+import { CheckIcon } from '@heroicons/react/24/solid';
 
 export interface StepItem {
   id: number;
@@ -18,6 +17,7 @@ export function PanelProgressBar({
   steps = [],
   className,
 }: PanelProgressBarProps) {
+  void className;
   return (
     <nav aria-label="Progress">
       <ol role="list" className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0">

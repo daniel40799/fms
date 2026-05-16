@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SplitImageCtaSectionProps {
   className?: string;
 }
 
 export function SplitImageCtaSection({ className }: SplitImageCtaSectionProps) {
+  void className;
   return (
     <div className="relative bg-gray-900">
       <div className="relative h-80 overflow-hidden bg-indigo-600 md:absolute md:left-0 md:h-full md:w-1/3 lg:w-1/2">

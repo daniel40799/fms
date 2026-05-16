@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Dialog, DialogPanel, DialogTitle, DialogBackdrop } from '@headlessui/react';
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import React from 'react';
 
 export interface DrawerProps {
   open: boolean;
@@ -34,6 +34,7 @@ export function Drawer({
   size = 'md',
   className = '',
 }: DrawerProps) {
+  void className;
   const slideClasses =
     side === 'right'
       ? 'data-[closed]:translate-x-full inset-y-0 right-0'

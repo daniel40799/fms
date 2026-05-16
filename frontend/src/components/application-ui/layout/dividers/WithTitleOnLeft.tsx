@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithTitleOnLeftProps {
   className?: string;
 }
 
 export function WithTitleOnLeft({ className }: WithTitleOnLeftProps) {
+  void className;
   return (
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 flex items-center">

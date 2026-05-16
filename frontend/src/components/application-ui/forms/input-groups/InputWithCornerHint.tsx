@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithCornerHintProps {
   className?: string;
 }
 
 export function InputWithCornerHint({ className }: InputWithCornerHintProps) {
+  void className;
   return (
     <div>
       <div className="flex justify-between">

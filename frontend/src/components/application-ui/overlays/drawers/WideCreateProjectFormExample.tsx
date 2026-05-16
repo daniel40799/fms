@@ -1,8 +1,8 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { LinkIcon, PlusIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { LinkIcon, PlusIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface TeamMember {
   name: string;
@@ -20,6 +20,7 @@ export function WideCreateProjectFormExample({
   team = [],
   className,
 }: WideCreateProjectFormExampleProps) {
+  void className;
   const [open, setOpen] = useState(true);
 
   return (

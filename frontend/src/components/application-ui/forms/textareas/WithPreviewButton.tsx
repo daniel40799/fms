@@ -1,13 +1,13 @@
 // @ts-nocheck
-import React from 'react';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
-import { AtSymbolIcon, CodeBracketIcon, LinkIcon } from '@heroicons/react/20/solid'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { AtSymbolIcon, CodeBracketIcon, LinkIcon } from '@heroicons/react/20/solid';
 
 export interface WithPreviewButtonProps {
   className?: string;
 }
 
 export function WithPreviewButton({ className }: WithPreviewButtonProps) {
+  void className;
   return (
     <form action="#">
       <TabGroup>

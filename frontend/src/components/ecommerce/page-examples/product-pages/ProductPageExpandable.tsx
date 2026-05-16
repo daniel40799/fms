@@ -1,35 +1,35 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Radio,
-  RadioGroup,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Disclosure,
+DisclosureButton,
+DisclosurePanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Radio,
+RadioGroup,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { StarIcon } from '@heroicons/react/20/solid';
 import {
-  Bars3Icon,
-  HeartIcon,
-  MagnifyingGlassIcon,
-  MinusIcon,
-  PlusIcon,
-  ShoppingBagIcon,
-  UserIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { StarIcon } from '@heroicons/react/20/solid'
+Bars3Icon,
+HeartIcon,
+MagnifyingGlassIcon,
+MinusIcon,
+PlusIcon,
+ShoppingBagIcon,
+UserIcon,
+XMarkIcon,
+} from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -89,6 +89,7 @@ export function ProductPageExpandable({
   footerNavigation,
   className,
 }: ProductPageExpandableProps) {
+  void className;
   const [open, setOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
 

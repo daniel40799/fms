@@ -1,10 +1,10 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Dialog, DialogPanel, Radio, RadioGroup } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon as XMarkIconOutline } from '@heroicons/react/24/outline'
-import { CheckIcon, XMarkIcon as XMarkIconMini } from '@heroicons/react/20/solid'
+import { Dialog, DialogPanel, Radio, RadioGroup } from '@headlessui/react';
+import { CheckIcon, XMarkIcon as XMarkIconMini } from '@heroicons/react/20/solid';
+import { Bars3Icon, XMarkIcon as XMarkIconOutline } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -60,6 +60,7 @@ export function PricingPageWithComparison({
   footerNavigation,
   className,
 }: PricingPageWithComparisonProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [frequency, setFrequency] = useState(pricing.frequencies[0]);
 

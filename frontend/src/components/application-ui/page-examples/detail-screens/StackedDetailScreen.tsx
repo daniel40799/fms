@@ -1,34 +1,29 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogPanel,
-  Label,
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-} from '@headlessui/react'
+Dialog,
+DialogPanel,
+Label,
+Listbox,
+ListboxButton,
+ListboxOption,
+ListboxOptions,
+Menu,
+MenuButton,
+MenuItem,
+MenuItems,
+} from '@headlessui/react';
 import {
-  Bars3Icon,
-  CalendarDaysIcon,
-  CreditCardIcon,
-  EllipsisVerticalIcon,
-  FaceFrownIcon,
-  FaceSmileIcon,
-  FireIcon,
-  HandThumbUpIcon,
-  HeartIcon,
-  PaperClipIcon,
-  UserCircleIcon,
-  XMarkIcon as XMarkIconMini,
-} from '@heroicons/react/20/solid'
-import { BellIcon, XMarkIcon as XMarkIconOutline } from '@heroicons/react/24/outline'
-import { CheckCircleIcon } from '@heroicons/react/24/solid'
+Bars3Icon,
+CalendarDaysIcon,
+CreditCardIcon,
+EllipsisVerticalIcon,
+FaceSmileIcon,
+PaperClipIcon,
+UserCircleIcon
+} from '@heroicons/react/20/solid';
+import { BellIcon, XMarkIcon as XMarkIconOutline } from '@heroicons/react/24/outline';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import React,{ useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -81,6 +76,7 @@ export function StackedDetailScreen({
   moods = [],
   className,
 }: StackedDetailScreenProps) {
+  void className;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selected, setSelected] = useState(moods[5]);
 

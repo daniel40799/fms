@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ProgressBarProps {
   className?: string;
 }
 
 export function ProgressBar({ className }: ProgressBarProps) {
+  void className;
   return (
     <div>
       <h4 className="sr-only">Status</h4>

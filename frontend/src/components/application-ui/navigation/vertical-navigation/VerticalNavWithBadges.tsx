@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface NavItem {
   name: string;
@@ -17,6 +16,7 @@ export function VerticalNavWithBadges({
   navigation = [],
   className,
 }: VerticalNavWithBadgesProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

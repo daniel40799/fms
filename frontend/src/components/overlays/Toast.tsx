@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
 import { Transition } from '@headlessui/react';
-import {
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  XCircleIcon,
-} from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/20/solid';
+import {
+CheckCircleIcon,
+ExclamationTriangleIcon,
+InformationCircleIcon,
+XCircleIcon,
+} from '@heroicons/react/24/outline';
+import React,{ useCallback,useState } from 'react';
 
 type ToastVariant = 'success' | 'error' | 'warning' | 'info';
 

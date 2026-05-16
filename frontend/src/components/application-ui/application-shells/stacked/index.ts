@@ -1,6 +1,6 @@
-export { default as BrandNavWithOverlap } from './BrandNavWithOverlap';
 export { default as BrandedNavCompact } from './BrandedNavCompact';
 export { default as BrandedNavWithPageHeader } from './BrandedNavWithPageHeader';
+export { default as BrandNavWithOverlap } from './BrandNavWithOverlap';
 export { default as DarkNavCompact } from './DarkNavCompact';
 export { default as DarkNavWithOverlap } from './DarkNavWithOverlap';
 export { default as DarkNavWithPageHeader } from './DarkNavWithPageHeader';

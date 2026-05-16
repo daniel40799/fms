@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -16,6 +15,8 @@ export function Narrow({
   people = [],
   className,
 }: NarrowProps) {
+  void className;
+  void people;
   return (
     <ul role="list" className="divide-y divide-gray-100">
       {people.map((person) => (

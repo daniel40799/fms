@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { CheckIcon, HandThumbUpIcon, UserIcon } from '@heroicons/react/20/solid'
 
 export interface TimelineItem {
   id: number;
@@ -22,6 +21,7 @@ export function SimpleWithIcons({
   timeline = [],
   className,
 }: SimpleWithIconsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

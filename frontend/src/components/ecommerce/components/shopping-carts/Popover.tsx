@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 
 export interface NavItem {
   name: string;
@@ -28,6 +27,7 @@ export function Popover({
   products = [],
   className,
 }: PopoverProps) {
+  void className;
   return (
     <header className="relative bg-white">
       <nav aria-label="Top" className="mx-auto max-w-7xl sm:px-6 lg:px-8">

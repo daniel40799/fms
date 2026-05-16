@@ -8,6 +8,7 @@ export interface BadgeProps {
 }
 
 export function Badge({ children, value, className = '' }: BadgeProps) {
+  void className;
   const tone = value ? statusTone(value) : 'bg-slate-100 text-slate-700 ring-slate-200'
   return (
     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset transition-colors duration-200 ease-out motion-reduce:transition-none ${tone} ${className}`}>

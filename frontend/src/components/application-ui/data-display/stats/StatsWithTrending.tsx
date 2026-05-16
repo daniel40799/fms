@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface StatItem {
   name: string;
@@ -17,6 +16,7 @@ export function StatsWithTrending({
   stats = [],
   className,
 }: StatsWithTrendingProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

@@ -1,7 +1,6 @@
 // @ts-nocheck
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import React from 'react';
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
-import { CalendarIcon, CommandLineIcon, MegaphoneIcon } from '@heroicons/react/24/outline'
 
 export interface ListItem {
   name: string;
@@ -20,6 +19,8 @@ export function WithTemplates({
   items = [],
   className,
 }: WithTemplatesProps) {
+  void className;
+  void items;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { CheckIcon } from '@heroicons/react/20/solid';
 
 export interface StepItem {
   name: string;
@@ -17,6 +16,7 @@ export function CircleProgressBar({
   steps = [],
   className,
 }: CircleProgressBarProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

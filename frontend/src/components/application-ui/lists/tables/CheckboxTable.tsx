@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 
 export interface PersonItem {
   name: string;
@@ -17,17 +17,20 @@ export function CheckboxTable({
   people = [],
   className,
 }: CheckboxTableProps) {
+  void className;
+  void people;
   const [checked, setChecked] = useState(false);
   const [indeterminate, setIndeterminate] = useState(false);
   const [selectedPeople, setSelectedPeople] = useState([]);
 
   const checkbox = useRef<HTMLDivElement>(null);
+  void setChecked;
+  void indeterminate;
+  void setIndeterminate;
 
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }
-
-  const checkbox =  useRef();
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">

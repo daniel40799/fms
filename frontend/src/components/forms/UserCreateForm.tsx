@@ -2,10 +2,7 @@ import { useState } from 'react'
 import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { roleLabels, roles } from '../../lib/constants'
 import type { Organization, RoleName } from '../../types'
-import { InlineError } from '../ui/Alert'
-import { Button } from '../ui/Button'
-import { Field } from '../ui/Field'
-import { Select } from '../ui/Select'
+import { Button, Field, InlineError, Select } from '../ui'
 
 export function UserCreateForm({
   organizations,

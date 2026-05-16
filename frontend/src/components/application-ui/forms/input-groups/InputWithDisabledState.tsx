@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithDisabledStateProps {
   className?: string;
 }
 
 export function InputWithDisabledState({ className }: InputWithDisabledStateProps) {
+  void className;
   return (
     <div>
       <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">

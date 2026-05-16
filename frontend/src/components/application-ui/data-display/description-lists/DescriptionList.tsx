@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PaperClipIcon } from '@heroicons/react/20/solid'
+import { PaperClipIcon } from '@heroicons/react/20/solid';
 
 export interface DescriptionListProps {
   className?: string;
 }
 
 export function DescriptionList({ className }: DescriptionListProps) {
+  void className;
   return (
     <div>
       <div className="px-4 sm:px-0">

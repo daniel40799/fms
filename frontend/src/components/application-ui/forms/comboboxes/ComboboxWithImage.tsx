@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Combobox as HLCombobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Label } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Combobox as HLCombobox, Label } from '@headlessui/react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface PersonItem {
   id: number;
@@ -18,6 +18,8 @@ export function ComboboxWithImage({
   people = [],
   className,
 }: ComboboxWithImageProps) {
+  void className;
+  void people;
   const [query, setQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState(null);
 

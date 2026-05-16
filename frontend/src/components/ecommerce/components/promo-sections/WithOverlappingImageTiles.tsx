@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CollectionItem {
   name: string;
@@ -17,6 +16,7 @@ export function WithOverlappingImageTiles({
   collections = [],
   className,
 }: WithOverlappingImageTilesProps) {
+  void className;
   return (
     <div className="relative bg-white">
       {/* Background image and overlap */}

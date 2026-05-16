@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ProductItem {
   id: number;
@@ -22,6 +21,7 @@ export function SwatchProductList({
   products = [],
   className,
 }: SwatchProductListProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="py-16 sm:py-24 lg:mx-auto lg:max-w-7xl lg:px-8">

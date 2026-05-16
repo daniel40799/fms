@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PrimaryButtonProps {
   className?: string;
 }
 
 export function PrimaryButton({ className }: PrimaryButtonProps) {
+  void className;
   return (
     <>
       <button

@@ -1,11 +1,11 @@
-import React from 'react';
 import {
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  XCircleIcon,
-  XMarkIcon,
+CheckCircleIcon,
+ExclamationTriangleIcon,
+InformationCircleIcon,
+XCircleIcon,
+XMarkIcon,
 } from '@heroicons/react/20/solid';
+import React from 'react';
 
 type AlertVariant = 'success' | 'warning' | 'error' | 'info';
 
@@ -68,6 +68,7 @@ export function Alert({
   onDismiss,
   className = '',
 }: AlertProps) {
+  void className;
   const config = variantConfig[variant];
   const Icon = config.icon;
 

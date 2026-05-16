@@ -1,16 +1,17 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Transition } from '@headlessui/react'
-import { InboxIcon } from '@heroicons/react/24/outline'
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/20/solid';
+import { InboxIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NotificationWithActionsProps {
   className?: string;
 }
 
 export function NotificationWithActions({ className }: NotificationWithActionsProps) {
+  void className;
   const [show, setShow] = useState(true);
 
   return (

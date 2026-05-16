@@ -1,9 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { CheckIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface FrequencieItem {
   value: string;
@@ -35,6 +35,7 @@ export function EmphasizedTierPricing({
   tiers = [],
   className,
 }: EmphasizedTierPricingProps) {
+  void className;
   const [frequency, setFrequency] = useState(frequencies[0]);
 
   function classNames(...classes: string[]): string {

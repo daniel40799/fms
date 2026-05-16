@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CheckboxListRightProps {
   className?: string;
 }
 
 export function CheckboxListRight({ className }: CheckboxListRightProps) {
+  void className;
   return (
     <fieldset className="border-b border-t border-gray-200">
       <legend className="sr-only">Notifications</legend>

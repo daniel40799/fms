@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
+import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid';
 
 export interface InputWithTrailingIconProps {
   className?: string;
 }
 
 export function InputWithTrailingIcon({ className }: InputWithTrailingIconProps) {
+  void className;
   return (
     <div>
       <label htmlFor="account-number" className="block text-sm font-medium leading-6 text-gray-900">

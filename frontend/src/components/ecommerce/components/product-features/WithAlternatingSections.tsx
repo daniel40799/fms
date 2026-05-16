@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FeatureItem {
   name: string;
@@ -17,6 +16,7 @@ export function WithAlternatingSections({
   features = [],
   className,
 }: WithAlternatingSectionsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

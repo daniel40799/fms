@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid'
 
 export interface FeatureItem {
   name: string;
@@ -17,6 +16,7 @@ export function DarkFeatureSectionWithScreenshot({
   features = [],
   className,
 }: DarkFeatureSectionWithScreenshotProps) {
+  void className;
   return (
     <div className="overflow-hidden bg-gray-900 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

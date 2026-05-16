@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SideBySideOnCardProps {
   className?: string;
 }
 
 export function SideBySideOnCard({ className }: SideBySideOnCardProps) {
+  void className;
   return (
     <div className="bg-white py-16 sm:py-24">
       <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">

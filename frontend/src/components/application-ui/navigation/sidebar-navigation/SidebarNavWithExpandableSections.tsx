@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export interface NavItem {
   name: string;
@@ -19,6 +18,7 @@ export function SidebarNavWithExpandableSections({
   navigation = [],
   className,
 }: SidebarNavWithExpandableSectionsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

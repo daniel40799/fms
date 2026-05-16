@@ -1,19 +1,19 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Radio,
-  RadioGroup,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
-import { StarIcon } from '@heroicons/react/20/solid'
-import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
+Disclosure,
+DisclosureButton,
+DisclosurePanel,
+Radio,
+RadioGroup,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { StarIcon } from '@heroicons/react/20/solid';
+import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface ProductItem {
   name: string;
@@ -40,6 +40,7 @@ export function ProductOverviewWithGallery({
   product,
   className,
 }: ProductOverviewWithGalleryProps) {
+  void className;
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
 
   function classNames(...classes: string[]): string {

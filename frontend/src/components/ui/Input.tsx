@@ -19,6 +19,7 @@ export function Input({
   id,
   ...rest
 }: InputProps) {
+  void className;
   const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
   const inputClasses = `block w-full min-w-0 flex-1 border-0 py-1.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 ${

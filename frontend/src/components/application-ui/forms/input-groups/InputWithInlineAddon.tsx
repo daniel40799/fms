@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface InputWithInlineAddonProps {
   className?: string;
 }
 
 export function InputWithInlineAddon({ className }: InputWithInlineAddonProps) {
+  void className;
   return (
     <div>
       <label htmlFor="company-website" className="block text-sm font-medium leading-6 text-gray-900">

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface TestimonialWithLargeAvatarProps {
   className?: string;
 }
 
 export function TestimonialWithLargeAvatar({ className }: TestimonialWithLargeAvatarProps) {
+  void className;
   return (
     <section className="isolate overflow-hidden bg-white px-6 lg:px-8">
       <div className="relative mx-auto max-w-2xl py-24 sm:py-32 lg:max-w-4xl">

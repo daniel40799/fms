@@ -1,22 +1,22 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
-  ArchiveBoxIcon,
-  ArrowRightCircleIcon,
-  ChevronDownIcon,
-  DocumentDuplicateIcon,
-  HeartIcon,
-  PencilSquareIcon,
-  TrashIcon,
-  UserPlusIcon,
-} from '@heroicons/react/20/solid'
+ArchiveBoxIcon,
+ArrowRightCircleIcon,
+ChevronDownIcon,
+DocumentDuplicateIcon,
+HeartIcon,
+PencilSquareIcon,
+TrashIcon,
+UserPlusIcon,
+} from '@heroicons/react/20/solid';
 
 export interface DropdownWithIconsProps {
   className?: string;
 }
 
 export function DropdownWithIcons({ className }: DropdownWithIconsProps) {
+  void className;
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>

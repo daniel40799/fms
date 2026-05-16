@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CardWithHeaderAndFooterProps {
   className?: string;
 }
 
 export function CardWithHeaderAndFooter({ className }: CardWithHeaderAndFooterProps) {
+  void className;
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">
       <div className="px-4 py-5 sm:px-6">

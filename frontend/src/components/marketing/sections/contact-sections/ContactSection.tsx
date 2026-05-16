@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { BugAntIcon, ChatBubbleLeftRightIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline'
+import { BugAntIcon, ChatBubbleLeftRightIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline';
 
 export interface ContactSectionProps {
   className?: string;
 }
 
 export function ContactSection({ className }: ContactSectionProps) {
+  void className;
   return (
     <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
       <div className="mx-auto max-w-2xl sm:text-center">

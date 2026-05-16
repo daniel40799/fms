@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SmallPillBadgeProps {
   className?: string;
 }
 
 export function SmallPillBadge({ className }: SmallPillBadgeProps) {
+  void className;
   return (
     <>
       <span className="inline-flex items-center rounded-full bg-gray-50 px-1.5 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">

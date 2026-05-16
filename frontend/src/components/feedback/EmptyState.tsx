@@ -9,6 +9,7 @@ export interface EmptyStateProps {
 }
 
 export function EmptyState({ title, description, icon, action, className = '' }: EmptyStateProps) {
+  void className;
   return (
     <div className={`text-center py-12 ${className}`}>
       {icon ? (

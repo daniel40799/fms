@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { CalendarDaysIcon, HandRaisedIcon } from '@heroicons/react/24/outline'
+import { CalendarDaysIcon, HandRaisedIcon } from '@heroicons/react/24/outline';
 
 export interface SideBySideWithDetailsProps {
   className?: string;
 }
 
 export function SideBySideWithDetails({ className }: SideBySideWithDetailsProps) {
+  void className;
   return (
     <div className="relative isolate overflow-hidden bg-gray-900 py-16 sm:py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

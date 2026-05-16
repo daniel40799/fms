@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CircularAvatarWithTopBadgeProps {
   className?: string;
 }
 
 export function CircularAvatarWithTopBadge({ className }: CircularAvatarWithTopBadgeProps) {
+  void className;
   return (
     <>
       <span className="relative inline-block">

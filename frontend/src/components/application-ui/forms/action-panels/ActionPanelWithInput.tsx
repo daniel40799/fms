@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ActionPanelWithInputProps {
   className?: string;
 }
 
 export function ActionPanelWithInput({ className }: ActionPanelWithInputProps) {
+  void className;
   return (
     <div className="bg-white shadow sm:rounded-lg">
       <div className="px-4 py-5 sm:p-6">

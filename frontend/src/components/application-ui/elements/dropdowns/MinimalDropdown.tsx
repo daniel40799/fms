@@ -1,13 +1,13 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 
 export interface MinimalDropdownProps {
   className?: string;
 }
 
 export function MinimalDropdown({ className }: MinimalDropdownProps) {
+  void className;
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>

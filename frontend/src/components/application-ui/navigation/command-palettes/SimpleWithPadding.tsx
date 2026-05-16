@@ -1,15 +1,15 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Dialog,
-  DialogPanel,
-  DialogBackdrop,
-} from '@headlessui/react'
-import { UsersIcon } from '@heroicons/react/24/outline'
+Combobox,
+ComboboxInput,
+ComboboxOption,
+ComboboxOptions,
+Dialog,
+DialogBackdrop,
+DialogPanel,
+} from '@headlessui/react';
+import { UsersIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface PersonItem {
   id: number;
@@ -26,6 +26,8 @@ export function SimpleWithPadding({
   people = [],
   className,
 }: SimpleWithPaddingProps) {
+  void className;
+  void people;
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(true);
 

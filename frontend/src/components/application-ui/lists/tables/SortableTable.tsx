@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export interface PersonItem {
   name: string;
@@ -18,6 +17,8 @@ export function SortableTable({
   people = [],
   className,
 }: SortableTableProps) {
+  void className;
+  void people;
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">

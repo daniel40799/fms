@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SimpleWellProps {
   className?: string;
 }
 
 export function SimpleWell({ className }: SimpleWellProps) {
+  void className;
   return (
     <div className="bg-gray-50 sm:rounded-lg">
       <div className="px-4 py-5 sm:p-6">

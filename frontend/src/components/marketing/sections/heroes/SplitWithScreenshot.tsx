@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export interface SplitWithScreenshotProps {
   className?: string;
 }
 
 export function SplitWithScreenshot({ className }: SplitWithScreenshotProps) {
+  void className;
   return (
     <div className="relative isolate overflow-hidden bg-white">
       <svg

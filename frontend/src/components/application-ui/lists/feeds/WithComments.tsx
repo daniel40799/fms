@@ -1,16 +1,11 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { CheckCircleIcon } from '@heroicons/react/24/solid'
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import {
-  FaceFrownIcon,
-  FaceSmileIcon,
-  FireIcon,
-  HandThumbUpIcon,
-  HeartIcon,
-  PaperClipIcon,
-  XMarkIcon,
-} from '@heroicons/react/20/solid'
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
+FaceSmileIcon,
+PaperClipIcon
+} from '@heroicons/react/20/solid';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import React,{ useState } from 'react';
 
 export interface ActivityItem {
   id: number;
@@ -41,6 +36,7 @@ export function WithComments({
   moods = [],
   className,
 }: WithCommentsProps) {
+  void className;
   const [selected, setSelected] = useState(moods[5]);
 
   function classNames(...classes: string[]): string {

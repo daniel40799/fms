@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { ArrowPathIcon, CalendarIcon, TruckIcon } from '@heroicons/react/24/outline'
 
 export interface PerkItem {
   name: string;
@@ -17,6 +16,7 @@ export function ThreeColumnIconIncentivesWithText({
   perks = [],
   className,
 }: ThreeColumnIconIncentivesWithTextProps) {
+  void className;
   return (
     <div className="bg-white">
       <h2 className="sr-only">Our perks</h2>

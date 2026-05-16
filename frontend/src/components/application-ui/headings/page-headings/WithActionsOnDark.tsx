@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithActionsOnDarkProps {
   className?: string;
 }
 
 export function WithActionsOnDark({ className }: WithActionsOnDarkProps) {
+  void className;
   return (
     <div className="md:flex md:items-center md:justify-between">
       <div className="min-w-0 flex-1">

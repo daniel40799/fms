@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface TabItem {
   name: string;
@@ -16,6 +15,7 @@ export function WithActionsAndTabs({
   tabs = [],
   className,
 }: WithActionsAndTabsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

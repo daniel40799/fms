@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
 
 export interface BenefitItem {
   [key: string]: unknown;
@@ -15,6 +14,7 @@ export function TwoColumnsWithPhotoOnDark({
   benefits = [],
   className,
 }: TwoColumnsWithPhotoOnDarkProps) {
+  void className;
   return (
     <div className="bg-gray-900 py-24 sm:py-32">
       <div className="relative isolate">

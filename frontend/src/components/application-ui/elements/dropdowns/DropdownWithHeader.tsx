@@ -1,13 +1,13 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export interface DropdownWithHeaderProps {
   className?: string;
 }
 
 export function DropdownWithHeader({ className }: DropdownWithHeaderProps) {
+  void className;
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>

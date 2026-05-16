@@ -1,9 +1,6 @@
-import { PaymentUploadForm } from '../components/forms/PaymentUploadForm'
-import { Page } from '../components/layout/Page'
-import { StatusBadge } from '../components/ui/Badge'
-import { EmptyState } from '../components/ui/EmptyState'
-import { Info } from '../components/ui/Info'
-import { Panel } from '../components/ui/Panel'
+import { PaymentUploadForm } from '../components/forms'
+import { Page } from '../components/layout'
+import { EmptyState, Info, Panel, StatusBadge } from '../components/ui'
 import { formatDateTime } from '../lib/datetime'
 import type { Registration } from '../types'
 

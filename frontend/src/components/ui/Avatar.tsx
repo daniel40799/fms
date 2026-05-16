@@ -32,6 +32,7 @@ export function Avatar({
   shape = 'circular',
   className = '',
 }: AvatarProps) {
+  void className;
   const baseClasses = `inline-flex items-center justify-center flex-shrink-0 bg-gray-100 ${sizeClasses[size]} ${shapeClasses[shape]} ${className}`;
 
   if (src) {
@@ -75,6 +76,7 @@ export interface AvatarGroupProps {
 }
 
 export function AvatarGroup({ avatars, max = 4, size = 'md', className = '' }: AvatarGroupProps) {
+  void className;
   const visible = avatars.slice(0, max);
   const overflow = avatars.length - max;
 

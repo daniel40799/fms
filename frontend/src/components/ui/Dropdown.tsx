@@ -25,6 +25,8 @@ export function Dropdown({
   variant = 'default',
   className = '',
 }: DropdownProps) {
+  void className;
+  void items;
   const alignClasses = align === 'left' ? 'left-0 origin-top-left' : 'right-0 origin-top-right';
 
   const buttonClasses =

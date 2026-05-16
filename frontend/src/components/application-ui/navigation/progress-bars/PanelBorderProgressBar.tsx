@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon } from '@heroicons/react/24/solid'
+import { CheckIcon } from '@heroicons/react/24/solid';
 
 export interface StepItem {
   id: number;
@@ -19,6 +18,7 @@ export function PanelBorderProgressBar({
   steps = [],
   className,
 }: PanelBorderProgressBarProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

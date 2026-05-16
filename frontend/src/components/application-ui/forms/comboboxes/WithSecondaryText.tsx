@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Label } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Label } from '@headlessui/react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface PersonItem {
   name: string;
@@ -17,6 +17,8 @@ export function WithSecondaryText({
   people = [],
   className,
 }: WithSecondaryTextProps) {
+  void className;
+  void people;
   const [query, setQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState(null);
 

@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PlusIcon } from '@heroicons/react/20/solid'
+import { PlusIcon } from '@heroicons/react/20/solid';
 
 export interface EmptyStateProps {
   className?: string;
 }
 
 export function EmptyState({ className }: EmptyStateProps) {
+  void className;
   return (
     <div className="text-center">
       <svg

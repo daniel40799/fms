@@ -1,16 +1,16 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Dialog,
-  DialogPanel,
-  DialogBackdrop,
-} from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { DocumentPlusIcon, FolderIcon, FolderPlusIcon, HashtagIcon, TagIcon } from '@heroicons/react/24/outline'
+Combobox,
+ComboboxInput,
+ComboboxOption,
+ComboboxOptions,
+Dialog,
+DialogBackdrop,
+DialogPanel,
+} from '@headlessui/react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { FolderIcon } from '@heroicons/react/24/outline';
+import React,{ useState } from 'react';
 
 export interface ProjectItem {
   id: number;
@@ -42,6 +42,8 @@ export function SemiTransparentWithIcons({
   quickActions = [],
   className,
 }: SemiTransparentWithIconsProps) {
+  void className;
+  void projects;
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(true);
 

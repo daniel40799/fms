@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PersonItem {
   name: string;
@@ -17,6 +16,8 @@ export function DarkTable({
   people = [],
   className,
 }: DarkTableProps) {
+  void className;
+  void people;
   return (
     <div className="bg-gray-900">
       <div className="mx-auto max-w-7xl">

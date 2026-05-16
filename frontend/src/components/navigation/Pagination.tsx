@@ -22,6 +22,7 @@ export function Pagination({
   variant = 'simple',
   className = '',
 }: PaginationProps) {
+  void className;
   if (variant === 'centered') {
     const pages = getPageNumbers(currentPage, totalPages);
     return (

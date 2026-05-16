@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ActionPanelWithLinkProps {
   className?: string;
 }
 
 export function ActionPanelWithLink({ className }: ActionPanelWithLinkProps) {
+  void className;
   return (
     <div className="bg-white shadow sm:rounded-lg">
       <div className="px-4 py-5 sm:p-6">

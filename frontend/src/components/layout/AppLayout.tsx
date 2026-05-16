@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Badge } from '../ui/Badge'
-import { Button } from '../ui/Button'
+import type { ReactNode } from 'react'
 import { roleLabels } from '../../lib/constants'
 import type { Me, View } from '../../types'
+import { Badge } from '../ui/Badge'
+import { Button } from '../ui/Button'
 
 export function AppLayout({
   me,

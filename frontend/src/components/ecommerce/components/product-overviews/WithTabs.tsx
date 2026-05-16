@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { StarIcon } from '@heroicons/react/20/solid'
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { StarIcon } from '@heroicons/react/20/solid';
 
 export interface ProductItem {
   name: string;
@@ -53,6 +52,7 @@ export function WithTabs({
   license,
   className,
 }: WithTabsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

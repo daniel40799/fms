@@ -1,8 +1,8 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface MemoryoptionItem {
   name: string;
@@ -18,6 +18,7 @@ export function RadioSmallCards({
   memoryOptions = [],
   className,
 }: RadioSmallCardsProps) {
+  void className;
   const [mem, setMem] = useState(memoryOptions[2]);
 
   function classNames(...classes: string[]): string {

@@ -1,13 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ClockIcon,
-  EllipsisHorizontalIcon,
-} from '@heroicons/react/20/solid'
+ChevronDownIcon,
+ChevronLeftIcon,
+ChevronRightIcon,
+ClockIcon,
+EllipsisHorizontalIcon,
+} from '@heroicons/react/20/solid';
 
 export interface CalendarDay {
   date: string;
@@ -38,6 +37,7 @@ export function MonthViewCalendar({
   days = [],
   className,
 }: MonthViewCalendarProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

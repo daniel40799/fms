@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckIcon, ClockIcon } from '@heroicons/react/20/solid'
+import { CheckIcon, ClockIcon } from '@heroicons/react/20/solid';
 
 export interface ProductItem {
   id: number;
@@ -23,6 +22,7 @@ export function WithExtendedSummary({
   products = [],
   className,
 }: WithExtendedSummaryProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">

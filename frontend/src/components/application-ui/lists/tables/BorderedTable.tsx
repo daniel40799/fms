@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PlanItem {
   id: number;
@@ -20,6 +19,7 @@ export function BorderedTable({
   plans = [],
   className,
 }: BorderedTableProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

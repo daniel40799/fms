@@ -1,13 +1,13 @@
 // @ts-nocheck
-import React from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { CodeBracketIcon, EllipsisVerticalIcon, FlagIcon, StarIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { CodeBracketIcon, EllipsisVerticalIcon, FlagIcon, StarIcon } from '@heroicons/react/20/solid';
 
 export interface WithAvatarMetaAndDropdownProps {
   className?: string;
 }
 
 export function WithAvatarMetaAndDropdown({ className }: WithAvatarMetaAndDropdownProps) {
+  void className;
   return (
     <div className="bg-white px-4 py-5 sm:px-6">
       <div className="flex space-x-3">

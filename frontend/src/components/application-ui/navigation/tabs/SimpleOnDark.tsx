@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface TabItem {
   name: string;
@@ -16,6 +15,7 @@ export function SimpleOnDark({
   tabs = [],
   className,
 }: SimpleOnDarkProps) {
+  void className;
   return (
     <div className="bg-gray-900 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">

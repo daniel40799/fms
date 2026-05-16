@@ -1,9 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
 
 export interface PublishingoptionItem {
   title: string;
@@ -20,6 +20,7 @@ export function BrandedWithSupportedText({
   publishingOptions = [],
   className,
 }: BrandedWithSupportedTextProps) {
+  void className;
   const [selected, setSelected] = useState(publishingOptions[0]);
 
   return (

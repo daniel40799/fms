@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { ChatBubbleLeftEllipsisIcon, TagIcon, UserCircleIcon } from '@heroicons/react/20/solid'
+import { ChatBubbleLeftEllipsisIcon, TagIcon, UserCircleIcon } from '@heroicons/react/20/solid';
 
 export interface ActivityItem {
   id: number;
@@ -24,6 +23,7 @@ export function WithMultipleItemTypes({
   activity = [],
   className,
 }: WithMultipleItemTypesProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

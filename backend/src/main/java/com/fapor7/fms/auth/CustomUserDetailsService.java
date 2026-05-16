@@ -1,6 +1,7 @@
 package com.fapor7.fms.auth;
 
 import com.fapor7.fms.users.UserRepository;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      * @throws UsernameNotFoundException when no user exists for the email
      */
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public @NonNull UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
                 .map(AuthenticatedUser::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

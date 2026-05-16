@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface DirectoryItem {
   id: number;
@@ -17,6 +16,7 @@ export function NarrowWithStickyHeadings({
   directory,
   className,
 }: NarrowWithStickyHeadingsProps) {
+  void className;
   return (
     <nav aria-label="Directory" className="h-full overflow-y-auto">
       {Object.keys(directory).map((letter) => (

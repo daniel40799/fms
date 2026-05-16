@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FeaturedpostItem {
   id: number;
@@ -36,6 +35,7 @@ export function WithFeaturedPost({
   posts = [],
   className,
 }: WithFeaturedPostProps) {
+  void className;
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-x-8 gap-y-12 px-6 sm:gap-y-16 lg:grid-cols-2 lg:px-8">

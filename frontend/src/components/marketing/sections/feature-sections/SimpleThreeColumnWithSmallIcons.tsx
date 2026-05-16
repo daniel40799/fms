@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { ArrowPathIcon, CloudArrowUpIcon, LockClosedIcon } from '@heroicons/react/20/solid'
 
 export interface FeatureItem {
   name: string;
@@ -18,6 +17,7 @@ export function SimpleThreeColumnWithSmallIcons({
   features = [],
   className,
 }: SimpleThreeColumnWithSmallIconsProps) {
+  void className;
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

@@ -1,29 +1,29 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Radio,
-  RadioGroup,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Radio,
+RadioGroup,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { CheckIcon, QuestionMarkCircleIcon, StarIcon } from '@heroicons/react/20/solid';
 import {
-  Bars3Icon,
-  MagnifyingGlassIcon,
-  ShieldCheckIcon,
-  ShoppingBagIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { CheckIcon, QuestionMarkCircleIcon, StarIcon } from '@heroicons/react/20/solid'
+Bars3Icon,
+MagnifyingGlassIcon,
+ShieldCheckIcon,
+ShoppingBagIcon,
+XMarkIcon,
+} from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface NavItem {
   name: string;
@@ -92,6 +92,8 @@ export function ProductPageFeatured({
   footerNavigation,
   className,
 }: ProductPageFeaturedProps) {
+  void className;
+  void userNavigation;
   const [open, setOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
 

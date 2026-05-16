@@ -1,13 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import {
-  Bars4Icon,
-  CalendarIcon,
-  ClockIcon,
-  PhotoIcon,
-  TableCellsIcon,
-  ViewColumnsIcon,
-} from '@heroicons/react/24/outline'
 
 export interface ListItem {
   title: string;
@@ -25,6 +17,8 @@ export function WithStartingPoints({
   items = [],
   className,
 }: WithStartingPointsProps) {
+  void className;
+  void items;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

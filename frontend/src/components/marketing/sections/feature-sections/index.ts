@@ -1,9 +1,9 @@
 export { default as Centered2x2Grid } from './Centered2x2Grid';
 export { default as ContainedInPanel } from './ContainedInPanel';
 export { default as DarkFeatureSectionWithScreenshot } from './DarkFeatureSectionWithScreenshot';
+export { default as FeatureSectionsComponent } from './FeatureSectionsComponent';
 export { default as FeatureSectionWithPanel } from './FeatureSectionWithPanel';
 export { default as FeatureSectionWithScreenshot } from './FeatureSectionWithScreenshot';
-export { default as FeatureSectionsComponent } from './FeatureSectionsComponent';
 export { default as Offset2x2Grid } from './Offset2x2Grid';
 export { default as OffsetWithFeatureList } from './OffsetWithFeatureList';
 export { default as SimpleThreeColumnWithLargeIconsOnDark } from './SimpleThreeColumnWithLargeIconsOnDark';

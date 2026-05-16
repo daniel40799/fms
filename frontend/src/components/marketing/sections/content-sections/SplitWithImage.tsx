@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid'
+import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid';
 
 export interface SplitWithImageProps {
   className?: string;
 }
 
 export function SplitWithImage({ className }: SplitWithImageProps) {
+  void className;
   return (
     <div className="relative bg-white">
       <div className="mx-auto max-w-7xl lg:flex lg:justify-between lg:px-8 xl:justify-end">

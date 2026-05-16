@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { BarsArrowUpIcon, UsersIcon } from '@heroicons/react/20/solid'
+import { BarsArrowUpIcon, UsersIcon } from '@heroicons/react/20/solid';
 
 export interface InputWithLeadingIconAndTrailingButtonProps {
   className?: string;
 }
 
 export function InputWithLeadingIconAndTrailingButton({ className }: InputWithLeadingIconAndTrailingButtonProps) {
+  void className;
   return (
     <div>
       <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">

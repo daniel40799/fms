@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ProductItem {
   id: number;
@@ -21,6 +20,7 @@ export function WithSplitImage({
   products = [],
   className,
 }: WithSplitImageProps) {
+  void className;
   return (
     <>
       

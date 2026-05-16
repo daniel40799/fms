@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SimpleStackedProps {
   className?: string;
 }
 
 export function SimpleStacked({ className }: SimpleStackedProps) {
+  void className;
   return (
     <div className="bg-white py-16 sm:py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

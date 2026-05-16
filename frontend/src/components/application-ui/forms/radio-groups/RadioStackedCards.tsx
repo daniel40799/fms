@@ -1,8 +1,8 @@
 // @ts-nocheck
 'use client'
 
-import React, { useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { useState } from 'react';
 
 export interface PlanItem {
   name: string;
@@ -21,6 +21,7 @@ export function RadioStackedCards({
   plans = [],
   className,
 }: RadioStackedCardsProps) {
+  void className;
   const [selected, setSelected] = useState(plans[0]);
 
   return (

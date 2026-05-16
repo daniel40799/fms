@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SimpleSideBySideOnDarkProps {
   className?: string;
 }
 
 export function SimpleSideBySideOnDark({ className }: SimpleSideBySideOnDarkProps) {
+  void className;
   return (
     <div className="bg-gray-900 py-16 sm:py-24 lg:py-32">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:gap-8 lg:px-8">

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface OfferItem {
   name: string;
@@ -16,6 +15,7 @@ export function WithOffersAndSplitImage({
   offers = [],
   className,
 }: WithOffersAndSplitImageProps) {
+  void className;
   return (
     <div className="bg-white">
       <div className="flex flex-col border-b border-gray-200 lg:border-0">

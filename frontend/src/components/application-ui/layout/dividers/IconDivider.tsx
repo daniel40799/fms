@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PlusIcon } from '@heroicons/react/20/solid'
+import { PlusIcon } from '@heroicons/react/20/solid';
 
 export interface IconDividerProps {
   className?: string;
 }
 
 export function IconDivider({ className }: IconDividerProps) {
+  void className;
   return (
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 flex items-center">

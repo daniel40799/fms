@@ -1,18 +1,7 @@
 // @ts-nocheck
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import React from 'react';
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import {
-  BookOpenIcon,
-  BriefcaseIcon,
-  GlobeAltIcon,
-  InformationCircleIcon,
-  NewspaperIcon,
-  ShieldCheckIcon,
-  UserGroupIcon,
-  UsersIcon,
-  VideoCameraIcon,
-} from '@heroicons/react/24/outline'
 
 export interface EngagementItem {
   name: string;
@@ -50,6 +39,7 @@ export function FullWidthTwoColumns({
   recentPosts = [],
   className,
 }: FullWidthTwoColumnsProps) {
+  void className;
   return (
     <Popover className="relative isolate z-50 shadow">
       <div className="bg-white py-5">

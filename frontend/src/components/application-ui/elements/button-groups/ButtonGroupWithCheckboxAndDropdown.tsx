@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ButtonGroupWithCheckboxAndDropdownProps {
   className?: string;
 }
 
 export function ButtonGroupWithCheckboxAndDropdown({ className }: ButtonGroupWithCheckboxAndDropdownProps) {
+  void className;
   return (
     <span className="inline-flex rounded-md shadow-sm">
       <span className="inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2">

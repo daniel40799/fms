@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import { LockClosedIcon } from '@heroicons/react/20/solid'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
+import { LockClosedIcon } from '@heroicons/react/20/solid';
 
 export interface DiscountItem {
   code: string;
@@ -30,6 +29,7 @@ export function WithOrderSummarySidebar({
   products = [],
   className,
 }: WithOrderSummarySidebarProps) {
+  void className;
   const subtotal = '$108.00';
   const taxes = '$9.92';
   const shipping = '$8.00';

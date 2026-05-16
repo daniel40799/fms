@@ -1,7 +1,6 @@
 // @ts-nocheck
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import React from 'react';
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
-import { BookmarkSquareIcon, BookOpenIcon, QueueListIcon, RssIcon } from '@heroicons/react/24/solid'
 
 export interface LinkItem {
   name: string;
@@ -27,6 +26,7 @@ export function WithPopularPages({
   social = [],
   className,
 }: WithPopularPagesProps) {
+  void className;
   return (
     <div className="bg-white">
       <main className="mx-auto w-full max-w-7xl px-6 pb-16 pt-10 sm:pb-24 lg:px-8">

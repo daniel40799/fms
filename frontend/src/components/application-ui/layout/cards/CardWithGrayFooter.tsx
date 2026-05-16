@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface CardWithGrayFooterProps {
   className?: string;
 }
 
 export function CardWithGrayFooter({ className }: CardWithGrayFooterProps) {
+  void className;
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow">
       <div className="px-4 py-5 sm:p-6">{/* Content goes here */}</div>

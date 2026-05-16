@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface AlignedToBottomProps {
   className?: string;
 }
 
 export function AlignedToBottom({ className }: AlignedToBottomProps) {
+  void className;
   return (
     <div className="flex">
       <div className="mr-4 flex-shrink-0 self-end">

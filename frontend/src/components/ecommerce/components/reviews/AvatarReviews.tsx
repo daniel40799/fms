@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { StarIcon } from '@heroicons/react/20/solid'
+import { StarIcon } from '@heroicons/react/20/solid';
 
 export interface ReviewItem {
   id: number;
@@ -20,6 +19,7 @@ export function AvatarReviews({
   reviews = [],
   className,
 }: AvatarReviewsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

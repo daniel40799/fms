@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithActionsProps {
   className?: string;
 }
 
 export function WithActions({ className }: WithActionsProps) {
+  void className;
   return (
     <div className="md:flex md:items-center md:justify-between">
       <div className="min-w-0 flex-1">

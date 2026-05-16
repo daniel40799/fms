@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SideItem {
   id: number;
@@ -15,6 +14,7 @@ export function SimpleListWithRadioOnRight({
   sides = [],
   className,
 }: SimpleListWithRadioOnRightProps) {
+  void className;
   return (
     <fieldset>
       <legend className="text-sm font-semibold leading-6 text-gray-900">Select a side</legend>

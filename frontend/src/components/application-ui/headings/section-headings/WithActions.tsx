@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WithActionsProps {
   className?: string;
 }
 
 export function WithActions({ className }: WithActionsProps) {
+  void className;
   return (
     <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
       <h3 className="text-base font-semibold leading-6 text-gray-900">Job Postings</h3>

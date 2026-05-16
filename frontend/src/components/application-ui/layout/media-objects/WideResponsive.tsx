@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface WideResponsiveProps {
   className?: string;
 }
 
 export function WideResponsive({ className }: WideResponsiveProps) {
+  void className;
   return (
     <div className="sm:flex">
       <div className="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4">

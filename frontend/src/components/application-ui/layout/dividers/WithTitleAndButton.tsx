@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PlusIcon } from '@heroicons/react/20/solid'
+import { PlusIcon } from '@heroicons/react/20/solid';
 
 export interface WithTitleAndButtonProps {
   className?: string;
 }
 
 export function WithTitleAndButton({ className }: WithTitleAndButtonProps) {
+  void className;
   return (
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 flex items-center">

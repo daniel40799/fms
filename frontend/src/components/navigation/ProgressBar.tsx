@@ -31,6 +31,7 @@ export function ProgressBar({
   size = 'sm',
   className = '',
 }: ProgressBarProps) {
+  void className;
   const percentage = Math.min(100, Math.max(0, (value / max) * 100));
 
   return (
@@ -75,6 +76,7 @@ const stepGridCols: Record<number, string> = {
 };
 
 export function StepProgressBar({ steps, currentStep, className = '' }: StepProgressBarProps) {
+  void className;
   const gridColsClass = stepGridCols[steps.length] ?? 'grid-cols-4';
   return (
     <div className={className}>

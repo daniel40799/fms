@@ -1,7 +1,6 @@
 // @ts-nocheck
-import React from 'react';
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export interface SolutionItem {
   name: string;
@@ -17,6 +16,7 @@ export function FlyoutMenu({
   solutions = [],
   className,
 }: FlyoutMenuProps) {
+  void className;
   return (
     <Popover className="relative">
       <PopoverButton className="inline-flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">

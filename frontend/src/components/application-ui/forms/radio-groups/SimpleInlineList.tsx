@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface NotificationmethodItem {
   id: number;
@@ -15,6 +14,7 @@ export function SimpleInlineList({
   notificationMethods = [],
   className,
 }: SimpleInlineListProps) {
+  void className;
   return (
     <fieldset>
       <legend className="text-sm font-semibold leading-6 text-gray-900">Notifications</legend>

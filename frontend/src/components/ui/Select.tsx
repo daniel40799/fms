@@ -24,6 +24,7 @@ export function Select({
   children,
   ...rest
 }: SelectProps) {
+  void className;
   const selectId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined)
 
   return (

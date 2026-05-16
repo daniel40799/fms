@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid'
+import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid';
 
 export interface ContentSectionWithTestimonialProps {
   className?: string;
 }
 
 export function ContentSectionWithTestimonial({ className }: ContentSectionWithTestimonialProps) {
+  void className;
   return (
     <div className="relative isolate overflow-hidden bg-white py-24 sm:py-32">
       <div

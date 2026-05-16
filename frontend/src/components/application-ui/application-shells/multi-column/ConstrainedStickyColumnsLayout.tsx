@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { BellIcon } from '@heroicons/react/24/outline'
+import { BellIcon } from '@heroicons/react/24/outline';
 
 export interface ConstrainedStickyColumnsLayoutProps {
   className?: string;
 }
 
 export function ConstrainedStickyColumnsLayout({ className }: ConstrainedStickyColumnsLayoutProps) {
+  void className;
   return (
     <div className="flex min-h-full flex-col">
       <header className="shrink-0 border-b border-gray-200 bg-white">

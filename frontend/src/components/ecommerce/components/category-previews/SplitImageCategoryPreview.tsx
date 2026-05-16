@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SplitImageCategoryPreviewProps {
   className?: string;
 }
 
 export function SplitImageCategoryPreview({ className }: SplitImageCategoryPreviewProps) {
+  void className;
   return (
     <>
       

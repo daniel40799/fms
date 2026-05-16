@@ -1,9 +1,9 @@
 // @ts-nocheck
 'use client'
 
-import React, { useRef, useEffect } from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
+import { useRef } from 'react';
 
 export interface CalendarDay {
   date: string;
@@ -21,6 +21,7 @@ export function DayViewCalendar({
   days = [],
   className,
 }: DayViewCalendarProps) {
+  void className;
   const container = useRef<HTMLDivElement>(null);
   const containerNav = useRef<HTMLDivElement>(null);
   const containerOffset = useRef<HTMLDivElement>(null);

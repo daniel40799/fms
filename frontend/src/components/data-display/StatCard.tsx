@@ -22,6 +22,7 @@ export function StatCard({
   icon: Icon,
   className = '',
 }: StatCardProps) {
+  void className;
   return (
     <div className={`overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 ${className}`}>
       <div className="flex items-center">
@@ -65,6 +66,7 @@ export interface StatGridProps {
 }
 
 export function StatGrid({ stats, columns = 3, title, className = '' }: StatGridProps) {
+  void className;
   const gridCols: Record<number, string> = {
     1: 'sm:grid-cols-1',
     2: 'sm:grid-cols-2',

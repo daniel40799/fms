@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface PlanItem {
   id: number;
@@ -16,6 +15,7 @@ export function ListWithInlineDescription({
   plans = [],
   className,
 }: ListWithInlineDescriptionProps) {
+  void className;
   return (
     <fieldset aria-label="Plan">
       <div className="space-y-5">

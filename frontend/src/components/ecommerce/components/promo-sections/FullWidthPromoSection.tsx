@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface FullWidthPromoSectionProps {
   className?: string;
 }
 
 export function FullWidthPromoSection({ className }: FullWidthPromoSectionProps) {
+  void className;
   return (
     <div className="relative bg-gray-800 px-6 py-32 sm:px-12 sm:py-40 lg:px-16">
       <div className="absolute inset-0 overflow-hidden">

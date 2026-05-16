@@ -1,8 +1,7 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { StarIcon } from '@heroicons/react/20/solid'
-import { Radio, RadioGroup } from '@headlessui/react'
-import { CurrencyDollarIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline'
+import { Radio, RadioGroup } from '@headlessui/react';
+import { StarIcon } from '@heroicons/react/20/solid';
+import React,{ useState } from 'react';
 
 export interface ProductItem {
   name: string;
@@ -36,6 +35,7 @@ export function WithTieredImages({
   policies = [],
   className,
 }: WithTieredImagesProps) {
+  void className;
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
 

@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
 
 export interface PricingTier {
   name: string;
@@ -22,6 +21,7 @@ export function ThreeTierPricingWithDividers({
   tiers = [],
   className,
 }: ThreeTierPricingWithDividersProps) {
+  void className;
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface TransactionItem {
   id: number;
@@ -20,6 +19,7 @@ export function CondensedTable({
   transactions = [],
   className,
 }: CondensedTableProps) {
+  void className;
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">

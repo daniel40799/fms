@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
 
 export interface StepItem {
   name: string;
@@ -17,6 +16,7 @@ export function BulletTextProgressBar({
   steps = [],
   className,
 }: BulletTextProgressBarProps) {
+  void className;
   return (
     <div className="px-4 py-12 sm:px-6 lg:px-8">
       <nav aria-label="Progress" className="flex justify-center">

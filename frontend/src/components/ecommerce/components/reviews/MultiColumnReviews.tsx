@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { StarIcon } from '@heroicons/react/20/solid'
+import { StarIcon } from '@heroicons/react/20/solid';
 
 export interface ReviewItem {
   id: number;
@@ -16,6 +15,7 @@ export function MultiColumnReviews({
   reviews = [],
   className,
 }: MultiColumnReviewsProps) {
+  void className;
   function classNames(...classes: string[]): string {
     return classes.filter(Boolean).join(' ');
   }

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface ListItem {
   id: number;
@@ -14,6 +13,8 @@ export function SeparateCardList({
   items = [],
   className,
 }: SeparateCardListProps) {
+  void className;
+  void items;
   return (
     <ul role="list" className="space-y-3">
       {items.map((item) => (

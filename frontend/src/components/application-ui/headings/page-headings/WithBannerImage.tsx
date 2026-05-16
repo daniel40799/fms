@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid'
+import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid';
 
 export interface ProfileItem {
   name: string;
@@ -19,6 +18,7 @@ export function WithBannerImage({
   profile,
   className,
 }: WithBannerImageProps) {
+  void className;
   return (
     <div>
       <div>

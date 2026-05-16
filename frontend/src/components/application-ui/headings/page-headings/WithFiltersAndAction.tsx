@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React from 'react';
-import { PlusSmallIcon } from '@heroicons/react/20/solid'
+import { PlusSmallIcon } from '@heroicons/react/20/solid';
 
 export interface WithFiltersAndActionProps {
   className?: string;
 }
 
 export function WithFiltersAndAction({ className }: WithFiltersAndActionProps) {
+  void className;
   return (
     <div>
       <div className="flex flex-wrap items-center gap-6 px-4 sm:flex-nowrap sm:px-6 lg:px-8">

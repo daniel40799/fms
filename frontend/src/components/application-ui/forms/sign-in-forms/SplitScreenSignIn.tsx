@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React from 'react';
 
 export interface SplitScreenSignInProps {
   className?: string;
 }
 
 export function SplitScreenSignIn({ className }: SplitScreenSignInProps) {
+  void className;
   return (
     <>
       

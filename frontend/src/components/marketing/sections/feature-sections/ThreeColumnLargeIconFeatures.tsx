@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React from 'react';
-import { InboxIcon, TrashIcon, UsersIcon } from '@heroicons/react/24/outline'
 
 export interface FeatureItem {
   name: string;
@@ -18,6 +17,7 @@ export function ThreeColumnLargeIconFeatures({
   features = [],
   className,
 }: ThreeColumnLargeIconFeaturesProps) {
+  void className;
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

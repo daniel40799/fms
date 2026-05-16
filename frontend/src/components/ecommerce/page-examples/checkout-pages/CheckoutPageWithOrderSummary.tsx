@@ -1,29 +1,29 @@
 // @ts-nocheck
-import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Radio,
-  RadioGroup,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from '@headlessui/react'
+Dialog,
+DialogBackdrop,
+DialogPanel,
+Popover,
+PopoverButton,
+PopoverGroup,
+PopoverPanel,
+Radio,
+RadioGroup,
+Tab,
+TabGroup,
+TabList,
+TabPanel,
+TabPanels,
+} from '@headlessui/react';
+import { CheckCircleIcon, ChevronDownIcon, TrashIcon } from '@heroicons/react/20/solid';
 import {
-  Bars3Icon,
-  MagnifyingGlassIcon,
-  QuestionMarkCircleIcon,
-  ShoppingBagIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { CheckCircleIcon, ChevronDownIcon, TrashIcon } from '@heroicons/react/20/solid'
+Bars3Icon,
+MagnifyingGlassIcon,
+QuestionMarkCircleIcon,
+ShoppingBagIcon,
+XMarkIcon,
+} from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
 export interface CurrencieItem {
   [key: string]: unknown;
@@ -88,6 +88,7 @@ export function CheckoutPageWithOrderSummary({
   footerNavigation,
   className,
 }: CheckoutPageWithOrderSummaryProps) {
+  void className;
   const [open, setOpen] = useState(false);
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(deliveryMethods[0]);
 

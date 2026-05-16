@@ -1,6 +1,5 @@
 // @ts-nocheck
-import React from 'react';
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export interface PersonItem {
   name: string;
@@ -21,6 +20,8 @@ export function LinkedStackedList({
   people = [],
   className,
 }: LinkedStackedListProps) {
+  void className;
+  void people;
   return (
     <ul role="list" className="divide-y divide-gray-100">
       {people.map((person) => (
