@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: fms
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/fms_dev
+    username: fms
+    password: fmspass
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
