@@ -1,5 +1,6 @@
 package com.fapor7.fms.auth;
 
+import com.fapor7.fms.users.dto.UserResponse;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,5 +28,16 @@ public class AuthController {
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    /**
+     * Creates a public end-user account without issuing a JWT.
+     *
+     * @param request self-registration payload
+     * @return created user profile
+     */
+    @PostMapping("/register")
+    public UserResponse register(@RequestBody RegisterRequest request) {
+        return authService.register(request);
     }
 }

@@ -3,7 +3,19 @@ import { Button, Field } from '../components/ui';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { api } from '../lib/api';
 
-export function LoginPage({ loading, notice, onLoggedIn }: { loading: boolean; notice: string; onLoggedIn: (token: string) => void }) {
+export function LoginPage({
+  loading,
+  notice,
+  noticeTone = 'INFORMATION',
+  onCreateAccount,
+  onLoggedIn,
+}: {
+  loading: boolean
+  notice: string
+  noticeTone?: string
+  onCreateAccount: () => void
+  onLoggedIn: (token: string) => void
+}) {
   const [email, setEmail] = useState('daniel@fapor7.org')
   const [password, setPassword] = useState('')
   const login = useAsyncAction(async () => {
@@ -37,7 +49,11 @@ export function LoginPage({ loading, notice, onLoggedIn }: { loading: boolean; n
           <p className="text-sm font-semibold uppercase tracking-wide text-sky-700">FAPOR7</p>
           <h2 className="mt-2 text-2xl font-semibold text-slate-950">Sign in</h2>
           <p className="mt-2 text-sm text-slate-600">Use your email and password to access the event management workspace.</p>
-          {(notice || login.error) && <div className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{login.error || notice}</div>}
+          {(notice || login.error) && (
+            <div className={`mt-4 rounded-md px-3 py-2 text-sm ${login.error || noticeTone === 'ERROR' ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}`}>
+              {login.error || notice}
+            </div>
+          )}
           <div className="mt-6 space-y-4">
             <Field label="Email">
               <input className="input" value={email} onChange={(event) => setEmail(event.target.value)} type="email" required />
@@ -49,6 +65,13 @@ export function LoginPage({ loading, notice, onLoggedIn }: { loading: boolean; n
           <Button className="mt-6 w-full justify-center" loading={loading || login.loading}>
             {login.loading ? 'Signing in...' : 'Sign in'}
           </Button>
+          <button
+            type="button"
+            className="mt-4 w-full rounded-md px-3 py-2 text-sm font-semibold text-sky-700 transition-colors duration-150 ease-out hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 motion-reduce:transition-none"
+            onClick={onCreateAccount}
+          >
+            Create an account
+          </button>
         </form>
       </section>
     </main>

@@ -5,7 +5,7 @@ import { ConfirmDeleteModal, FormModal } from '../components/modals'
 import { Button, EmptyState, InlineError, Panel, StatusBadge } from '../components/ui'
 import { useAsyncAction } from '../hooks/useAsyncAction'
 import { formatDateTime } from '../lib/datetime'
-import type { EventRecord, Organization } from '../types'
+import type { EventPayload, EventRecord, Organization } from '../types'
 
 function RegisterButton({ eventId, onRegister }: { eventId: string; onRegister: (eventId: string) => Promise<void> }) {
   const action = useAsyncAction(() => onRegister(eventId))
@@ -29,8 +29,8 @@ export function EventsPage({
   events: EventRecord[]
   organizations: Organization[]
   canManageEvents: boolean
-  onCreate: (payload: Partial<EventRecord>) => Promise<void>
-  onUpdate: (id: string, payload: Partial<EventRecord>) => Promise<void>
+  onCreate: (payload: EventPayload) => Promise<void>
+  onUpdate: (id: string, payload: EventPayload) => Promise<void>
   onArchive: (id: string) => Promise<void>
   onRegister: (eventId: string) => Promise<void>
 }) {

@@ -28,6 +28,7 @@ export function AppLayout({
     <div className="min-h-screen bg-slate-50 text-slate-950">
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-slate-200 bg-white lg:block">
         <div className="border-b border-slate-200 px-6 py-5">
+            <img src="/fapor7.png"/>
           <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">FAPOR7</p>
           <h1 className="mt-1 text-xl font-semibold">Event Management</h1>
         </div>

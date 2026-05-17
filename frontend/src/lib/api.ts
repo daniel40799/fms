@@ -1,4 +1,4 @@
-import type { AttendanceLog, EventRecord, FmsUser, Me, Organization, Registration, RoleName } from '../types'
+import type { AttendanceLog, EventPayload, EventRecord, FmsUser, Me, Organization, Registration, RoleName } from '../types'
 import { ApiError, parseApiError } from './errors'
 
 const TOKEN_KEY = 'fapor7.jwt'
@@ -63,6 +63,11 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       }),
+    register: (payload: { fullName: string; email: string; password: string; organizationId: string | null }) =>
+      request<FmsUser>('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
   },
   me: () => request<Me>('/api/me'),
   organizations: {
@@ -89,12 +94,12 @@ export const api = {
   },
   events: {
     list: () => request<EventRecord[]>('/api/events'),
-    create: (payload: Partial<EventRecord>) =>
+    create: (payload: EventPayload) =>
       request<EventRecord>('/api/events', {
         method: 'POST',
         body: JSON.stringify(payload),
       }),
-    update: (id: string, payload: Partial<EventRecord>) =>
+    update: (id: string, payload: EventPayload) =>
       request<EventRecord>(`/api/events/${id}`, {
         method: 'PUT',
         body: JSON.stringify(payload),

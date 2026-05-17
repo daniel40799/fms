@@ -25,12 +25,11 @@ public class OrganizationController {
     }
 
     /**
-     * Lists all organizations for administrators.
+     * Lists all organizations for administration and public self-registration.
      *
      * @return organization response records
      */
     @GetMapping
-    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('USER_ADMIN')")
     public List<OrganizationResponse> findAll() {
         return organizationService.findAll();
     }

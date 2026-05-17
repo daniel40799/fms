@@ -3,6 +3,9 @@ package com.fapor7.fms.auth;
 import com.fapor7.fms.users.UserEntity;
 import com.fapor7.fms.users.UserRepository;
 import com.fapor7.fms.users.UserStatus;
+import com.fapor7.fms.users.UserService;
+import com.fapor7.fms.users.dto.UserCreateRequest;
+import com.fapor7.fms.users.dto.UserResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +19,18 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthService(
             UserRepository userRepository,
+            UserService userService,
             PasswordEncoder passwordEncoder,
             JwtService jwtService
     ) {
         this.userRepository = userRepository;
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -51,5 +57,24 @@ public class AuthService {
         String token = jwtService.generateToken(user.getId(), user.getEmail());
 
         return new LoginResponse(token);
+    }
+
+    /**
+     * Creates a public self-registered account.
+     *
+     * <p>The request cannot provide roles or status. User creation applies the
+     * default end-user role and active status.</p>
+     *
+     * @param request public registration payload
+     * @return created user profile
+     */
+    public UserResponse register(RegisterRequest request) {
+        return userService.create(new UserCreateRequest(
+                request.email(),
+                request.password(),
+                request.fullName(),
+                request.organizationId(),
+                null
+        ));
     }
 }

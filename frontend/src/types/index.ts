@@ -49,6 +49,18 @@ export interface EventRecord {
   createdByName: string
 }
 
+export interface EventPayload {
+  title: string
+  description: string
+  venue: string
+  startDate: string
+  endDate: string
+  capacity: number | null
+  registrationOpen: string | null
+  registrationClose: string | null
+  organizationId: string | null
+}
+
 export interface Registration {
   id: string
   eventId: string

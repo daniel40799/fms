@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { parseApiDateTime, toLocalDateTimePayload } from '../../lib/datetime'
-import type { EventRecord, Organization } from '../../types'
+import type { EventPayload, EventRecord, Organization } from '../../types'
 import { Button, Field, InlineError, Select } from '../ui'
 import { DateTimePicker } from './DateTimePicker'
 
@@ -13,7 +13,7 @@ export function EventForm({
 }: {
   event: EventRecord | null
   organizations: Organization[]
-  onSubmit: (payload: Partial<EventRecord>) => Promise<void>
+  onSubmit: (payload: EventPayload) => Promise<void>
   onCancel: () => void
 }) {
   const action = useAsyncAction(onSubmit)
@@ -43,15 +43,18 @@ export function EventForm({
             action.setError('Start and end dates are required.')
             return
           }
-          void action.run({
-            ...form,
+          const payload: EventPayload = {
+            title: form.title,
+            description: form.description,
+            venue: form.venue,
             startDate: toLocalDateTimePayload(form.startDate) ?? '',
             endDate: toLocalDateTimePayload(form.endDate) ?? '',
             registrationOpen: toLocalDateTimePayload(form.registrationOpen),
             registrationClose: toLocalDateTimePayload(form.registrationClose),
             capacity: form.capacity ? Number(form.capacity) : null,
             organizationId: form.organizationId || null,
-          })
+          }
+          void action.run(payload)
         }}
       >
         <Field label="Event name"><input className="input" value={form.title} onChange={(e) => set('title', e.target.value)} required /></Field>

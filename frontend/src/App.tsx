@@ -11,6 +11,7 @@ EventsPage,
 LoginPage,
 MyRegistrationsPage,
 OrganizationsPage,
+RegisterPage,
 RegistrationReviewPage,
 ReportsPage,
 UsersPage,
@@ -26,6 +27,7 @@ function App() {
   const [attendance, setAttendance] = useState<AttendanceLog[]>([])
   const [users, setUsers] = useState<FmsUser[]>([])
   const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [authView, setAuthView] = useState<'login' | 'register'>('login')
   const [view, setView] = useState<View>('dashboard')
   const [loading, setLoading] = useState(false)
   const [notice, setNotice] = useState('')
@@ -85,6 +87,7 @@ function App() {
     tokenStore.clear()
     setToken(null)
     setMe(null)
+    setAuthView('login')
     setView('dashboard')
   }
 
@@ -112,11 +115,34 @@ function App() {
   }
 
   if (!token || !me) {
+    if (authView === 'register') {
+      return (
+        <MotionConfig reducedMotion="user">
+          <RegisterPage
+            onBackToLogin={() => {
+              setAuthView('login')
+              setNotice('')
+            }}
+            onRegistered={() => {
+              setAuthView('login')
+              setNotice('Account created. Sign in with your email and password.')
+              setNoticeTone('CONFIRMED')
+            }}
+          />
+        </MotionConfig>
+      )
+    }
+
     return (
       <MotionConfig reducedMotion="user">
         <LoginPage
           loading={loading}
           notice={notice}
+          noticeTone={noticeTone}
+          onCreateAccount={() => {
+            setAuthView('register')
+            setNotice('')
+          }}
           onLoggedIn={(nextToken) => {
             tokenStore.set(nextToken)
             setToken(nextToken)
