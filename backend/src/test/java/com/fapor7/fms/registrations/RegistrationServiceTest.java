@@ -1,0 +1,246 @@
+package com.fapor7.fms.registrations;
+
+import com.fapor7.fms.TestData;
+import com.fapor7.fms.events.EventEntity;
+import com.fapor7.fms.events.EventRepository;
+import com.fapor7.fms.registrations.dto.RegistrationApprovalRequest;
+import com.fapor7.fms.registrations.dto.RegistrationCreateRequest;
+import com.fapor7.fms.registrations.dto.RegistrationResponse;
+import com.fapor7.fms.users.UserEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class RegistrationServiceTest {
+
+    @Mock
+    private RegistrationRepository registrationRepository;
+
+    @Mock
+    private EventRepository eventRepository;
+
+    @InjectMocks
+    private RegistrationService registrationService;
+
+    private Path uploadedPath;
+
+    @AfterEach
+    void deleteUploadedFile() throws IOException {
+        if (uploadedPath != null) {
+            Files.deleteIfExists(uploadedPath);
+        }
+    }
+
+    @Test
+    void registerCreatesPendingPaymentRegistration() {
+        UserEntity user = TestData.activeUser(1);
+        EventEntity event = TestData.event(2, null, null);
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+        when(registrationRepository.findByEventIdAndUserId(event.getId(), user.getId())).thenReturn(Optional.empty());
+        when(registrationRepository.save(any(RegistrationEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        RegistrationResponse response = registrationService.register(new RegistrationCreateRequest(event.getId()), TestData.principal(user));
+
+        assertThat(response.eventId()).isEqualTo(event.getId());
+        assertThat(response.userId()).isEqualTo(user.getId());
+        assertThat(response.status()).isEqualTo("PENDING_PAYMENT");
+    }
+
+    @Test
+    void registerRejectsMissingEvent() {
+        when(eventRepository.findById(TestData.uuid(99))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> registrationService.register(new RegistrationCreateRequest(TestData.uuid(99)), TestData.principal(TestData.activeUser(1))))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Event not found");
+    }
+
+    @Test
+    void registerRejectsDuplicateRegistration() {
+        UserEntity user = TestData.activeUser(1);
+        EventEntity event = TestData.event(2, null, null);
+        RegistrationEntity existing = TestData.registration(3, event, user, RegistrationStatus.PENDING_PAYMENT);
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+        when(registrationRepository.findByEventIdAndUserId(event.getId(), user.getId())).thenReturn(Optional.of(existing));
+
+        assertThatThrownBy(() -> registrationService.register(new RegistrationCreateRequest(event.getId()), TestData.principal(user)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("User is already registered to this event");
+    }
+
+    @Test
+    void findMyRegistrationsReturnsOnlyCurrentUsersRegistrations() {
+        UserEntity currentUser = TestData.activeUser(1);
+        RegistrationEntity mine = TestData.registration(2, TestData.event(3, null, null), currentUser, RegistrationStatus.CONFIRMED);
+        RegistrationEntity other = TestData.registration(4, TestData.event(5, null, null), TestData.activeUser(6), RegistrationStatus.CONFIRMED);
+        when(registrationRepository.findAll()).thenReturn(List.of(mine, other));
+
+        List<RegistrationResponse> responses = registrationService.findMyRegistrations(TestData.principal(currentUser));
+
+        assertThat(responses).hasSize(1);
+        assertThat(responses.getFirst().id()).isEqualTo(mine.getId());
+    }
+
+    @Test
+    void findAllMapsRegistrations() {
+        RegistrationEntity registration = TestData.registration(1, TestData.event(2, null, null), TestData.activeUser(3), RegistrationStatus.PAYMENT_UPLOADED);
+        when(registrationRepository.findAll()).thenReturn(List.of(registration));
+
+        List<RegistrationResponse> responses = registrationService.findAll();
+
+        assertThat(responses).hasSize(1);
+        assertThat(responses.getFirst().status()).isEqualTo("PAYMENT_UPLOADED");
+    }
+
+    @Test
+    void uploadPaymentProofStoresFileAndMarksRegistrationForReview() {
+        UserEntity user = TestData.activeUser(1);
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), user, RegistrationStatus.PENDING_PAYMENT);
+        MockMultipartFile file = new MockMultipartFile("file", "proof.txt", "text/plain", "paid".getBytes());
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+        when(registrationRepository.save(registration)).thenReturn(registration);
+
+        RegistrationResponse response = registrationService.uploadPaymentProof(registration.getId(), "REF-1", file, TestData.principal(user));
+
+        uploadedPath = Path.of(response.paymentFilePath());
+        assertThat(response.paymentReference()).isEqualTo("REF-1");
+        assertThat(response.status()).isEqualTo("PAYMENT_UPLOADED");
+        assertThat(Files.exists(uploadedPath)).isTrue();
+    }
+
+    @Test
+    void uploadPaymentProofRejectsMissingRegistration() {
+        when(registrationRepository.findById(TestData.uuid(99))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> registrationService.uploadPaymentProof(TestData.uuid(99), "REF", new MockMultipartFile("file", new byte[0]), TestData.principal(TestData.activeUser(1))))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Registration not found");
+    }
+
+    @Test
+    void uploadPaymentProofRejectsOtherUsersRegistration() {
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), TestData.activeUser(1), RegistrationStatus.PENDING_PAYMENT);
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        assertThatThrownBy(() -> registrationService.uploadPaymentProof(registration.getId(), "REF", new MockMultipartFile("file", new byte[0]), TestData.principal(TestData.activeUser(9))))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("You can only upload payment proof for your own registration");
+    }
+
+    @Test
+    void uploadPaymentProofWrapsStorageFailure() throws IOException {
+        UserEntity user = TestData.activeUser(1);
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), user, RegistrationStatus.PENDING_PAYMENT);
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("proof.txt");
+        when(file.getInputStream()).thenThrow(new IOException("disk full"));
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        assertThatThrownBy(() -> registrationService.uploadPaymentProof(registration.getId(), "REF", file, TestData.principal(user)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Failed to upload payment proof");
+    }
+
+    @Test
+    void downloadPaymentProofReturnsResource() throws IOException {
+        Path proof = Files.createTempFile("proof", ".txt");
+        Files.writeString(proof, "paid");
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), TestData.activeUser(1), RegistrationStatus.PAYMENT_UPLOADED);
+        registration.setPaymentFilePath(proof.toString());
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        ResponseEntity<Resource> response = registrationService.downloadPaymentProof(registration.getId());
+
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getHeaders().getFirst("Content-Disposition")).contains(proof.getFileName().toString());
+        Files.deleteIfExists(proof);
+    }
+
+    @Test
+    void downloadPaymentProofRejectsMissingRegistration() {
+        when(registrationRepository.findById(TestData.uuid(99))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> registrationService.downloadPaymentProof(TestData.uuid(99)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Registration not found");
+    }
+
+    @Test
+    void downloadPaymentProofRejectsRegistrationWithoutProof() {
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), TestData.activeUser(1), RegistrationStatus.PENDING_PAYMENT);
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        assertThatThrownBy(() -> registrationService.downloadPaymentProof(registration.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("No payment proof uploaded");
+    }
+
+    @Test
+    void downloadPaymentProofWrapsMissingFile() {
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), TestData.activeUser(1), RegistrationStatus.PAYMENT_UPLOADED);
+        registration.setPaymentFilePath("missing-proof-file.txt");
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        assertThatThrownBy(() -> registrationService.downloadPaymentProof(registration.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Failed to download payment proof");
+    }
+
+    @Test
+    void approveConfirmsRegistrationAndGeneratesQrToken() {
+        UserEntity approver = TestData.activeUser(9);
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), TestData.activeUser(1), RegistrationStatus.PAYMENT_UPLOADED);
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+        when(registrationRepository.save(registration)).thenReturn(registration);
+
+        RegistrationResponse response = registrationService.approve(registration.getId(), new RegistrationApprovalRequest("ok"), TestData.principal(approver));
+
+        assertThat(response.status()).isEqualTo("CONFIRMED");
+        assertThat(response.approvedById()).isEqualTo(approver.getId());
+        assertThat(response.qrToken()).isNotBlank();
+        assertThat(response.remarks()).isEqualTo("ok");
+    }
+
+    @Test
+    void approveKeepsExistingQrToken() {
+        UserEntity approver = TestData.activeUser(9);
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), TestData.activeUser(1), RegistrationStatus.PAYMENT_UPLOADED);
+        registration.setQrToken("existing");
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+        when(registrationRepository.save(registration)).thenReturn(registration);
+
+        RegistrationResponse response = registrationService.approve(registration.getId(), new RegistrationApprovalRequest("ok"), TestData.principal(approver));
+
+        assertThat(response.qrToken()).isEqualTo("existing");
+    }
+
+    @Test
+    void approveRejectsMissingRegistration() {
+        when(registrationRepository.findById(TestData.uuid(99))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> registrationService.approve(TestData.uuid(99), new RegistrationApprovalRequest("ok"), TestData.principal(TestData.activeUser(1))))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Registration not found");
+    }
+}

@@ -10,8 +10,25 @@ on:
       - master
 
 jobs:
+  backend_tests:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Backend Tests and Coverage
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Run JUnit and JaCoCo
+        working-directory: backend
+        run: ./mvnw -B verify
+
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    needs: backend_tests
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     permissions:
