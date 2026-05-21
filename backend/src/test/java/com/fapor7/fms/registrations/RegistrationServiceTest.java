@@ -3,6 +3,8 @@ package com.fapor7.fms.registrations;
 import com.fapor7.fms.TestData;
 import com.fapor7.fms.events.EventEntity;
 import com.fapor7.fms.events.EventRepository;
+import com.fapor7.fms.events.EventStatus;
+import com.fapor7.fms.organizations.OrganizationEntity;
 import com.fapor7.fms.registrations.dto.RegistrationApprovalRequest;
 import com.fapor7.fms.registrations.dto.RegistrationCreateRequest;
 import com.fapor7.fms.registrations.dto.RegistrationResponse;
@@ -90,6 +92,30 @@ class RegistrationServiceTest {
     }
 
     @Test
+    void registerRejectsInternalFapor7Users() {
+        UserEntity user = TestData.activeUser(1);
+        OrganizationEntity fapor7 = TestData.organization(7);
+        fapor7.setCode("FAPOR7");
+        user.setOrganization(fapor7);
+
+        assertThatThrownBy(() -> registrationService.register(new RegistrationCreateRequest(TestData.uuid(2)), TestData.principal(user)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("FAPOR7 organization users cannot register for events");
+    }
+
+    @Test
+    void registerRejectsNonPublishedEvent() {
+        UserEntity user = TestData.activeUser(1);
+        EventEntity event = TestData.event(2, null, null);
+        event.setStatus(EventStatus.DRAFT);
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+
+        assertThatThrownBy(() -> registrationService.register(new RegistrationCreateRequest(event.getId()), TestData.principal(user)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Only published events accept registrations");
+    }
+
+    @Test
     void findMyRegistrationsReturnsOnlyCurrentUsersRegistrations() {
         UserEntity currentUser = TestData.activeUser(1);
         RegistrationEntity mine = TestData.registration(2, TestData.event(3, null, null), currentUser, RegistrationStatus.CONFIRMED);
@@ -100,6 +126,16 @@ class RegistrationServiceTest {
 
         assertThat(responses).hasSize(1);
         assertThat(responses.getFirst().id()).isEqualTo(mine.getId());
+    }
+
+    @Test
+    void findMyRegistrationsHidesInternalFapor7Registrations() {
+        UserEntity user = TestData.activeUser(1);
+        OrganizationEntity fapor7 = TestData.organization(7);
+        fapor7.setCode("fapor7");
+        user.setOrganization(fapor7);
+
+        assertThat(registrationService.findMyRegistrations(TestData.principal(user))).isEmpty();
     }
 
     @Test

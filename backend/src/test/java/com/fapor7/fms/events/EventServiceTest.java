@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,6 +130,74 @@ class EventServiceTest {
     }
 
     @Test
+    void updateRejectsArchivedEvents() {
+        EventEntity event = TestData.event(1, null, null);
+        event.setStatus(EventStatus.ARCHIVED);
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+
+        assertThatThrownBy(() -> eventService.update(event.getId(), updateRequest(null, null)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Archived events cannot be edited");
+    }
+
+    @Test
+    void updateRejectsArchiveStatus() {
+        EventEntity event = TestData.event(1, null, null);
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+
+        assertThatThrownBy(() -> eventService.update(event.getId(), updateRequest(null, "ARCHIVED")))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Use the archive action for published events");
+    }
+
+    @Test
+    void updateRejectsNegativePrice() {
+        EventEntity event = TestData.event(1, null, null);
+        EventUpdateRequest request = new EventUpdateRequest(
+                "Updated Event",
+                "Updated Description",
+                "Updated Venue",
+                TestData.time(5),
+                TestData.time(6),
+                30,
+                TestData.time(2),
+                TestData.time(4),
+                BigDecimal.valueOf(-1),
+                "wide",
+                "portrait",
+                null,
+                null
+        );
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+
+        assertThatThrownBy(() -> eventService.update(event.getId(), request))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Registration price must be zero or greater");
+    }
+
+    @Test
+    void createRejectsMissingPoster() {
+        EventCreateRequest request = new EventCreateRequest(
+                "New Event",
+                "Description",
+                "Venue",
+                TestData.time(3),
+                TestData.time(4),
+                25,
+                TestData.time(1),
+                TestData.time(2),
+                BigDecimal.ZERO,
+                " ",
+                "portrait",
+                null
+        );
+
+        assertThatThrownBy(() -> eventService.create(request, TestData.principal(TestData.activeUser(1))))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Horizontal poster is required");
+    }
+
+    @Test
     void updateThrowsWhenEventIsMissing() {
         when(eventRepository.findById(TestData.uuid(99))).thenReturn(Optional.empty());
 
@@ -169,6 +238,47 @@ class EventServiceTest {
                 .hasMessage("Event not found");
     }
 
+    @Test
+    void archiveRejectsDrafts() {
+        EventEntity event = TestData.event(1, null, null);
+        event.setStatus(EventStatus.DRAFT);
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+
+        assertThatThrownBy(() -> eventService.archive(event.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Only published events can be archived");
+    }
+
+    @Test
+    void deleteDraftRemovesDraft() {
+        EventEntity event = TestData.event(1, null, null);
+        event.setStatus(EventStatus.DRAFT);
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+
+        eventService.deleteDraft(event.getId());
+
+        verify(eventRepository).delete(event);
+    }
+
+    @Test
+    void deleteDraftRejectsPublishedEvent() {
+        EventEntity event = TestData.event(1, null, null);
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+
+        assertThatThrownBy(() -> eventService.deleteDraft(event.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Only draft events can be deleted");
+    }
+
+    @Test
+    void deleteDraftRejectsMissingEvent() {
+        when(eventRepository.findById(TestData.uuid(99))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> eventService.deleteDraft(TestData.uuid(99)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Event not found");
+    }
+
     private static EventCreateRequest createRequest(java.util.UUID organizationId) {
         return new EventCreateRequest(
                 "New Event",
@@ -179,6 +289,9 @@ class EventServiceTest {
                 25,
                 TestData.time(1),
                 TestData.time(2),
+                BigDecimal.valueOf(250),
+                "https://assets.example.test/wide.jpg",
+                "https://assets.example.test/portrait.jpg",
                 organizationId
         );
     }
@@ -193,6 +306,9 @@ class EventServiceTest {
                 30,
                 TestData.time(2),
                 TestData.time(4),
+                BigDecimal.valueOf(300),
+                "https://assets.example.test/updated-wide.jpg",
+                "https://assets.example.test/updated-portrait.jpg",
                 organizationId,
                 status
         );

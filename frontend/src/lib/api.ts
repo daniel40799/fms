@@ -1,4 +1,4 @@
-import type { AttendanceLog, EventPayload, EventRecord, FmsUser, Me, Organization, Registration, RoleName } from '../types'
+import type { AttendanceLog, EventPayload, EventRecord, FmsUser, Me, Organization, ProfilePayload, Registration, RoleName } from '../types'
 import { ApiError, parseApiError } from './errors'
 
 const TOKEN_KEY = 'fapor7.jwt'
@@ -70,6 +70,11 @@ export const api = {
       }),
   },
   me: () => request<Me>('/api/me'),
+  updateMe: (payload: ProfilePayload) =>
+    request<FmsUser>('/api/me', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
   organizations: {
     list: () => request<Organization[]>('/api/organizations'),
     create: (payload: { name: string; code: string }) =>
@@ -91,6 +96,19 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(payload),
       }),
+    importCsv: (file: File) => {
+      const body = new FormData()
+      body.set('file', file)
+      return request<FmsUser[]>('/api/users/import', {
+        method: 'POST',
+        body,
+      })
+    },
+    updateOrganization: (id: string, organizationId: string | null) =>
+      request<FmsUser>(`/api/users/${id}/organization`, {
+        method: 'PATCH',
+        body: JSON.stringify({ organizationId }),
+      }),
   },
   events: {
     list: () => request<EventRecord[]>('/api/events'),
@@ -107,6 +125,10 @@ export const api = {
     archive: (id: string) =>
       request<EventRecord>(`/api/events/${id}/archive`, {
         method: 'PATCH',
+      }),
+    deleteDraft: (id: string) =>
+      request<void>(`/api/events/${id}`, {
+        method: 'DELETE',
       }),
   },
   registrations: {

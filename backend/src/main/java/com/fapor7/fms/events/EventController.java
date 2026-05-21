@@ -6,6 +6,7 @@ import com.fapor7.fms.events.dto.EventResponse;
 import com.fapor7.fms.events.dto.EventUpdateRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -91,5 +92,17 @@ public class EventController {
     @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN')")
     public EventResponse archive(@PathVariable UUID id) {
         return eventService.archive(id);
+    }
+
+    /**
+     * Deletes a draft event that has not been published.
+     *
+     * @param id draft event id
+     */
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN')")
+    public void deleteDraft(@PathVariable UUID id) {
+        eventService.deleteDraft(id);
     }
 }

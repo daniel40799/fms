@@ -1,5 +1,6 @@
 package com.fapor7.fms.events.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,6 +15,9 @@ import java.util.UUID;
  * @param capacity maximum participant count, if enforced
  * @param registrationOpen registration opening date and time
  * @param registrationClose registration closing date and time
+ * @param registrationPrice participant price shown at registration
+ * @param horizontalPosterUrl wide event poster shown in heroes and sliders
+ * @param verticalPosterUrl portrait event poster shown in event grids
  * @param organizationId optional owning organization
  */
 public record EventCreateRequest(
@@ -25,6 +29,9 @@ public record EventCreateRequest(
         Integer capacity,
         LocalDateTime registrationOpen,
         LocalDateTime registrationClose,
+        BigDecimal registrationPrice,
+        String horizontalPosterUrl,
+        String verticalPosterUrl,
         UUID organizationId
 ) {
 }

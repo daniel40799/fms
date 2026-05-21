@@ -1,0 +1,2 @@
+fullName,email,password,organizationCode,roles
+Sample End User,sample.end.user@example.test,ChangeMe123!,FAPOR7,END_USER

@@ -52,7 +52,7 @@ public class AttendanceController {
      * @return list of all attendance records
      */
     @GetMapping
-    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN')")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN') or hasRole('USER_ADMIN')")
     public List<AttendanceResponse> findAll() {
         return attendanceService.findAll();
     }

@@ -4,8 +4,11 @@ import com.fapor7.fms.TestData;
 import com.fapor7.fms.organizations.OrganizationEntity;
 import com.fapor7.fms.roles.RoleName;
 import com.fapor7.fms.users.dto.UserCreateRequest;
+import com.fapor7.fms.users.dto.UserOrganizationUpdateRequest;
+import com.fapor7.fms.users.dto.UserProfileUpdateRequest;
 import com.fapor7.fms.users.dto.UserResponse;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -32,8 +35,11 @@ class UserControllerTest {
                 .containsEntry("id", user.getId())
                 .containsEntry("email", "admin@example.test")
                 .containsEntry("fullName", "Admin")
+                .containsEntry("firstName", null)
                 .containsEntry("status", UserStatus.ACTIVE)
-                .containsEntry("organization", "Organization 2");
+                .containsEntry("organizationId", organization.getId())
+                .containsEntry("organization", "Organization 2")
+                .containsEntry("organizationCode", "ORG2");
         assertThat(profile.get("roles")).asList().containsExactly("MAIN_ADMIN");
     }
 
@@ -43,15 +49,24 @@ class UserControllerTest {
 
         Map<String, Object> profile = controller.me(TestData.principal(user));
 
-        assertThat(profile).containsEntry("organization", null);
+        assertThat(profile)
+                .containsEntry("organizationId", null)
+                .containsEntry("organization", null);
     }
 
     @Test
     void findAllDelegatesToService() {
+        var principal = TestData.principal(TestData.user(
+                2,
+                "org-admin@example.test",
+                "Organization Admin",
+                UserStatus.ACTIVE,
+                RoleName.ORGANIZATION_ADMIN
+        ));
         UserResponse response = response();
-        when(userService.findAll()).thenReturn(List.of(response));
+        when(userService.findAll(principal)).thenReturn(List.of(response));
 
-        assertThat(controller.findAll()).containsExactly(response);
+        assertThat(controller.findAll(principal)).containsExactly(response);
     }
 
     @Test
@@ -63,7 +78,59 @@ class UserControllerTest {
         assertThat(controller.create(request)).isSameAs(response);
     }
 
+    @Test
+    void importCsvDelegatesToService() {
+        MockMultipartFile file = new MockMultipartFile("file", "users.csv", "text/csv", new byte[0]);
+        UserResponse response = response();
+        when(userService.importCsv(file)).thenReturn(List.of(response));
+
+        assertThat(controller.importCsv(file)).containsExactly(response);
+    }
+
+    @Test
+    void updateMeDelegatesToService() {
+        UserEntity user = TestData.activeUser(1);
+        var principal = TestData.principal(user);
+        UserProfileUpdateRequest request = new UserProfileUpdateRequest("Updated User", null, null, null, null, null, null, null, null);
+        UserResponse response = response();
+        when(userService.updateProfile(principal, request)).thenReturn(response);
+
+        assertThat(controller.updateMe(request, principal)).isSameAs(response);
+    }
+
+    @Test
+    void updateOrganizationDelegatesToService() {
+        var principal = TestData.principal(TestData.user(
+                2,
+                "org-admin@example.test",
+                "Organization Admin",
+                UserStatus.ACTIVE,
+                RoleName.ORGANIZATION_ADMIN
+        ));
+        UserOrganizationUpdateRequest request = new UserOrganizationUpdateRequest(TestData.uuid(3));
+        UserResponse response = response();
+        when(userService.updateOrganization(TestData.uuid(1), request, principal)).thenReturn(response);
+
+        assertThat(controller.updateOrganization(TestData.uuid(1), request, principal)).isSameAs(response);
+    }
+
     private static UserResponse response() {
-        return new UserResponse(TestData.uuid(1), "user@example.test", "User", "ACTIVE", null, null, Set.of("END_USER"));
+        return new UserResponse(
+                TestData.uuid(1),
+                "user@example.test",
+                "User",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "ACTIVE",
+                null,
+                null,
+                Set.of("END_USER")
+        );
     }
 }

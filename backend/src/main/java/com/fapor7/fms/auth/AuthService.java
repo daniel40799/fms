@@ -7,7 +7,11 @@ import com.fapor7.fms.users.UserService;
 import com.fapor7.fms.users.dto.UserCreateRequest;
 import com.fapor7.fms.users.dto.UserResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Locale;
+import java.util.UUID;
 
 /**
  * Handles email/password authentication and JWT issuance.
@@ -76,5 +80,61 @@ public class AuthService {
                 request.organizationId(),
                 null
         ));
+    }
+
+    /**
+     * Creates an app JWT for an authenticated OIDC provider user.
+     *
+     * <p>Existing local accounts are matched by email. A provider identity
+     * without a matching local account is provisioned as an end user with an
+     * unguessable password placeholder so email/password login remains
+     * unavailable until the account is explicitly managed locally.</p>
+     *
+     * @param oauth2User provider principal containing OIDC profile claims
+     * @return response containing an app JWT
+     */
+    public LoginResponse loginSso(OAuth2User oauth2User) {
+        String email = firstAttribute(oauth2User, "email", "preferred_username", "upn");
+
+        if (email == null || email.isBlank()) {
+            throw new RuntimeException("SSO provider did not return an email address");
+        }
+
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        UserEntity user = userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseGet(() -> provisionSsoUser(
+                        normalizedEmail,
+                        firstAttribute(oauth2User, "name", "given_name")
+                ));
+
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new RuntimeException("User account is not active");
+        }
+
+        return new LoginResponse(jwtService.generateToken(user.getId(), user.getEmail()));
+    }
+
+    private UserEntity provisionSsoUser(String email, String fullName) {
+        userService.create(new UserCreateRequest(
+                email,
+                UUID.randomUUID() + "-" + UUID.randomUUID(),
+                fullName == null || fullName.isBlank() ? email : fullName.trim(),
+                null,
+                null
+        ));
+
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new RuntimeException("Failed to provision SSO user"));
+    }
+
+    private String firstAttribute(OAuth2User oauth2User, String... names) {
+        for (String name : names) {
+            Object value = oauth2User.getAttributes().get(name);
+            if (value instanceof String text && !text.isBlank()) {
+                return text;
+            }
+        }
+
+        return null;
     }
 }

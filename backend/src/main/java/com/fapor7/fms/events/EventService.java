@@ -9,6 +9,7 @@ import com.fapor7.fms.organizations.OrganizationRepository;
 import com.fapor7.fms.users.UserEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -87,6 +88,9 @@ public class EventService {
         event.setCapacity(request.capacity());
         event.setRegistrationOpen(request.registrationOpen());
         event.setRegistrationClose(request.registrationClose());
+        event.setRegistrationPrice(requireRegistrationPrice(request.registrationPrice()));
+        event.setHorizontalPosterUrl(requirePosterUrl(request.horizontalPosterUrl(), "Horizontal poster"));
+        event.setVerticalPosterUrl(requirePosterUrl(request.verticalPosterUrl(), "Vertical poster"));
         event.setStatus(EventStatus.DRAFT);
         event.setOrganization(organization);
         event.setCreatedBy(currentUser);
@@ -108,6 +112,10 @@ public class EventService {
         EventEntity event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
+        if (event.getStatus() == EventStatus.ARCHIVED) {
+            throw new RuntimeException("Archived events cannot be edited");
+        }
+
         OrganizationEntity organization = null;
 
         if (request.organizationId() != null) {
@@ -123,10 +131,17 @@ public class EventService {
         event.setCapacity(request.capacity());
         event.setRegistrationOpen(request.registrationOpen());
         event.setRegistrationClose(request.registrationClose());
+        event.setRegistrationPrice(requireRegistrationPrice(request.registrationPrice()));
+        event.setHorizontalPosterUrl(requirePosterUrl(request.horizontalPosterUrl(), "Horizontal poster"));
+        event.setVerticalPosterUrl(requirePosterUrl(request.verticalPosterUrl(), "Vertical poster"));
         event.setOrganization(organization);
 
         if (request.status() != null) {
-            event.setStatus(EventStatus.valueOf(request.status()));
+            EventStatus status = EventStatus.valueOf(request.status());
+            if (status == EventStatus.ARCHIVED) {
+                throw new RuntimeException("Use the archive action for published events");
+            }
+            event.setStatus(status);
         }
 
         event.setUpdatedAt(LocalDateTime.now());
@@ -145,10 +160,31 @@ public class EventService {
         EventEntity event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
+        if (event.getStatus() != EventStatus.PUBLISHED) {
+            throw new RuntimeException("Only published events can be archived");
+        }
+
         event.setStatus(EventStatus.ARCHIVED);
         event.setUpdatedAt(LocalDateTime.now());
 
         return toResponse(eventRepository.save(event));
+    }
+
+    /**
+     * Deletes a draft that has not entered the published lifecycle.
+     *
+     * @param id event id to delete
+     * @throws RuntimeException when the event does not exist or is not a draft
+     */
+    public void deleteDraft(UUID id) {
+        EventEntity event = eventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (event.getStatus() != EventStatus.DRAFT) {
+            throw new RuntimeException("Only draft events can be deleted");
+        }
+
+        eventRepository.delete(event);
     }
 
     /**
@@ -168,11 +204,30 @@ public class EventService {
                 event.getCapacity(),
                 event.getRegistrationOpen(),
                 event.getRegistrationClose(),
+                event.getRegistrationPrice(),
+                event.getHorizontalPosterUrl(),
+                event.getVerticalPosterUrl(),
                 event.getStatus().name(),
                 event.getOrganization() != null ? event.getOrganization().getId() : null,
                 event.getOrganization() != null ? event.getOrganization().getName() : null,
                 event.getCreatedBy() != null ? event.getCreatedBy().getId() : null,
                 event.getCreatedBy() != null ? event.getCreatedBy().getFullName() : null
         );
+    }
+
+    private BigDecimal requireRegistrationPrice(BigDecimal registrationPrice) {
+        if (registrationPrice == null || registrationPrice.signum() < 0) {
+            throw new RuntimeException("Registration price must be zero or greater");
+        }
+
+        return registrationPrice;
+    }
+
+    private String requirePosterUrl(String posterUrl, String label) {
+        if (posterUrl == null || posterUrl.isBlank()) {
+            throw new RuntimeException(label + " is required");
+        }
+
+        return posterUrl.trim();
     }
 }

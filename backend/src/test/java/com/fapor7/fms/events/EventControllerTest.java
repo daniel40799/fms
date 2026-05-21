@@ -6,6 +6,7 @@ import com.fapor7.fms.events.dto.EventResponse;
 import com.fapor7.fms.events.dto.EventUpdateRequest;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +37,7 @@ class EventControllerTest {
 
     @Test
     void createDelegatesToService() {
-        EventCreateRequest request = new EventCreateRequest("t", "d", "v", null, null, null, null, null, null);
+        EventCreateRequest request = new EventCreateRequest("t", "d", "v", null, null, null, null, null, BigDecimal.ZERO, "wide", "vertical", null);
         EventResponse response = response();
         var principal = TestData.principal(TestData.activeUser(1));
         when(eventService.create(request, principal)).thenReturn(response);
@@ -46,7 +47,7 @@ class EventControllerTest {
 
     @Test
     void updateDelegatesToService() {
-        EventUpdateRequest request = new EventUpdateRequest("t", "d", "v", null, null, null, null, null, null, null);
+        EventUpdateRequest request = new EventUpdateRequest("t", "d", "v", null, null, null, null, null, BigDecimal.ZERO, "wide", "vertical", null, null);
         EventResponse response = response();
         when(eventService.update(TestData.uuid(1), request)).thenReturn(response);
 
@@ -62,7 +63,14 @@ class EventControllerTest {
         verify(eventService).archive(TestData.uuid(1));
     }
 
+    @Test
+    void deleteDraftDelegatesToService() {
+        controller.deleteDraft(TestData.uuid(1));
+
+        verify(eventService).deleteDraft(TestData.uuid(1));
+    }
+
     private static EventResponse response() {
-        return new EventResponse(TestData.uuid(1), "t", "d", "v", null, null, null, null, null, "DRAFT", null, null, null, null);
+        return new EventResponse(TestData.uuid(1), "t", "d", "v", null, null, null, null, null, BigDecimal.ZERO, "wide", "vertical", "DRAFT", null, null, null, null);
     }
 }

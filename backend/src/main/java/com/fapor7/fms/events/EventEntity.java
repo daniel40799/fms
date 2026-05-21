@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -44,6 +45,15 @@ public class EventEntity {
 
     @Column(name = "registration_close")
     private LocalDateTime registrationClose;
+
+    @Column(name = "registration_price")
+    private BigDecimal registrationPrice;
+
+    @Column(name = "horizontal_poster_url")
+    private String horizontalPosterUrl;
+
+    @Column(name = "vertical_poster_url")
+    private String verticalPosterUrl;
 
     @Enumerated(EnumType.STRING)
     private EventStatus status;

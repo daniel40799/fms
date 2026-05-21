@@ -21,4 +21,12 @@ public interface UserRepository extends JpaRepository<@NonNull UserEntity, @NonN
      * @return matching user when present
      */
     Optional<@NonNull UserEntity> findByEmail(String email);
+
+    /**
+     * Finds a user by login email without relying on email case.
+     *
+     * @param email email address to search for
+     * @return matching user when present
+     */
+    Optional<@NonNull UserEntity> findByEmailIgnoreCase(String email);
 }

@@ -65,6 +65,14 @@ export function LoginPage({
           <Button className="mt-6 w-full justify-center" loading={loading || login.loading}>
             {login.loading ? 'Signing in...' : 'Sign in'}
           </Button>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <Button type="button" variant="secondary" onClick={() => window.location.assign('/oauth2/authorization/entra')}>
+              Microsoft
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => window.location.assign('/oauth2/authorization/google')}>
+              Google
+            </Button>
+          </div>
           <button
             type="button"
             className="mt-4 w-full rounded-md px-3 py-2 text-sm font-semibold text-sky-700 transition-colors duration-150 ease-out hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 motion-reduce:transition-none"

@@ -29,6 +29,8 @@ export function AttendancePage({ logs, onCheckIn }: { logs: AttendanceLog[]; onC
           columns={['Participant', 'Event', 'Checked in by', 'Time']}
           rows={logs.map((log) => [log.userFullName, log.eventTitle, log.checkedInByName, formatDateTime(log.checkedInAt)])}
           empty="No check-ins recorded."
+          filterableColumns={[true, true, true, true]}
+          pageSize={10}
         />
       </Panel>
     </Page>

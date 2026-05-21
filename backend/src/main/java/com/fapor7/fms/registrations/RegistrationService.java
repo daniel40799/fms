@@ -3,6 +3,7 @@ package com.fapor7.fms.registrations;
 import com.fapor7.fms.auth.AuthenticatedUser;
 import com.fapor7.fms.events.EventEntity;
 import com.fapor7.fms.events.EventRepository;
+import com.fapor7.fms.events.EventStatus;
 import com.fapor7.fms.registrations.dto.RegistrationCreateRequest;
 import com.fapor7.fms.registrations.dto.RegistrationResponse;
 import com.fapor7.fms.users.UserEntity;
@@ -56,8 +57,16 @@ public class RegistrationService {
     ) {
         UserEntity user = authenticatedUser.getUser();
 
+        if (isInternalFapor7User(user)) {
+            throw new RuntimeException("FAPOR7 organization users cannot register for events");
+        }
+
         EventEntity event = eventRepository.findById(request.eventId())
                 .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (event.getStatus() != EventStatus.PUBLISHED) {
+            throw new RuntimeException("Only published events accept registrations");
+        }
 
         registrationRepository.findByEventIdAndUserId(event.getId(), user.getId())
                 .ifPresent(existing -> {
@@ -82,7 +91,12 @@ public class RegistrationService {
      * @return current user's registrations
      */
     public List<RegistrationResponse> findMyRegistrations(AuthenticatedUser authenticatedUser) {
-        UUID userId = authenticatedUser.getUser().getId();
+        UserEntity user = authenticatedUser.getUser();
+        if (isInternalFapor7User(user)) {
+            return List.of();
+        }
+
+        UUID userId = user.getId();
 
         return registrationRepository.findAll()
                 .stream()
@@ -242,5 +256,9 @@ public class RegistrationService {
         );
     }
 
+    private boolean isInternalFapor7User(UserEntity user) {
+        return user.getOrganization() != null
+                && "FAPOR7".equalsIgnoreCase(user.getOrganization().getCode());
+    }
 
 }

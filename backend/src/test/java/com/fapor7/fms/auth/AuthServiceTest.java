@@ -14,12 +14,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -96,6 +98,14 @@ class AuthServiceTest {
                 TestData.uuid(5),
                 request.email(),
                 request.fullName(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 "ACTIVE",
                 request.organizationId(),
                 "Organization 4",
@@ -113,6 +123,63 @@ class AuthServiceTest {
         assertThat(captor.getValue().password()).isEqualTo("secret");
         assertThat(captor.getValue().fullName()).isEqualTo("New User");
         assertThat(captor.getValue().organizationId()).isEqualTo(TestData.uuid(4));
+        assertThat(captor.getValue().roles()).isNull();
+    }
+
+    @Test
+    void loginSsoReturnsTokenForExistingEmail() {
+        UserEntity user = TestData.activeUser(6);
+        OAuth2User oauth2User = mock(OAuth2User.class);
+        when(oauth2User.getAttributes()).thenReturn(java.util.Map.of("email", user.getEmail()));
+        when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
+        when(jwtService.generateToken(user.getId(), user.getEmail())).thenReturn("sso-token");
+
+        LoginResponse response = authService.loginSso(oauth2User);
+
+        assertThat(response.token()).isEqualTo("sso-token");
+    }
+
+    @Test
+    void loginSsoRejectsProviderWithoutEmail() {
+        OAuth2User oauth2User = mock(OAuth2User.class);
+        when(oauth2User.getAttributes()).thenReturn(java.util.Map.of());
+
+        assertThatThrownBy(() -> authService.loginSso(oauth2User))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("SSO provider did not return an email address");
+    }
+
+    @Test
+    void loginSsoRejectsInactiveUsers() {
+        UserEntity user = TestData.user(9, "inactive-sso@example.test", "Inactive SSO", UserStatus.INACTIVE);
+        OAuth2User oauth2User = mock(OAuth2User.class);
+        when(oauth2User.getAttributes()).thenReturn(java.util.Map.of("email", user.getEmail()));
+        when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authService.loginSso(oauth2User))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("User account is not active");
+    }
+
+    @Test
+    void loginSsoProvisionsMissingEmailAsEndUser() {
+        OAuth2User oauth2User = mock(OAuth2User.class);
+        UserEntity user = TestData.activeUser(7);
+        when(oauth2User.getAttributes()).thenReturn(java.util.Map.of(
+                "preferred_username", "SSO.User@example.test",
+                "name", "SSO User"
+        ));
+        when(userRepository.findByEmailIgnoreCase("sso.user@example.test"))
+                .thenReturn(Optional.empty(), Optional.of(user));
+        when(jwtService.generateToken(user.getId(), user.getEmail())).thenReturn("sso-token");
+
+        LoginResponse response = authService.loginSso(oauth2User);
+
+        assertThat(response.token()).isEqualTo("sso-token");
+        ArgumentCaptor<UserCreateRequest> captor = ArgumentCaptor.forClass(UserCreateRequest.class);
+        verify(userService).create(captor.capture());
+        assertThat(captor.getValue().email()).isEqualTo("sso.user@example.test");
+        assertThat(captor.getValue().fullName()).isEqualTo("SSO User");
         assertThat(captor.getValue().roles()).isNull();
     }
 }

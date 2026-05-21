@@ -40,6 +40,7 @@ public class RegistrationController {
      * @return newly created registration in pending-payment status
      */
     @PostMapping
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('END_USER')")
     public RegistrationResponse register(
             @RequestBody RegistrationCreateRequest request,
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser
@@ -54,6 +55,7 @@ public class RegistrationController {
      * @return registrations for the current user
      */
     @GetMapping("/me")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('END_USER')")
     public List<RegistrationResponse> myRegistrations(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
@@ -66,7 +68,7 @@ public class RegistrationController {
      * @return all registration records
      */
     @GetMapping
-    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN')")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN') or hasRole('USER_ADMIN')")
     public List<RegistrationResponse> findAll() {
         return registrationService.findAll();
     }
@@ -81,6 +83,7 @@ public class RegistrationController {
      * @return updated registration with payment upload details
      */
     @PostMapping("/{id}/payment")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('END_USER')")
     public RegistrationResponse uploadPaymentProof(
             @PathVariable UUID id,
             @RequestParam String paymentReference,

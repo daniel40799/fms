@@ -10,8 +10,18 @@ export interface Me {
   id: string
   email: string
   fullName: string
+  firstName: string | null
+  middleName: string | null
+  lastName: string | null
+  birthday: string | null
+  sex: string | null
+  address: string | null
+  mobileNumber: string | null
+  prcNumber: string | null
   status: string
+  organizationId: string | null
   organization: string | null
+  organizationCode: string | null
   roles: RoleName[]
 }
 
@@ -26,6 +36,14 @@ export interface FmsUser {
   id: string
   email: string
   fullName: string
+  firstName: string | null
+  middleName: string | null
+  lastName: string | null
+  birthday: string | null
+  sex: string | null
+  address: string | null
+  mobileNumber: string | null
+  prcNumber: string | null
   status: string
   organizationId: string | null
   organizationName: string | null
@@ -42,6 +60,9 @@ export interface EventRecord {
   capacity: number | null
   registrationOpen: string | null
   registrationClose: string | null
+  registrationPrice: number
+  horizontalPosterUrl: string | null
+  verticalPosterUrl: string | null
   status: string
   organizationId: string | null
   organizationName: string | null
@@ -58,7 +79,23 @@ export interface EventPayload {
   capacity: number | null
   registrationOpen: string | null
   registrationClose: string | null
+  registrationPrice: number
+  horizontalPosterUrl: string
+  verticalPosterUrl: string
   organizationId: string | null
+  status?: 'DRAFT' | 'PUBLISHED'
+}
+
+export interface ProfilePayload {
+  fullName?: string
+  firstName: string
+  middleName: string | null
+  lastName: string
+  birthday: string | null
+  sex: string | null
+  address: string | null
+  mobileNumber: string | null
+  prcNumber: string | null
 }
 
 export interface Registration {
@@ -94,6 +131,7 @@ export interface AttendanceLog {
 
 export type View =
   | 'dashboard'
+  | 'profile'
   | 'events'
   | 'my-registrations'
   | 'registrations'

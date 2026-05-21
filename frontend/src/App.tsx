@@ -11,15 +11,33 @@ EventsPage,
 LoginPage,
 MyRegistrationsPage,
 OrganizationsPage,
+ProfilePage,
 RegisterPage,
 RegistrationReviewPage,
 ReportsPage,
 UsersPage,
 } from './pages'
-import type { AttendanceLog, EventRecord, FmsUser, Me, Organization, Registration, View } from './types'
+import type { AttendanceLog, EventRecord, FmsUser, Me, Organization, ProfilePayload, Registration, RoleName, View } from './types'
+
+function hasAnyRole(roles: RoleName[], expectedRoles: RoleName[]) {
+  return roles.some((role) => expectedRoles.includes(role))
+}
+
+function getInitialToken() {
+  const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+  const ssoToken = fragment.get('sso_token')
+
+  if (ssoToken) {
+    tokenStore.set(ssoToken)
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
+    return ssoToken
+  }
+
+  return tokenStore.get()
+}
 
 function App() {
-  const [token, setToken] = useState(tokenStore.get())
+  const [token, setToken] = useState(getInitialToken)
   const [me, setMe] = useState<Me | null>(null)
   const [events, setEvents] = useState<EventRecord[]>([])
   const [myRegistrations, setMyRegistrations] = useState<Registration[]>([])
@@ -33,9 +51,17 @@ function App() {
   const [notice, setNotice] = useState('')
   const [noticeTone, setNoticeTone] = useState('INFORMATION')
 
-  const isMainAdmin = me?.roles.includes('MAIN_ADMIN') ?? false
-  const canManageUsers = Boolean(me?.roles.some((role) => role === 'MAIN_ADMIN' || role === 'USER_ADMIN'))
-  const canManageEvents = Boolean(me?.roles.some((role) => role === 'MAIN_ADMIN' || role === 'EVENT_ADMIN'))
+  const roles = me?.roles ?? []
+  const isMainAdmin = roles.includes('MAIN_ADMIN')
+  const canManageUsers = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN'])
+  const canManageAffiliations = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN', 'ORGANIZATION_ADMIN'])
+  const canManageEvents = hasAnyRole(roles, ['MAIN_ADMIN', 'EVENT_ADMIN'])
+  const isInternalFapor7User = me?.organizationCode?.toUpperCase() === 'FAPOR7'
+  const canRegisterForEvents = hasAnyRole(roles, ['MAIN_ADMIN', 'END_USER']) && !isInternalFapor7User
+  const canViewDashboard = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN', 'END_USER'])
+  const canViewEvents = hasAnyRole(roles, ['MAIN_ADMIN', 'EVENT_ADMIN', 'END_USER'])
+  const canViewMyRegistrations = canRegisterForEvents
+  const canViewReports = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN'])
   const canReviewRegistrations = canManageEvents
   const canViewOrganizations = canManageUsers
   const canCreateOrganizations = isMainAdmin
@@ -59,20 +85,43 @@ function App() {
   }
 
   async function loadCore(profile = me) {
-    const [eventData, ownRegistrations] = await Promise.all([api.events.list(), api.registrations.mine()])
-    setEvents(eventData)
-    setMyRegistrations(ownRegistrations)
+    const profileRoles = profile?.roles ?? []
+    const profileCanManageEvents = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'EVENT_ADMIN'])
+    const profileCanViewEvents = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'EVENT_ADMIN', 'END_USER'])
+    const profileCanViewOwnRegistrations = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'END_USER'])
+      && profile?.organizationCode?.toUpperCase() !== 'FAPOR7'
+    const profileCanViewDashboard = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN', 'END_USER'])
+    const profileCanViewReports = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN'])
+    const profileCanManageAffiliations = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'USER_ADMIN', 'ORGANIZATION_ADMIN'])
 
-    if (profile?.roles.some((role) => role === 'MAIN_ADMIN' || role === 'EVENT_ADMIN')) {
+    if (profileCanViewEvents || profileCanViewDashboard || profileCanViewReports) {
+      setEvents(await api.events.list())
+    } else {
+      setEvents([])
+    }
+
+    if (profileCanViewOwnRegistrations) {
+      setMyRegistrations(await api.registrations.mine())
+    } else {
+      setMyRegistrations([])
+    }
+
+    if (profileCanManageEvents || profileCanViewReports) {
       const [allRegistrations, logs] = await Promise.all([api.registrations.list(), api.attendance.list()])
       setRegistrations(allRegistrations)
       setAttendance(logs)
+    } else {
+      setRegistrations([])
+      setAttendance([])
     }
 
-    if (profile?.roles.some((role) => role === 'MAIN_ADMIN' || role === 'USER_ADMIN')) {
+    if (profileCanManageAffiliations) {
       const [userData, orgData] = await Promise.all([api.users.list(), api.organizations.list()])
       setUsers(userData)
       setOrganizations(orgData)
+    } else {
+      setUsers([])
+      setOrganizations([])
     }
   }
 
@@ -102,6 +151,23 @@ function App() {
     } catch (error) {
       setNotice(getErrorMessage(error))
       setNoticeTone('ERROR')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function updateProfile(payload: ProfilePayload) {
+    setLoading(true)
+    try {
+      await api.updateMe(payload)
+      const profile = await api.me()
+      setMe(profile)
+      setNotice('Profile updated.')
+      setNoticeTone('CONFIRMED')
+    } catch (error) {
+      setNotice(getErrorMessage(error))
+      setNoticeTone('ERROR')
+      throw error
     } finally {
       setLoading(false)
     }
@@ -155,15 +221,17 @@ function App() {
   }
 
   const navItems: { id: View; label: string }[] = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'events', label: 'Events' },
-    { id: 'my-registrations', label: 'My registrations' },
+    ...(canViewDashboard ? [{ id: 'dashboard' as View, label: 'Dashboard' }] : []),
+    { id: 'profile', label: 'Profile' },
+    ...(canViewEvents ? [{ id: 'events' as View, label: 'Events' }] : []),
+    ...(canViewMyRegistrations ? [{ id: 'my-registrations' as View, label: 'My registrations' }] : []),
     ...(canReviewRegistrations ? [{ id: 'registrations' as View, label: 'Payment review' }] : []),
     ...(canReviewRegistrations ? [{ id: 'attendance' as View, label: 'Attendance' }] : []),
-    ...(canManageUsers ? [{ id: 'users' as View, label: 'Users' }] : []),
+    ...(canManageAffiliations ? [{ id: 'users' as View, label: 'Users' }] : []),
     ...(canViewOrganizations ? [{ id: 'organizations' as View, label: 'Organizations' }] : []),
-    { id: 'reports', label: 'Reports' },
+    ...(canViewReports ? [{ id: 'reports' as View, label: 'Reports' }] : []),
   ]
+  const activeView = navItems.some((item) => item.id === view) ? view : navItems[0].id
 
   const currentPage = {
     dashboard: (
@@ -173,16 +241,22 @@ function App() {
         attendance={attendance}
         users={users}
         canReviewRegistrations={canReviewRegistrations}
+        canRegister={canRegisterForEvents}
+        isEndUserDashboard={roles.includes('END_USER') && !canReviewRegistrations}
+        onRegister={(eventId) => api.registrations.create(eventId).then(() => refresh('Registration created.'))}
       />
     ),
+    profile: <ProfilePage me={me} onUpdate={updateProfile} />,
     events: (
       <EventsPage
         events={events}
         organizations={organizations}
         canManageEvents={canManageEvents}
+        canRegister={canRegisterForEvents}
         onCreate={(payload) => api.events.create(payload).then(() => refresh('Event created.'))}
         onUpdate={(id, payload) => api.events.update(id, payload).then(() => refresh('Event updated.'))}
         onArchive={(id) => api.events.archive(id).then(() => refresh('Event archived.'))}
+        onDelete={(id) => api.events.deleteDraft(id).then(() => refresh('Draft event deleted.'))}
         onRegister={(eventId) => api.registrations.create(eventId).then(() => refresh('Registration created.'))}
       />
     ),
@@ -213,7 +287,15 @@ function App() {
       <UsersPage
         users={users}
         organizations={organizations}
+        affiliationOrganizations={canManageUsers
+          ? organizations
+          : organizations.filter((organization) => organization.id === me.organizationId)}
+        canCreate={canManageUsers}
         onCreate={(payload) => api.users.create(payload).then(() => refresh('User account created.'))}
+        onImport={(file) => api.users.importCsv(file).then(() => refresh('Users imported.'))}
+        onUpdateOrganization={(userId, organizationId) =>
+          api.users.updateOrganization(userId, organizationId).then(() => refresh('Organization affiliation updated.'))
+        }
       />
     ),
     organizations: (
@@ -229,6 +311,7 @@ function App() {
         registrations={canReviewRegistrations ? registrations : myRegistrations}
         attendance={attendance}
         users={users}
+        roles={roles}
       />
     ),
   } satisfies Record<View, ReactElement>
@@ -237,7 +320,7 @@ function App() {
     <MotionConfig reducedMotion="user">
       <AppLayout
         me={me}
-        view={view}
+        view={activeView}
         navItems={navItems}
         loading={loading}
         onNavigate={setView}
@@ -247,7 +330,7 @@ function App() {
         <AnimatePresence initial={false}>
           {notice && <Alert key={notice} message={notice} tone={noticeTone} onDismiss={() => setNotice('')} />}
         </AnimatePresence>
-        {currentPage[view]}
+        {currentPage[activeView]}
       </AppLayout>
     </MotionConfig>
   )

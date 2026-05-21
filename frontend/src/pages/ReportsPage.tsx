@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Page } from '../components/layout'
 import { Button, Panel, Stat, Table } from '../components/ui'
 import { toCsv } from '../lib/csv'
-import type { AttendanceLog, EventRecord, FmsUser, Registration } from '../types'
+import type { AttendanceLog, EventRecord, FmsUser, Registration, RoleName } from '../types'
 
 function DownloadButton({ filename, rows, children }: { filename: string; rows: Record<string, unknown>[]; children: string }) {
   return (
@@ -29,12 +29,17 @@ export function ReportsPage({
   registrations,
   attendance,
   users,
+  roles,
 }: {
   events: EventRecord[]
   registrations: Registration[]
   attendance: AttendanceLog[]
   users: FmsUser[]
+  roles: RoleName[]
 }) {
+  const isMainAdmin = roles.includes('MAIN_ADMIN')
+  const canExportEvents = isMainAdmin || roles.includes('EVENT_ADMIN')
+  const canExportUsers = isMainAdmin || roles.includes('USER_ADMIN')
   const eventRows = useMemo<Record<string, unknown>[]>(() => events.map((event) => ({
     title: event.title,
     venue: event.venue,
@@ -55,32 +60,35 @@ export function ReportsPage({
   return (
     <Page title="Reports" description="Exportable operational summaries for events, payments, registration status, and attendance.">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Events" value={events.length} tone="INFORMATION" />
-        <Stat label="Payment uploads" value={registrations.filter((item) => item.status === 'PAYMENT_UPLOADED').length} tone="PAYMENT_UPLOADED" />
-        <Stat label="Confirmed registrations" value={registrations.filter((item) => item.status === 'CONFIRMED').length} tone="CONFIRMED" />
-        <Stat label="Attendance logs" value={attendance.length} tone="ACTIVE" />
+        {canExportEvents ? <Stat label="Events" value={events.length} tone="INFORMATION" /> : null}
+        {isMainAdmin ? <Stat label="Payment uploads" value={registrations.filter((item) => item.status === 'PAYMENT_UPLOADED').length} tone="PAYMENT_UPLOADED" /> : null}
+        {isMainAdmin ? <Stat label="Confirmed registrations" value={registrations.filter((item) => item.status === 'CONFIRMED').length} tone="CONFIRMED" /> : null}
+        {isMainAdmin ? <Stat label="Attendance logs" value={attendance.length} tone="ACTIVE" /> : null}
+        {canExportUsers ? <Stat label="Users" value={users.length} tone="DEFAULT" /> : null}
       </div>
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className={`mt-6 grid gap-6 ${isMainAdmin ? 'xl:grid-cols-2' : ''}`}>
         <Panel title="Exports">
           <div className="flex flex-wrap gap-2">
-            <DownloadButton filename="fapor7-events.csv" rows={eventRows}>Events CSV</DownloadButton>
-            <DownloadButton filename="fapor7-registrations.csv" rows={registrationRows}>Registrations CSV</DownloadButton>
-            <DownloadButton filename="fapor7-attendance.csv" rows={attendance.map((log) => ({ ...log }))}>Attendance CSV</DownloadButton>
-            <DownloadButton filename="fapor7-users.csv" rows={users.map((user) => ({ ...user }))}>Users CSV</DownloadButton>
+            {canExportEvents ? <DownloadButton filename="fapor7-events.csv" rows={eventRows}>Events CSV</DownloadButton> : null}
+            {isMainAdmin ? <DownloadButton filename="fapor7-registrations.csv" rows={registrationRows}>Registrations CSV</DownloadButton> : null}
+            {isMainAdmin ? <DownloadButton filename="fapor7-attendance.csv" rows={attendance.map((log) => ({ ...log }))}>Attendance CSV</DownloadButton> : null}
+            {canExportUsers ? <DownloadButton filename="fapor7-users.csv" rows={users.map((user) => ({ ...user }))}>Users CSV</DownloadButton> : null}
           </div>
         </Panel>
-        <Panel title="Completion criteria">
-          <Table
-            columns={['Participant', 'Registration', 'Payment', 'Attendance']}
-            rows={registrations.slice(0, 8).map((registration) => [
-              registration.userFullName,
-              'Complete',
-              registration.status === 'CONFIRMED' ? 'Confirmed' : registration.status === 'PAYMENT_UPLOADED' ? 'For review' : 'Pending',
-              attendance.some((log) => log.registrationId === registration.id) ? 'Checked in' : 'Not checked in',
-            ])}
-            empty="No completion data yet."
-          />
-        </Panel>
+        {isMainAdmin ? (
+          <Panel title="Completion criteria">
+            <Table
+              columns={['Participant', 'Registration', 'Payment', 'Attendance']}
+              rows={registrations.slice(0, 8).map((registration) => [
+                registration.userFullName,
+                'Complete',
+                registration.status === 'CONFIRMED' ? 'Confirmed' : registration.status === 'PAYMENT_UPLOADED' ? 'For review' : 'Pending',
+                attendance.some((log) => log.registrationId === registration.id) ? 'Checked in' : 'Not checked in',
+              ])}
+              empty="No completion data yet."
+            />
+          </Panel>
+        ) : null}
       </div>
     </Page>
   )

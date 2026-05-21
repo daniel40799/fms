@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,27 @@ public class UserEntity {
 
     @Column(name = "full_name")
     private String fullName;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "middle_name")
+    private String middleName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    private LocalDate birthday;
+
+    private String sex;
+
+    private String address;
+
+    @Column(name = "mobile_number")
+    private String mobileNumber;
+
+    @Column(name = "prc_number")
+    private String prcNumber;
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;

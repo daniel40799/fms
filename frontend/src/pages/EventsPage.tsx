@@ -21,23 +21,29 @@ export function EventsPage({
   events,
   organizations,
   canManageEvents,
+  canRegister,
   onCreate,
   onUpdate,
   onArchive,
+  onDelete,
   onRegister,
 }: {
   events: EventRecord[]
   organizations: Organization[]
   canManageEvents: boolean
+  canRegister: boolean
   onCreate: (payload: EventPayload) => Promise<void>
   onUpdate: (id: string, payload: EventPayload) => Promise<void>
   onArchive: (id: string) => Promise<void>
+  onDelete: (id: string) => Promise<void>
   onRegister: (eventId: string) => Promise<void>
 }) {
   const [selectedItem, setSelectedItem] = useState<EventRecord | null>(null)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<'archive' | 'delete'>('archive')
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
+  const visibleEvents = canManageEvents ? events : events.filter((event) => event.status === 'PUBLISHED')
 
   const openCreateModal = () => {
     setSelectedItem(null)
@@ -51,9 +57,10 @@ export function EventsPage({
     setIsFormModalOpen(true)
   }
 
-  const openDeleteModal = (item: EventRecord) => {
+  const openConfirmModal = (item: EventRecord, action: 'archive' | 'delete') => {
     setSelectedItem(item)
-    setIsDeleteModalOpen(true)
+    setConfirmAction(action)
+    setIsConfirmModalOpen(true)
   }
 
   return (
@@ -83,41 +90,51 @@ export function EventsPage({
             />
           </FormModal>
           <ConfirmDeleteModal
-            actionLabel="Archive event"
-            description="This keeps historical registrations and attendance logs but removes the event from active use."
-            isOpen={isDeleteModalOpen}
+            actionLabel={confirmAction === 'archive' ? 'Archive event' : 'Delete draft'}
+            description={confirmAction === 'archive'
+              ? 'This keeps historical registrations and attendance logs but removes the event from active use.'
+              : 'This permanently removes the draft before it is published.'}
+            isOpen={isConfirmModalOpen}
             objectName={selectedItem?.title ?? ''}
-            title="Archive event"
-            onClose={() => setIsDeleteModalOpen(false)}
+            title={confirmAction === 'archive' ? 'Archive event' : 'Delete draft event'}
+            onClose={() => setIsConfirmModalOpen(false)}
             onConfirm={async () => {
               if (!selectedItem) return
-              await onArchive(selectedItem.id)
-              setIsDeleteModalOpen(false)
+              if (confirmAction === 'archive') await onArchive(selectedItem.id)
+              else await onDelete(selectedItem.id)
+              setIsConfirmModalOpen(false)
               setSelectedItem(null)
             }}
           />
         </>
       )}
       <div className="mt-6 grid gap-4">
-        {events.map((event) => (
+        {visibleEvents.map((event) => (
           <Panel key={event.id} title={event.title} actions={<StatusBadge value={event.status} />}>
-            <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+            <div className="grid gap-4 md:grid-cols-[112px_1fr] lg:grid-cols-[112px_1fr_auto]">
+              <div className="aspect-[3/4] overflow-hidden rounded-md bg-slate-100">
+                {event.verticalPosterUrl ? (
+                  <img className="h-full w-full object-cover" src={event.verticalPosterUrl} alt="" />
+                ) : null}
+              </div>
               <div className="space-y-2 text-sm text-slate-600">
                 <p>{event.description || 'No description provided.'}</p>
                 <p><span className="font-medium text-slate-800">Venue:</span> {event.venue || 'TBA'}</p>
                 <p><span className="font-medium text-slate-800">Schedule:</span> {formatDateTime(event.startDate)} to {formatDateTime(event.endDate)}</p>
                 <p><span className="font-medium text-slate-800">Registration:</span> {formatDateTime(event.registrationOpen)} to {formatDateTime(event.registrationClose)}</p>
+                <p><span className="font-medium text-slate-800">Price:</span> PHP {event.registrationPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 <p><span className="font-medium text-slate-800">Capacity:</span> {event.capacity ?? 'No limit'} {event.organizationName ? `| ${event.organizationName}` : ''}</p>
               </div>
               <div className="flex flex-wrap items-start gap-2 lg:justify-end">
-                <RegisterButton eventId={event.id} onRegister={onRegister} />
-                {canManageEvents && <Button type="button" variant="secondary" onClick={() => openEditModal(event)}>Edit</Button>}
-                {canManageEvents && event.status !== 'ARCHIVED' && <Button type="button" variant="danger" onClick={() => openDeleteModal(event)}>Archive</Button>}
+                {canRegister && event.status === 'PUBLISHED' && <RegisterButton eventId={event.id} onRegister={onRegister} />}
+                {canManageEvents && event.status !== 'ARCHIVED' && <Button type="button" variant="secondary" onClick={() => openEditModal(event)}>Edit</Button>}
+                {canManageEvents && event.status === 'PUBLISHED' && <Button type="button" variant="danger" onClick={() => openConfirmModal(event, 'archive')}>Archive</Button>}
+                {canManageEvents && event.status === 'DRAFT' && <Button type="button" variant="danger" onClick={() => openConfirmModal(event, 'delete')}>Delete</Button>}
               </div>
             </div>
           </Panel>
         ))}
-        {events.length === 0 && <EmptyState message="No events have been created yet." />}
+        {visibleEvents.length === 0 && <EmptyState message="No events have been created yet." />}
       </div>
     </Page>
   )

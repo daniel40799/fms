@@ -1,6 +1,8 @@
 package com.fapor7.fms.config;
 
 import com.fapor7.fms.auth.JwtAuthenticationFilter;
+import com.fapor7.fms.auth.SsoAuthenticationSuccessHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,8 +11,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -26,9 +26,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final SsoAuthenticationSuccessHandler ssoAuthenticationSuccessHandler;
+    private final boolean ssoEnabled;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            SsoAuthenticationSuccessHandler ssoAuthenticationSuccessHandler,
+            @Value("${app.sso.enabled:false}") boolean ssoEnabled
+    ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.ssoAuthenticationSuccessHandler = ssoAuthenticationSuccessHandler;
+        this.ssoEnabled = ssoEnabled;
     }
 
     /**
@@ -39,33 +47,42 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        return http
+        http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/organizations").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(HttpMethod.GET, "/api/health").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/organizations").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll();
+
+                    if (ssoEnabled) {
+                        auth.requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll();
+                    }
+
+                    auth.anyRequest().authenticated();
+                });
+
+        if (ssoEnabled) {
+            http
+                    .sessionManagement(session ->
+                            session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                    )
+                    .oauth2Login(oauth -> oauth
+                            .successHandler(ssoAuthenticationSuccessHandler)
+                    );
+        } else {
+            http.sessionManagement(session ->
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
+        }
+
+        return http
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    /**
-     * Provides BCrypt password hashing for stored user passwords.
-     *
-     * @return password encoder used by authentication and user creation
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

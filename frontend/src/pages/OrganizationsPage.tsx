@@ -32,6 +32,8 @@ export function OrganizationsPage({
           columns={['Name', 'Code', 'Status']}
           rows={organizations.map((org) => [org.name, org.code, <StatusBadge key={org.id} value={org.status} />])}
           empty="No organizations found."
+          filterableColumns={[true, true, true]}
+          pageSize={10}
         />
       </Panel>
     </Page>

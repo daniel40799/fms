@@ -32,7 +32,23 @@ class AuthControllerTest {
         AuthService authService = mock(AuthService.class);
         AuthController controller = new AuthController(authService);
         RegisterRequest request = new RegisterRequest("User", "user@example.test", "secret", TestData.uuid(1));
-        UserResponse expected = new UserResponse(TestData.uuid(2), "user@example.test", "User", "ACTIVE", TestData.uuid(1), "Organization 1", Set.of("END_USER"));
+        UserResponse expected = new UserResponse(
+                TestData.uuid(2),
+                "user@example.test",
+                "User",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "ACTIVE",
+                TestData.uuid(1),
+                "Organization 1",
+                Set.of("END_USER")
+        );
         when(authService.register(request)).thenReturn(expected);
 
         UserResponse response = controller.register(request);

@@ -12,6 +12,7 @@ import com.fapor7.fms.roles.RoleName;
 import com.fapor7.fms.users.UserEntity;
 import com.fapor7.fms.users.UserStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Set;
@@ -82,6 +83,9 @@ public final class TestData {
         event.setCapacity(100);
         event.setRegistrationOpen(time(1));
         event.setRegistrationClose(time(2));
+        event.setRegistrationPrice(BigDecimal.valueOf(250));
+        event.setHorizontalPosterUrl("https://assets.example.test/event-" + id + "-wide.jpg");
+        event.setVerticalPosterUrl("https://assets.example.test/event-" + id + "-portrait.jpg");
         event.setStatus(EventStatus.PUBLISHED);
         event.setOrganization(organization);
         event.setCreatedBy(creator);

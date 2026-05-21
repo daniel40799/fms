@@ -26,6 +26,9 @@ export function EventForm({
     capacity: event?.capacity?.toString() ?? '',
     registrationOpen: parseApiDateTime(event?.registrationOpen),
     registrationClose: parseApiDateTime(event?.registrationClose),
+    registrationPrice: event?.registrationPrice?.toString() ?? '0',
+    horizontalPosterUrl: event?.horizontalPosterUrl ?? '',
+    verticalPosterUrl: event?.verticalPosterUrl ?? '',
     organizationId: event?.organizationId ?? '',
     status: event?.status ?? 'DRAFT',
   })
@@ -52,7 +55,11 @@ export function EventForm({
             registrationOpen: toLocalDateTimePayload(form.registrationOpen),
             registrationClose: toLocalDateTimePayload(form.registrationClose),
             capacity: form.capacity ? Number(form.capacity) : null,
+            registrationPrice: Number(form.registrationPrice),
+            horizontalPosterUrl: form.horizontalPosterUrl,
+            verticalPosterUrl: form.verticalPosterUrl,
             organizationId: form.organizationId || null,
+            ...(event ? { status: form.status === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT' } : {}),
           }
           void action.run(payload)
         }}
@@ -64,6 +71,9 @@ export function EventForm({
         <Field label="Registration opens"><DateTimePicker value={form.registrationOpen} onChange={(value) => set('registrationOpen', value)} /></Field>
         <Field label="Registration closes"><DateTimePicker value={form.registrationClose} onChange={(value) => set('registrationClose', value)} /></Field>
         <Field label="Capacity"><input className="input" type="number" min="0" value={form.capacity} onChange={(e) => set('capacity', e.target.value)} /></Field>
+        <Field label="Registration price">
+          <input className="input" type="number" min="0" step="0.01" value={form.registrationPrice} onChange={(e) => set('registrationPrice', e.target.value)} required />
+        </Field>
         <Field label="Organization">
           <Select value={form.organizationId} onChange={(e) => set('organizationId', e.target.value)}>
             <option value="">None</option>
@@ -75,10 +85,15 @@ export function EventForm({
             <Select value={form.status} onChange={(e) => set('status', e.target.value)}>
               <option value="DRAFT">Draft</option>
               <option value="PUBLISHED">Published</option>
-              <option value="ARCHIVED">Archived</option>
             </Select>
           </Field>
         )}
+        <Field label="Horizontal poster URL" className="lg:col-span-2">
+          <input className="input" type="url" value={form.horizontalPosterUrl} onChange={(e) => set('horizontalPosterUrl', e.target.value)} required />
+        </Field>
+        <Field label="Vertical poster URL" className="lg:col-span-2">
+          <input className="input" type="url" value={form.verticalPosterUrl} onChange={(e) => set('verticalPosterUrl', e.target.value)} required />
+        </Field>
         <Field label="Description" className="lg:col-span-2">
           <textarea className="input min-h-24" value={form.description} onChange={(e) => set('description', e.target.value)} />
         </Field>

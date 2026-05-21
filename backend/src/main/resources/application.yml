@@ -21,5 +21,8 @@ server:
 
 app:
   jwt:
-    secret: "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_CHANGE_THIS_TO_A_LONG_RANDOM_SECRET"
-    expiration-ms: 86400000
+    secret: ${APP_JWT_SECRET:CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_CHANGE_THIS_TO_A_LONG_RANDOM_SECRET}
+    expiration-ms: ${APP_JWT_EXPIRATION_MS:86400000}
+  sso:
+    enabled: false
+    frontend-success-uri: http://127.0.0.1:5173/

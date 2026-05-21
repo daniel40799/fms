@@ -39,7 +39,13 @@ export function RegistrationReviewPage({
   return (
     <Page title="Payment Review" description="Validate manual payment uploads and confirm registrations to generate attendance QR tokens.">
       <Panel>
-        <Table columns={['Participant', 'Event', 'Status', 'Reference', 'File', 'Action']} rows={rows} empty="No registrations to review." />
+        <Table
+          columns={['Participant', 'Event', 'Status', 'Reference', 'File', 'Action']}
+          rows={rows}
+          empty="No registrations to review."
+          filterableColumns={[true, true, true, true, false, true]}
+          pageSize={10}
+        />
       </Panel>
     </Page>
   )

@@ -35,7 +35,9 @@ This repository currently contains:
   - `EXHIBITOR`
   - `END_USER`
 - Current-user endpoint through `GET /api/me`.
-- Administrative user listing and creation through `/api/users`.
+- Self-service profile updates through `PATCH /api/me`.
+- Administrative user listing, creation, and CSV import through `/api/users`.
+- Organization administrators can maintain end-user organization affiliation within their organization scope.
 
 ### Organization Management
 
@@ -68,7 +70,7 @@ This repository currently contains:
 The broader system roadmap includes:
 
 - Single Sign-On using Microsoft Entra ID or equivalent.
-- Bulk user upload from CSV or Excel.
+- Excel user import.
 - Event resources, sub-events, parallel sessions, ticket limits, and external registration forms.
 - Online payment gateway integration such as Maya Checkout, including webhook confirmation.
 - Azure Blob Storage for payment proof, resources, and generated certificates.
@@ -182,6 +184,35 @@ Current migrations initialize:
 - Registration payment fields
 - Registration QR fields
 - Attendance logs
+
+### Seeded RBAC Test Users
+
+The database migrations seed one FAPOR7 account for each RBAC role. The role-specific accounts below copy the stored password hash from the seeded main administrator, so sign in with the same password used for `daniel@fapor7.org`.
+
+| Role | Email |
+| --- | --- |
+| Main Administrator | `daniel@fapor7.org` |
+| User Administrator | `user.admin@fapor7.org` |
+| Event Administrator | `event.admin@fapor7.org` |
+| Organization Administrator | `organization.admin@fapor7.org` |
+| Exhibitor | `exhibitor@fapor7.org` |
+| End User | `end.user@fapor7.org` |
+
+## Bulk User CSV Import
+
+Main and user administrators can import CSV files from the Users page or through `POST /api/users/import`.
+The CSV template is in `docs/user-import-template.csv`.
+
+Required columns:
+
+- `fullName`
+- `email`
+- `password`
+
+Optional columns:
+
+- `organizationCode` - short organization code stored in the system
+- `roles` - role names separated by `|` or `;`; blank values default to `END_USER`
 
 ## Documentation Notes
 
