@@ -33,7 +33,7 @@ export function AnimatedDialog({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto px-4 py-6"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden px-4 py-4 sm:py-6"
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
@@ -42,9 +42,9 @@ export function AnimatedDialog({
           exit={{ opacity: 0, transition: { duration: 0.12, ease: 'easeIn' } }}
           transition={{ duration: 0.16, ease: 'easeOut' }}
           onMouseDown={onClose}
-        >
+          >
           <motion.div
-            className="fixed inset-0 bg-slate-950/40"
+            className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm dark:bg-slate-950/70"
             aria-hidden
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -56,14 +56,14 @@ export function AnimatedDialog({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.98, transition: { duration: 0.12, ease: 'easeIn' } }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className={`relative w-full ${size === 'sm' ? 'max-w-md' : 'max-w-3xl'} rounded-lg border border-slate-200 bg-white shadow-xl`}
+            className={`relative flex max-h-[90vh] w-full ${size === 'sm' ? 'max-w-md' : 'max-w-3xl'} flex-col overflow-hidden rounded-lg border border-slate-200 bg-white text-slate-950 shadow-xl dark:border-slate-800 dark:bg-slate-900 dark:text-white`}
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
-              <h3 id={titleId} className="text-base font-semibold text-slate-950">{title}</h3>
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-white px-5 py-4 dark:border-slate-800 dark:bg-slate-900">
+              <h3 id={titleId} className="min-w-0 break-words text-base font-semibold text-slate-950 dark:text-white">{title}</h3>
               <button
                 type="button"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition-all duration-150 ease-out hover:bg-slate-100 hover:text-slate-900 active:scale-95 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 motion-reduce:transition-none motion-reduce:active:scale-100"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-slate-500 transition-all duration-150 ease-out hover:bg-slate-100 hover:text-slate-900 active:scale-95 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:outline-sky-400 motion-reduce:transition-none motion-reduce:active:scale-100"
                 onClick={onClose}
                 aria-label={`Close ${title}`}
               >
@@ -75,7 +75,7 @@ export function AnimatedDialog({
                 </svg>
               </button>
             </div>
-            <div className="px-5 py-4">{children}</div>
+            <div className="min-h-0 overflow-y-auto px-5 py-4">{children}</div>
           </motion.section>
         </motion.div>
       )}

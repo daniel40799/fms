@@ -19,7 +19,7 @@ export function PaymentUploadForm({
   })
 
   return (
-    <form className="space-y-3 rounded-md border border-slate-200 p-4 transition-colors duration-200 ease-out hover:border-sky-200 hover:bg-sky-50/30 motion-reduce:transition-none" onSubmit={(event) => {
+    <form className="space-y-3 rounded-md border border-slate-200 p-4 transition-colors duration-200 ease-out hover:border-sky-200 hover:bg-sky-50/30 dark:border-slate-700 dark:hover:border-sky-400/30 dark:hover:bg-sky-400/10 motion-reduce:transition-none" onSubmit={(event) => {
       event.preventDefault()
       void action.run()
     }}>

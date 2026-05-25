@@ -75,12 +75,24 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify(payload),
     }),
+  uploadProfilePicture: (file: File) => {
+    const body = new FormData()
+    body.set('file', file)
+    return request<FmsUser>('/api/me/profile-picture', {
+      method: 'POST',
+      body,
+    })
+  },
   organizations: {
     list: () => request<Organization[]>('/api/organizations'),
     create: (payload: { name: string; code: string }) =>
       request<Organization>('/api/organizations', {
         method: 'POST',
         body: JSON.stringify(payload),
+      }),
+    delete: (id: string) =>
+      request<void>(`/api/organizations/${id}`, {
+        method: 'DELETE',
       }),
   },
   users: {
@@ -108,6 +120,10 @@ export const api = {
       request<FmsUser>(`/api/users/${id}/organization`, {
         method: 'PATCH',
         body: JSON.stringify({ organizationId }),
+      }),
+    delete: (id: string) =>
+      request<void>(`/api/users/${id}`, {
+        method: 'DELETE',
       }),
   },
   events: {

@@ -5,6 +5,7 @@ import com.fapor7.fms.users.dto.UserCreateRequest;
 import com.fapor7.fms.users.dto.UserOrganizationUpdateRequest;
 import com.fapor7.fms.users.dto.UserProfileUpdateRequest;
 import com.fapor7.fms.users.dto.UserResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.MediaType;
@@ -54,6 +55,7 @@ public class UserController {
         profile.put("address", user.getAddress());
         profile.put("mobileNumber", user.getMobileNumber());
         profile.put("prcNumber", user.getPrcNumber());
+        profile.put("profileImageUrl", user.getProfileImageUrl());
         profile.put("status", user.getStatus());
         profile.put("organizationId", user.getOrganization() != null ? user.getOrganization().getId() : null);
         profile.put("organization", user.getOrganization() != null ? user.getOrganization().getName() : null);
@@ -79,6 +81,21 @@ public class UserController {
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
         return userService.updateProfile(authenticatedUser, request);
+    }
+
+    /**
+     * Stores or replaces the current user's profile picture.
+     *
+     * @param file selected image file
+     * @param authenticatedUser current user principal
+     * @return updated user projection
+     */
+    @PostMapping(value = "/api/me/profile-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserResponse uploadProfilePicture(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return userService.updateProfilePicture(authenticatedUser, file);
     }
 
     /**
@@ -133,5 +150,21 @@ public class UserController {
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
         return userService.updateOrganization(id, request, authenticatedUser);
+    }
+
+    /**
+     * Deletes a user account.
+     *
+     * @param id user id to delete
+     * @param authenticatedUser administrative principal applying the change
+     */
+    @DeleteMapping("/api/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('USER_ADMIN')")
+    public void delete(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        userService.delete(id, authenticatedUser);
     }
 }

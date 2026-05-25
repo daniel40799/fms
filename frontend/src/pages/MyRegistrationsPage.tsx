@@ -26,7 +26,7 @@ export function MyRegistrationsPage({
               {registration.status !== 'CONFIRMED' ? (
                 <PaymentUploadForm registrationId={registration.id} onUpload={onUpload} />
               ) : (
-                <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-emerald-900">
+                <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-100">
                   <p className="text-xs font-semibold uppercase tracking-wide">Attendance QR token</p>
                   <p className="mt-2 break-all font-mono text-sm">{registration.qrToken}</p>
                 </div>

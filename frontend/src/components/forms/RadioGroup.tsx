@@ -30,7 +30,7 @@ export function RadioGroup({
   return (
     <fieldset className={className}>
       {legend && (
-        <legend className="text-sm font-semibold leading-6 text-gray-900">{legend}</legend>
+        <legend className="text-sm font-semibold leading-6 text-slate-900 dark:text-slate-100">{legend}</legend>
       )}
       <div
         className={`mt-2 ${
@@ -55,18 +55,18 @@ export function RadioGroup({
                   }
                   disabled={opt.disabled}
                   onChange={() => onChange?.(opt.value)}
-                  className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 disabled:opacity-50"
+                  className="h-4 w-4 border-slate-300 text-sky-700 focus:ring-sky-700 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:focus:ring-sky-400"
                 />
               </div>
               <label
                 htmlFor={optId}
-                className={`block text-sm font-medium leading-6 text-gray-900 ${
+                className={`block text-sm font-medium leading-6 text-slate-900 dark:text-slate-100 ${
                   opt.disabled ? 'opacity-50' : 'cursor-pointer'
                 }`}
               >
                 {opt.label}
                 {opt.description && (
-                  <span className="block font-normal text-gray-500">
+                  <span className="block font-normal text-slate-500 dark:text-slate-400">
                     {opt.description}
                   </span>
                 )}

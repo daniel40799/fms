@@ -13,7 +13,7 @@ export function Alert({ message, tone = 'INFORMATION', onDismiss }: { message: s
       <span>{message}</span>
       <button
         type="button"
-        className="rounded px-2 py-1 font-semibold transition-all duration-150 ease-out hover:bg-white/50 hover:text-slate-950 active:scale-95 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current motion-reduce:transition-none motion-reduce:active:scale-100"
+        className="rounded px-2 py-1 font-semibold transition-all duration-150 ease-out hover:bg-white/50 hover:text-slate-950 active:scale-95 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current dark:hover:bg-white/10 dark:hover:text-white motion-reduce:transition-none motion-reduce:active:scale-100"
         onClick={onDismiss}
       >
         Dismiss
@@ -29,7 +29,7 @@ export function InlineError({ message }: { message: string }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4, transition: { duration: 0.12, ease: 'easeIn' } }}
       transition={{ duration: 0.16, ease: 'easeOut' }}
-      className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+      className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-400/20 dark:bg-red-400/10 dark:text-red-200"
     >
       {message}
     </motion.div>

@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class UserControllerTest {
@@ -28,6 +29,7 @@ class UserControllerTest {
         OrganizationEntity organization = TestData.organization(2);
         UserEntity user = TestData.user(1, "admin@example.test", "Admin", UserStatus.ACTIVE, RoleName.MAIN_ADMIN);
         user.setOrganization(organization);
+        user.setProfileImageUrl("/uploads/profile-pictures/admin.png");
 
         Map<String, Object> profile = controller.me(TestData.principal(user));
 
@@ -37,6 +39,7 @@ class UserControllerTest {
                 .containsEntry("fullName", "Admin")
                 .containsEntry("firstName", null)
                 .containsEntry("status", UserStatus.ACTIVE)
+                .containsEntry("profileImageUrl", "/uploads/profile-pictures/admin.png")
                 .containsEntry("organizationId", organization.getId())
                 .containsEntry("organization", "Organization 2")
                 .containsEntry("organizationCode", "ORG2");
@@ -99,6 +102,17 @@ class UserControllerTest {
     }
 
     @Test
+    void uploadProfilePictureDelegatesToService() {
+        UserEntity user = TestData.activeUser(1);
+        var principal = TestData.principal(user);
+        MockMultipartFile file = new MockMultipartFile("file", "avatar.png", "image/png", "image".getBytes());
+        UserResponse response = response();
+        when(userService.updateProfilePicture(principal, file)).thenReturn(response);
+
+        assertThat(controller.uploadProfilePicture(file, principal)).isSameAs(response);
+    }
+
+    @Test
     void updateOrganizationDelegatesToService() {
         var principal = TestData.principal(TestData.user(
                 2,
@@ -112,6 +126,21 @@ class UserControllerTest {
         when(userService.updateOrganization(TestData.uuid(1), request, principal)).thenReturn(response);
 
         assertThat(controller.updateOrganization(TestData.uuid(1), request, principal)).isSameAs(response);
+    }
+
+    @Test
+    void deleteDelegatesToService() {
+        var principal = TestData.principal(TestData.user(
+                2,
+                "admin@example.test",
+                "Admin",
+                UserStatus.ACTIVE,
+                RoleName.MAIN_ADMIN
+        ));
+
+        controller.delete(TestData.uuid(1), principal);
+
+        verify(userService).delete(TestData.uuid(1), principal);
     }
 
     private static UserResponse response() {

@@ -11,13 +11,13 @@ export function Topbar({ onMenuClick, logo, actions, className = '' }: TopbarPro
   void className;
   return (
     <div
-      className={`sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 ${className}`}
+      className={`sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-slate-200 bg-white px-4 shadow-sm dark:border-slate-800 dark:bg-slate-950 sm:gap-x-6 sm:px-6 lg:px-8 ${className}`}
     >
       {onMenuClick && (
         <button
           type="button"
           onClick={onMenuClick}
-          className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+          className="-m-2.5 p-2.5 text-slate-700 dark:text-slate-200 lg:hidden"
           aria-label="Open sidebar"
         >
           <svg
@@ -38,7 +38,7 @@ export function Topbar({ onMenuClick, logo, actions, className = '' }: TopbarPro
       )}
 
       {/* Separator */}
-      <div className="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
+      <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 lg:hidden" aria-hidden="true" />
 
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
         <div className="flex flex-1" />

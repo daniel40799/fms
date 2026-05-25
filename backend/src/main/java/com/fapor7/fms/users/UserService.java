@@ -17,7 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -38,6 +42,12 @@ import java.util.stream.Collectors;
  */
 @Service
 public class UserService {
+
+    private static final Path PROFILE_PICTURE_UPLOAD_DIR = Path.of("uploads", "profile-pictures");
+    private static final String PROFILE_PICTURE_URL_PREFIX = "/uploads/profile-pictures/";
+    private static final long MAX_PROFILE_PICTURE_BYTES = 5 * 1024 * 1024;
+    private static final Set<String> ALLOWED_PROFILE_PICTURE_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif");
+    private static final String MOBILE_NUMBER_MESSAGE = "Mobile number must be in 09XXXXXXXXX or +639XXXXXXXXX format.";
 
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
@@ -245,11 +255,57 @@ public class UserService {
         user.setBirthday(request.birthday());
         user.setSex(trimToNull(request.sex()));
         user.setAddress(trimToNull(request.address()));
-        user.setMobileNumber(trimToNull(request.mobileNumber()));
+        user.setMobileNumber(validateMobileNumber(request.mobileNumber()));
         user.setPrcNumber(validatePrcNumber(request.prcNumber()));
         user.setUpdatedAt(LocalDateTime.now());
 
         return toResponse(userRepository.save(user));
+    }
+
+    /**
+     * Stores a profile image for the authenticated user and exposes it through
+     * the public uploads resource handler.
+     *
+     * @param authenticatedUser current user principal
+     * @param file selected image file
+     * @return updated user response
+     * @throws RuntimeException when the file is missing, invalid, or cannot be stored
+     */
+    public UserResponse updateProfilePicture(
+            AuthenticatedUser authenticatedUser,
+            MultipartFile file
+    ) {
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("Profile picture is required");
+        }
+
+        if (file.getSize() > MAX_PROFILE_PICTURE_BYTES) {
+            throw new RuntimeException("Profile picture must be 5 MB or smaller");
+        }
+
+        String extension = resolveProfilePictureExtension(file);
+        UserEntity user = authenticatedUser.getUser();
+        String previousUrl = user.getProfileImageUrl();
+
+        try {
+            Path uploadDir = PROFILE_PICTURE_UPLOAD_DIR.toAbsolutePath().normalize();
+            Files.createDirectories(uploadDir);
+
+            String filename = user.getId() + "_" + System.currentTimeMillis() + "." + extension;
+            Path targetPath = uploadDir.resolve(filename).normalize();
+
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            user.setProfileImageUrl(PROFILE_PICTURE_URL_PREFIX + filename);
+            user.setUpdatedAt(LocalDateTime.now());
+            UserResponse response = toResponse(userRepository.save(user));
+            deletePreviousProfilePicture(previousUrl, uploadDir);
+            return response;
+        } catch (IOException exception) {
+            throw new RuntimeException("Failed to upload profile picture", exception);
+        }
     }
 
     /**
@@ -296,6 +352,25 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
         return toResponse(userRepository.save(user));
+    }
+
+    /**
+     * Deletes a user account.
+     *
+     * @param id user id to delete
+     * @param authenticatedUser administrative principal applying the deletion
+     * @throws RuntimeException when the user is missing or tries to delete their own account
+     */
+    @Transactional
+    public void delete(UUID id, AuthenticatedUser authenticatedUser) {
+        if (authenticatedUser.getUser().getId().equals(id)) {
+            throw new RuntimeException("You cannot delete your own account");
+        }
+
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        userRepository.delete(user);
     }
 
     private boolean canManageAllUsers(UserEntity user) {
@@ -506,6 +581,7 @@ public class UserService {
                 user.getAddress(),
                 user.getMobileNumber(),
                 user.getPrcNumber(),
+                user.getProfileImageUrl(),
                 user.getStatus().name(),
                 user.getOrganization() != null ? user.getOrganization().getId() : null,
                 user.getOrganization() != null ? user.getOrganization().getName() : null,
@@ -523,6 +599,71 @@ public class UserService {
         }
 
         return normalized;
+    }
+
+    private String validateMobileNumber(String mobileNumber) {
+        String normalized = trimToNull(mobileNumber);
+        if (normalized != null && !normalized.matches("^(09\\d{9}|\\+639\\d{9})$")) {
+            throw new RuntimeException(MOBILE_NUMBER_MESSAGE);
+        }
+
+        return normalized;
+    }
+
+    private String resolveProfilePictureExtension(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.toLowerCase(Locale.ROOT).startsWith("image/")) {
+            throw new RuntimeException("Profile picture must be an image file");
+        }
+
+        String extension = extensionFromFilename(file.getOriginalFilename());
+        if (extension == null) {
+            extension = extensionFromContentType(contentType);
+        }
+
+        if (extension == null || !ALLOWED_PROFILE_PICTURE_EXTENSIONS.contains(extension)) {
+            throw new RuntimeException("Profile picture must be a JPG, PNG, WEBP, or GIF image");
+        }
+
+        return extension.equals("jpeg") ? "jpg" : extension;
+    }
+
+    private String extensionFromFilename(String filename) {
+        if (filename == null || filename.isBlank()) {
+            return null;
+        }
+
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex < 0 || dotIndex == filename.length() - 1) {
+            return null;
+        }
+
+        return filename.substring(dotIndex + 1).toLowerCase(Locale.ROOT);
+    }
+
+    private String extensionFromContentType(String contentType) {
+        return switch (contentType.toLowerCase(Locale.ROOT)) {
+            case "image/jpeg" -> "jpg";
+            case "image/png" -> "png";
+            case "image/webp" -> "webp";
+            case "image/gif" -> "gif";
+            default -> null;
+        };
+    }
+
+    private void deletePreviousProfilePicture(String previousUrl, Path uploadDir) {
+        if (previousUrl == null || !previousUrl.startsWith(PROFILE_PICTURE_URL_PREFIX)) {
+            return;
+        }
+
+        try {
+            Path previousPath = uploadDir.resolve(previousUrl.substring(PROFILE_PICTURE_URL_PREFIX.length())).normalize();
+            if (previousPath.startsWith(uploadDir)) {
+                Files.deleteIfExists(previousPath);
+            }
+        } catch (IOException ignored) {
+            // A stale old image should not fail an otherwise successful upload.
+        }
     }
 
     private String joinName(String firstName, String middleName, String lastName) {

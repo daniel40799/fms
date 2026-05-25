@@ -40,7 +40,7 @@ export function Checkbox({
           disabled={disabled}
           aria-describedby={descriptionId}
           onChange={(e) => onChange?.(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 disabled:opacity-50"
+          className="h-4 w-4 rounded border-slate-300 text-sky-700 focus:ring-sky-700 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:focus:ring-sky-400"
         />
       </div>
       {(label || description) && (
@@ -48,13 +48,13 @@ export function Checkbox({
           {label && (
             <label
               htmlFor={inputId}
-              className={`font-medium text-gray-900 ${disabled ? 'opacity-50' : ''}`}
+              className={`font-medium text-slate-900 dark:text-slate-100 ${disabled ? 'opacity-50' : ''}`}
             >
               {label}
             </label>
           )}
           {description && (
-            <p id={descriptionId} className="text-gray-500">
+            <p id={descriptionId} className="text-slate-500 dark:text-slate-400">
               {description}
             </p>
           )}
@@ -90,17 +90,17 @@ export function CheckboxGroup({
   return (
     <fieldset className={className}>
       {legend && (
-        <legend className="text-sm font-semibold leading-6 text-gray-900">{legend}</legend>
+        <legend className="text-sm font-semibold leading-6 text-slate-900 dark:text-slate-100">{legend}</legend>
       )}
-      <div className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+      <div className="mt-2 divide-y divide-slate-200 border-b border-t border-slate-200 dark:divide-slate-800 dark:border-slate-800">
         {options.map((opt) => (
           <div key={opt.id} className="relative flex items-start py-4">
             <div className="min-w-0 flex-1 text-sm leading-6">
-              <label htmlFor={opt.id} className="font-medium text-gray-900">
+              <label htmlFor={opt.id} className="font-medium text-slate-900 dark:text-slate-100">
                 {opt.label}
               </label>
               {opt.description && (
-                <p id={`${opt.id}-description`} className="text-gray-500">
+                <p id={`${opt.id}-description`} className="text-slate-500 dark:text-slate-400">
                   {opt.description}
                 </p>
               )}
@@ -112,7 +112,7 @@ export function CheckboxGroup({
                 checked={values.includes(opt.id)}
                 onChange={() => toggle(opt.id)}
                 aria-describedby={opt.description ? `${opt.id}-description` : undefined}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                className="h-4 w-4 rounded border-slate-300 text-sky-700 focus:ring-sky-700 dark:border-slate-600 dark:bg-slate-900 dark:focus:ring-sky-400"
               />
             </div>
           </div>

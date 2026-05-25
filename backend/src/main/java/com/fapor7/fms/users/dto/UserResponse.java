@@ -18,6 +18,7 @@ import java.time.LocalDate;
  * @param address user's address, if supplied
  * @param mobileNumber user's mobile number, if supplied
  * @param prcNumber user's seven-digit PRC number, if supplied
+ * @param profileImageUrl public profile image URL, if supplied
  * @param status account lifecycle state
  * @param organizationId affiliated organization id, if any
  * @param organizationName affiliated organization name, if any
@@ -35,9 +36,46 @@ public record UserResponse(
         String address,
         String mobileNumber,
         String prcNumber,
+        String profileImageUrl,
         String status,
         UUID organizationId,
         String organizationName,
         Set<String> roles
 ) {
+    public UserResponse(
+            UUID id,
+            String email,
+            String fullName,
+            String firstName,
+            String middleName,
+            String lastName,
+            LocalDate birthday,
+            String sex,
+            String address,
+            String mobileNumber,
+            String prcNumber,
+            String status,
+            UUID organizationId,
+            String organizationName,
+            Set<String> roles
+    ) {
+        this(
+                id,
+                email,
+                fullName,
+                firstName,
+                middleName,
+                lastName,
+                birthday,
+                sex,
+                address,
+                mobileNumber,
+                prcNumber,
+                null,
+                status,
+                organizationId,
+                organizationName,
+                roles
+        );
+    }
 }

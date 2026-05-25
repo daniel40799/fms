@@ -35,20 +35,20 @@ export function PageHeader({
                   {index > 0 && (
                     <ChevronRightIcon
                       aria-hidden="true"
-                      className="mr-4 h-5 w-5 flex-shrink-0 text-gray-400"
+                      className="mr-4 h-5 w-5 flex-shrink-0 text-slate-400 dark:text-slate-500"
                     />
                   )}
                   {crumb.href && !crumb.current ? (
                     <a
                       href={crumb.href}
-                      className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                      className="text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                     >
                       {crumb.name}
                     </a>
                   ) : (
                     <span
                       aria-current={crumb.current ? 'page' : undefined}
-                      className="text-sm font-medium text-gray-500"
+                      className="text-sm font-medium text-slate-500 dark:text-slate-400"
                     >
                       {crumb.name}
                     </span>
@@ -61,11 +61,11 @@ export function PageHeader({
       )}
       <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+          <h2 className="text-2xl font-bold leading-7 text-slate-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
             {title}
           </h2>
           {subtitle && (
-            <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
           )}
         </div>
         {actions && (

@@ -10,9 +10,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,5 +49,24 @@ class OrganizationServiceTest {
         assertThat(response.name()).isEqualTo("FAPOR7");
         assertThat(response.code()).isEqualTo("FP7");
         assertThat(response.status()).isEqualTo("ACTIVE");
+    }
+
+    @Test
+    void deleteRemovesOrganization() {
+        OrganizationEntity organization = TestData.organization(1);
+        when(organizationRepository.findById(TestData.uuid(1))).thenReturn(Optional.of(organization));
+
+        organizationService.delete(TestData.uuid(1));
+
+        verify(organizationRepository).delete(organization);
+    }
+
+    @Test
+    void deleteRejectsMissingOrganization() {
+        when(organizationRepository.findById(TestData.uuid(99))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> organizationService.delete(TestData.uuid(99)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Organization not found");
     }
 }

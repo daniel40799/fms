@@ -45,14 +45,14 @@ export function Table({
 
   return (
     <div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+      <div className="max-w-full overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-200 text-left text-sm dark:divide-white/10">
           <thead>
             <tr>
-              {columns.map((column) => <th key={column} className="whitespace-nowrap px-3 py-3 font-semibold text-slate-700">{column}</th>)}
+              {columns.map((column) => <th key={column} className="whitespace-nowrap px-3 py-3 font-semibold text-slate-700 dark:text-slate-300">{column}</th>)}
             </tr>
             {hasFilters ? (
-              <tr className="border-t border-slate-100">
+              <tr className="border-t border-slate-100 dark:border-white/10">
                 {columns.map((column, index) => (
                   <th key={`${column}-filter`} className="px-3 pb-3 align-top">
                     {filterableColumns[index] ? (
@@ -72,15 +72,15 @@ export function Table({
               </tr>
             ) : null}
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-white/10">
             <AnimatePresence initial={false}>
               {visibleRows.length ? visibleRows.map((row, index) => (
-                <motion.tr key={`${activePage}-${index}`} layout {...listItemMotion} className="transition-colors duration-150 ease-out hover:bg-slate-50 motion-reduce:transition-none">
-                  {row.map((cell, cellIndex) => <td key={cellIndex} className="px-3 py-3 align-top text-slate-700 transition-colors duration-150 ease-out motion-reduce:transition-none">{cell}</td>)}
+                <motion.tr key={`${activePage}-${index}`} layout {...listItemMotion} className="transition-colors duration-150 ease-out hover:bg-slate-50 dark:hover:bg-white/5 motion-reduce:transition-none">
+                  {row.map((cell, cellIndex) => <td key={cellIndex} className="max-w-[18rem] break-words px-3 py-3 align-top text-slate-700 transition-colors duration-150 ease-out dark:text-slate-300 motion-reduce:transition-none">{cell}</td>)}
                 </motion.tr>
               )) : (
                 <motion.tr key="empty" {...listItemMotion}>
-                  <td className="px-3 py-8 text-center text-slate-500" colSpan={columns.length}>{empty}</td>
+                  <td className="px-3 py-8 text-center text-slate-500 dark:text-slate-400" colSpan={columns.length}>{empty}</td>
                 </motion.tr>
               )}
             </AnimatePresence>
@@ -88,11 +88,11 @@ export function Table({
         </table>
       </div>
       {pageSize && pageCount > 1 ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-3 py-3 text-sm text-slate-600">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-3 py-3 text-sm text-slate-600 dark:border-white/10 dark:text-slate-400">
           <p>{filteredRows.length} rows | Page {activePage} of {pageCount}</p>
           <div className="flex gap-2">
-            <button className="rounded-md border border-slate-200 px-3 py-2 font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-40" type="button" disabled={activePage === 1} onClick={() => setPage((current) => Math.max(current - 1, 1))}>Previous</button>
-            <button className="rounded-md border border-slate-200 px-3 py-2 font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-40" type="button" disabled={activePage === pageCount} onClick={() => setPage((current) => Math.min(current + 1, pageCount))}>Next</button>
+            <button className="rounded-md border border-slate-200 px-3 py-2 font-medium text-slate-700 transition-colors duration-150 ease-out hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10 motion-reduce:transition-none" type="button" disabled={activePage === 1} onClick={() => setPage((current) => Math.max(current - 1, 1))}>Previous</button>
+            <button className="rounded-md border border-slate-200 px-3 py-2 font-medium text-slate-700 transition-colors duration-150 ease-out hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10 motion-reduce:transition-none" type="button" disabled={activePage === pageCount} onClick={() => setPage((current) => Math.min(current + 1, pageCount))}>Next</button>
           </div>
         </div>
       ) : null}

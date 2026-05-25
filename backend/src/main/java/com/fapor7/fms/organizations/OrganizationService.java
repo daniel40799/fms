@@ -3,6 +3,7 @@ package com.fapor7.fms.organizations;
 import com.fapor7.fms.organizations.dto.OrganizationCreateRequest;
 import com.fapor7.fms.organizations.dto.OrganizationResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,6 +52,19 @@ public class OrganizationService {
         organization.setUpdatedAt(LocalDateTime.now());
 
         return toResponse(organizationRepository.save(organization));
+    }
+
+    /**
+     * Deletes an organization by id.
+     *
+     * @param id organization id to delete
+     */
+    @Transactional
+    public void delete(UUID id) {
+        OrganizationEntity organization = organizationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Organization not found"));
+
+        organizationRepository.delete(organization);
     }
 
     /**

@@ -46,12 +46,12 @@ export function Toggle({
         checked={enabled}
         onChange={handleChange}
         disabled={disabled}
-        className={`group relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 data-[checked]:bg-indigo-600 disabled:opacity-50 ${switchSizeClasses} ${className}`}
+        className={`group relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-sky-700 focus:ring-offset-2 data-[checked]:bg-sky-700 disabled:opacity-50 dark:bg-slate-700 dark:focus:ring-sky-400 dark:focus:ring-offset-slate-950 dark:data-[checked]:bg-sky-500 ${switchSizeClasses} ${className}`}
       >
         <span className="sr-only">Toggle</span>
         <span
           aria-hidden="true"
-          className={`pointer-events-none inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${thumbSizeClasses}`}
+          className={`pointer-events-none inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out dark:bg-slate-100 ${thumbSizeClasses}`}
         />
       </Switch>
     );
@@ -62,10 +62,10 @@ export function Toggle({
       {(label || description) && (
         <span className="flex flex-grow flex-col">
           {label && (
-            <span className="text-sm font-medium leading-6 text-gray-900">{label}</span>
+            <span className="text-sm font-medium leading-6 text-slate-900 dark:text-slate-100">{label}</span>
           )}
           {description && (
-            <span className="text-sm text-gray-500">{description}</span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">{description}</span>
           )}
         </span>
       )}
@@ -73,12 +73,12 @@ export function Toggle({
         checked={enabled}
         onChange={handleChange}
         disabled={disabled}
-        className={`group relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 data-[checked]:bg-indigo-600 disabled:opacity-50 ${switchSizeClasses}`}
+        className={`group relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-sky-700 focus:ring-offset-2 data-[checked]:bg-sky-700 disabled:opacity-50 dark:bg-slate-700 dark:focus:ring-sky-400 dark:focus:ring-offset-slate-950 dark:data-[checked]:bg-sky-500 ${switchSizeClasses}`}
       >
         <span className="sr-only">{label ?? 'Toggle'}</span>
         <span
           aria-hidden="true"
-          className={`pointer-events-none inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${thumbSizeClasses}`}
+          className={`pointer-events-none inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out dark:bg-slate-100 ${thumbSizeClasses}`}
         />
       </Switch>
     </div>

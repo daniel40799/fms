@@ -33,7 +33,7 @@ export function Avatar({
   className = '',
 }: AvatarProps) {
   void className;
-  const baseClasses = `inline-flex items-center justify-center flex-shrink-0 bg-gray-100 ${sizeClasses[size]} ${shapeClasses[shape]} ${className}`;
+  const baseClasses = `inline-flex items-center justify-center flex-shrink-0 bg-slate-100 dark:bg-slate-800 ${sizeClasses[size]} ${shapeClasses[shape]} ${className}`;
 
   if (src) {
     return (
@@ -47,7 +47,7 @@ export function Avatar({
 
   if (initials) {
     return (
-      <span className={`${baseClasses} font-medium text-gray-600`}>
+      <span className={`${baseClasses} font-medium text-slate-600 dark:text-slate-200`}>
         {initials.slice(0, 2).toUpperCase()}
       </span>
     );
@@ -57,7 +57,7 @@ export function Avatar({
   return (
     <span className={baseClasses}>
       <svg
-        className="h-3/5 w-3/5 text-gray-400"
+        className="h-3/5 w-3/5 text-slate-400 dark:text-slate-500"
         fill="currentColor"
         viewBox="0 0 24 24"
         aria-hidden="true"
@@ -87,12 +87,12 @@ export function AvatarGroup({ avatars, max = 4, size = 'md', className = '' }: A
           key={i}
           {...avatar}
           size={size}
-          className="ring-2 ring-white"
+          className="ring-2 ring-white dark:ring-slate-950"
         />
       ))}
       {overflow > 0 && (
         <span
-          className={`inline-flex items-center justify-center rounded-full bg-gray-200 ring-2 ring-white font-medium text-gray-600 ${sizeClasses[size]} text-xs`}
+          className={`inline-flex items-center justify-center rounded-full bg-slate-200 ring-2 ring-white font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:ring-slate-950 ${sizeClasses[size]} text-xs`}
         >
           +{overflow}
         </span>

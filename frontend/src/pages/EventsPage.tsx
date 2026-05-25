@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import fallbackHero from '../assets/hero.png'
 import { EventForm } from '../components/forms'
 import { Page } from '../components/layout'
 import { ConfirmDeleteModal, FormModal } from '../components/modals'
-import { Button, EmptyState, InlineError, Panel, StatusBadge } from '../components/ui'
+import { Button, EmptyState, InlineError, StatusBadge } from '../components/ui'
 import { useAsyncAction } from '../hooks/useAsyncAction'
 import { formatDateTime } from '../lib/datetime'
 import type { EventPayload, EventRecord, Organization } from '../types'
@@ -108,34 +109,70 @@ export function EventsPage({
           />
         </>
       )}
-      <div className="mt-6 grid gap-4">
+      <div className="mx-auto mt-6 grid max-w-6xl gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {visibleEvents.map((event) => (
-          <Panel key={event.id} title={event.title} actions={<StatusBadge value={event.status} />}>
-            <div className="grid gap-4 md:grid-cols-[112px_1fr] lg:grid-cols-[112px_1fr_auto]">
-              <div className="aspect-[3/4] overflow-hidden rounded-md bg-slate-100">
-                {event.verticalPosterUrl ? (
-                  <img className="h-full w-full object-cover" src={event.verticalPosterUrl} alt="" />
-                ) : null}
+          <article
+            key={event.id}
+            className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:bg-slate-900 dark:hover:border-white/20 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+          >
+            <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-950">
+              <img
+                className="h-full w-full object-cover transition-transform duration-500 ease-out hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100"
+                src={event.horizontalPosterUrl || event.verticalPosterUrl || fallbackHero}
+                alt=""
+              />
+              {canManageEvents && (
+                <div className="absolute left-3 top-3">
+                  <StatusBadge value={event.status} />
+                </div>
+              )}
+            </div>
+            <div className="flex flex-1 flex-col p-4">
+              <div className="space-y-2">
+                <h3 className="line-clamp-2 min-h-12 text-lg font-bold tracking-tight text-slate-950 dark:text-white">
+                  {event.title}
+                </h3>
+                <p className="line-clamp-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                  {event.description || 'No description provided.'}
+                </p>
               </div>
-              <div className="space-y-2 text-sm text-slate-600">
-                <p>{event.description || 'No description provided.'}</p>
-                <p><span className="font-medium text-slate-800">Venue:</span> {event.venue || 'TBA'}</p>
-                <p><span className="font-medium text-slate-800">Schedule:</span> {formatDateTime(event.startDate)} to {formatDateTime(event.endDate)}</p>
-                <p><span className="font-medium text-slate-800">Registration:</span> {formatDateTime(event.registrationOpen)} to {formatDateTime(event.registrationClose)}</p>
-                <p><span className="font-medium text-slate-800">Price:</span> PHP {event.registrationPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                <p><span className="font-medium text-slate-800">Capacity:</span> {event.capacity ?? 'No limit'} {event.organizationName ? `| ${event.organizationName}` : ''}</p>
-              </div>
-              <div className="flex flex-wrap items-start gap-2 lg:justify-end">
+              <dl className="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                <div>
+                  <dt className="inline font-semibold text-slate-800 dark:text-slate-100">Venue: </dt>
+                  <dd className="inline">{event.venue || 'TBA'}</dd>
+                </div>
+                <div>
+                  <dt className="inline font-semibold text-slate-800 dark:text-slate-100">Schedule: </dt>
+                  <dd className="inline">{formatDateTime(event.startDate)} to {formatDateTime(event.endDate)}</dd>
+                </div>
+                <div>
+                  <dt className="inline font-semibold text-slate-800 dark:text-slate-100">Registration: </dt>
+                  <dd className="inline">{formatDateTime(event.registrationOpen)} to {formatDateTime(event.registrationClose)}</dd>
+                </div>
+                <div>
+                  <dt className="inline font-semibold text-slate-800 dark:text-slate-100">Price: </dt>
+                  <dd className="inline">PHP {event.registrationPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                </div>
+                <div>
+                  <dt className="inline font-semibold text-slate-800 dark:text-slate-100">Capacity: </dt>
+                  <dd className="inline">{event.capacity ?? 'No limit'} {event.organizationName ? `| ${event.organizationName}` : ''}</dd>
+                </div>
+              </dl>
+              <div className="mt-auto flex flex-wrap items-start gap-2 pt-5">
                 {canRegister && event.status === 'PUBLISHED' && <RegisterButton eventId={event.id} onRegister={onRegister} />}
                 {canManageEvents && event.status !== 'ARCHIVED' && <Button type="button" variant="secondary" onClick={() => openEditModal(event)}>Edit</Button>}
                 {canManageEvents && event.status === 'PUBLISHED' && <Button type="button" variant="danger" onClick={() => openConfirmModal(event, 'archive')}>Archive</Button>}
                 {canManageEvents && event.status === 'DRAFT' && <Button type="button" variant="danger" onClick={() => openConfirmModal(event, 'delete')}>Delete</Button>}
               </div>
             </div>
-          </Panel>
+          </article>
         ))}
-        {visibleEvents.length === 0 && <EmptyState message="No events have been created yet." />}
       </div>
+      {visibleEvents.length === 0 && (
+        <div className="mx-auto mt-6 max-w-6xl">
+          <EmptyState message="No events have been created yet." />
+        </div>
+      )}
     </Page>
   )
 }

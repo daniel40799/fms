@@ -97,7 +97,7 @@ export function EventForm({
         <Field label="Description" className="lg:col-span-2">
           <textarea className="input min-h-24" value={form.description} onChange={(e) => set('description', e.target.value)} />
         </Field>
-        <div className="flex gap-2 lg:col-span-2">
+        <div className="sticky bottom-0 z-10 -mx-5 -mb-4 flex flex-wrap gap-2 border-t border-slate-200 bg-white/95 px-5 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 lg:col-span-2">
           <Button loading={action.loading}>{action.loading ? 'Saving...' : event ? 'Save changes' : 'Create event'}</Button>
           <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
         </div>

@@ -33,7 +33,7 @@ export function AppShell({
       <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-50 lg:hidden">
         <DialogBackdrop
           transition
-          className="fixed inset-0 bg-gray-900/80 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
+          className="fixed inset-0 bg-slate-950/80 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
         />
         <div className="fixed inset-0 flex">
           <DialogPanel
@@ -68,7 +68,7 @@ export function AppShell({
           onMenuClick={() => setSidebarOpen(true)}
           actions={topbarActions}
         />
-        <main className="py-6">
+        <main className="bg-slate-50 py-6 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
           <div className="px-4 sm:px-6 lg:px-8">{children}</div>
         </main>
       </div>

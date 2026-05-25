@@ -18,6 +18,7 @@ export interface Me {
   address: string | null
   mobileNumber: string | null
   prcNumber: string | null
+  profileImageUrl: string | null
   status: string
   organizationId: string | null
   organization: string | null
@@ -44,6 +45,7 @@ export interface FmsUser {
   address: string | null
   mobileNumber: string | null
   prcNumber: string | null
+  profileImageUrl: string | null
   status: string
   organizationId: string | null
   organizationName: string | null

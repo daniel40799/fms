@@ -38,7 +38,7 @@ public class AttendanceController {
      * @return created attendance log
      */
     @PostMapping("/check-in")
-    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN')")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN') or hasRole('EXHIBITOR')")
     public AttendanceResponse checkIn(
             @RequestBody AttendanceCheckInRequest request,
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser
@@ -52,7 +52,7 @@ public class AttendanceController {
      * @return list of all attendance records
      */
     @GetMapping
-    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN') or hasRole('USER_ADMIN')")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('EVENT_ADMIN') or hasRole('USER_ADMIN') or hasRole('EXHIBITOR')")
     public List<AttendanceResponse> findAll() {
         return attendanceService.findAll();
     }

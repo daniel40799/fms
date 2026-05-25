@@ -2,6 +2,7 @@ package com.fapor7.fms.organizations;
 
 import com.fapor7.fms.organizations.dto.OrganizationCreateRequest;
 import com.fapor7.fms.organizations.dto.OrganizationResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +42,20 @@ public class OrganizationController {
      * @return created organization response
      */
     @PostMapping
-    @PreAuthorize("hasRole('MAIN_ADMIN')")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('ORGANIZATION_ADMIN')")
     public OrganizationResponse create(@RequestBody OrganizationCreateRequest request) {
         return organizationService.create(request);
+    }
+
+    /**
+     * Deletes an organization.
+     *
+     * @param id organization id
+     */
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('ORGANIZATION_ADMIN')")
+    public void delete(@PathVariable java.util.UUID id) {
+        organizationService.delete(id);
     }
 }

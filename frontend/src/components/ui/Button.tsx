@@ -21,10 +21,10 @@ export function Button({
 }: ButtonProps) {
   void className;
   const styles: Record<ButtonVariant, string> = {
-    primary: 'bg-sky-700 text-white shadow-sm hover:bg-sky-800 hover:shadow-md focus-visible:outline-sky-700',
-    secondary: 'border border-slate-300 bg-white text-slate-800 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:shadow-md focus-visible:outline-sky-700',
-    danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700 hover:shadow-md focus-visible:outline-red-600',
-    ghost: 'text-slate-700 hover:bg-slate-100 focus-visible:outline-slate-600',
+    primary: 'bg-sky-700 text-white shadow-sm hover:bg-sky-800 hover:shadow-md focus-visible:outline-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:focus-visible:outline-sky-400',
+    secondary: 'border border-slate-300 bg-white text-slate-800 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:shadow-md focus-visible:outline-sky-700 dark:border-white/10 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-white/20 dark:hover:bg-white/10 dark:focus-visible:outline-sky-400',
+    danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700 hover:shadow-md focus-visible:outline-red-600 dark:bg-red-500 dark:hover:bg-red-400 dark:focus-visible:outline-red-400',
+    ghost: 'text-slate-700 hover:bg-slate-100 focus-visible:outline-slate-600 dark:text-slate-200 dark:hover:bg-white/10 dark:focus-visible:outline-slate-300',
   }
 
   return (

@@ -35,8 +35,8 @@ export function ButtonGroup({ items, className = '' }: ButtonGroupProps) {
             onClick={item.onClick}
             className={`relative -ml-px inline-flex items-center gap-x-1.5 ${isFirst ? 'ml-0' : ''} ${roundedClasses} ${
               item.active
-                ? 'bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-600 ring-1 ring-inset ring-indigo-300 hover:bg-indigo-100 focus:z-10'
-                : 'bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10'
+                ? 'bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700 ring-1 ring-inset ring-sky-300 hover:bg-sky-100 focus:z-10 dark:bg-sky-400/10 dark:text-sky-200 dark:ring-sky-400/30 dark:hover:bg-sky-400/20'
+                : 'bg-white px-3 py-2 text-sm font-semibold text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus:z-10 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700 dark:hover:bg-slate-800'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {item.icon}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { UserAffiliationForm, UserCreateForm, UserImportForm } from '../components/forms'
 import { Page } from '../components/layout'
-import { FormModal } from '../components/modals'
+import { ConfirmDeleteModal, FormModal } from '../components/modals'
 import { Button, Panel, StatusBadge, Table } from '../components/ui'
 import type { FmsUser, Organization, RoleName } from '../types'
 
@@ -10,20 +10,27 @@ export function UsersPage({
   organizations,
   affiliationOrganizations,
   canCreate,
+  canDelete,
+  currentUserId,
   onCreate,
   onImport,
   onUpdateOrganization,
+  onDelete,
 }: {
   users: FmsUser[]
   organizations: Organization[]
   affiliationOrganizations: Organization[]
   canCreate: boolean
+  canDelete: boolean
+  currentUserId: string
   onCreate: (payload: { email: string; password: string; fullName: string; organizationId: string | null; roles: RoleName[] }) => Promise<void>
   onImport: (file: File) => Promise<void>
   onUpdateOrganization: (userId: string, organizationId: string | null) => Promise<void>
+  onDelete: (id: string) => Promise<void>
 }) {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<FmsUser | null>(null)
 
   return (
     <Page
@@ -46,9 +53,24 @@ export function UsersPage({
           </FormModal>
         </>
       )}
+      {canDelete && (
+        <ConfirmDeleteModal
+          actionLabel="Delete user"
+          description="This permanently removes the user account. Historical registrations or attendance records may block deletion."
+          isOpen={Boolean(selectedUser)}
+          objectName={selectedUser?.fullName ?? ''}
+          title="Delete user"
+          onClose={() => setSelectedUser(null)}
+          onConfirm={async () => {
+            if (!selectedUser) return
+            await onDelete(selectedUser.id)
+            setSelectedUser(null)
+          }}
+        />
+      )}
       <Panel title="User directory">
         <Table
-          columns={['Name', 'Email', 'Organization', 'Roles', 'Status', 'Affiliation']}
+          columns={['Name', 'Email', 'Organization', 'Roles', 'Status', 'Affiliation', ...(canDelete ? ['Actions'] : [])]}
           rows={users.map((user) => [
             user.fullName,
             user.email,
@@ -65,9 +87,18 @@ export function UsersPage({
             ) : (
               'Not applicable'
             ),
+            ...(canDelete ? [
+              user.id === currentUserId ? (
+                <span key={`${user.id}-self`} className="text-sm text-slate-500 dark:text-slate-400">Current user</span>
+              ) : (
+                <Button key={`${user.id}-delete`} type="button" variant="danger" onClick={() => setSelectedUser(user)}>
+                  Delete
+                </Button>
+              ),
+            ] : []),
           ])}
           empty="No users found."
-          filterableColumns={[true, true, true, true, true, true]}
+          filterableColumns={[true, true, true, true, true, true, false]}
           pageSize={10}
         />
       </Panel>

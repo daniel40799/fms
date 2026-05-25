@@ -37,13 +37,13 @@ export function UserCreateForm({
           </Select>
         </Field>
         <div className="lg:col-span-2">
-          <p className="text-sm font-medium text-slate-800">Roles</p>
+          <p className="text-sm font-medium text-slate-800 dark:text-slate-200">Roles</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {roles.map((role) => (
-              <label key={role} className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm transition-all duration-200 ease-out hover:border-sky-200 hover:bg-sky-50/60 focus-within:ring-2 focus-within:ring-sky-700 motion-reduce:transition-none">
+              <label key={role} className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 transition-all duration-200 ease-out hover:border-sky-200 hover:bg-sky-50/60 focus-within:ring-2 focus-within:ring-sky-700 dark:border-slate-700 dark:text-slate-200 dark:hover:border-sky-400/30 dark:hover:bg-sky-400/10 dark:focus-within:ring-sky-400 motion-reduce:transition-none">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border-slate-300 text-sky-700 transition-colors duration-200 ease-out focus:ring-sky-700 motion-reduce:transition-none"
+                  className="h-4 w-4 rounded border-slate-300 text-sky-700 transition-colors duration-200 ease-out focus:ring-sky-700 dark:border-slate-600 dark:bg-slate-900 dark:focus:ring-sky-400 motion-reduce:transition-none"
                   checked={form.roles.includes(role)}
                   onChange={(event) => {
                     const nextRoles = event.target.checked
@@ -57,7 +57,7 @@ export function UserCreateForm({
             ))}
           </div>
         </div>
-        <div className="flex gap-2 lg:col-span-2">
+        <div className="sticky bottom-0 z-10 -mx-5 -mb-4 flex flex-wrap gap-2 border-t border-slate-200 bg-white/95 px-5 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 lg:col-span-2">
           <Button loading={action.loading}>{action.loading ? 'Creating...' : 'Create user'}</Button>
           <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
         </div>

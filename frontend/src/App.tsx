@@ -23,6 +23,21 @@ function hasAnyRole(roles: RoleName[], expectedRoles: RoleName[]) {
   return roles.some((role) => expectedRoles.includes(role))
 }
 
+const internalRoles: RoleName[] = ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN', 'ORGANIZATION_ADMIN', 'EXHIBITOR']
+
+function isEndUserOnly(roles: RoleName[]) {
+  return roles.includes('END_USER') && !hasAnyRole(roles, internalRoles)
+}
+
+function getAssignedExhibitorEvents(events: EventRecord[], me: Me) {
+  const activeEvents = events.filter((event) => event.status !== 'ARCHIVED')
+  const organizationEvents = me.organizationId
+    ? activeEvents.filter((event) => event.organizationId === me.organizationId)
+    : []
+
+  return organizationEvents.length ? organizationEvents : activeEvents
+}
+
 function getInitialToken() {
   const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ''))
   const ssoToken = fragment.get('sso_token')
@@ -45,6 +60,7 @@ function App() {
   const [attendance, setAttendance] = useState<AttendanceLog[]>([])
   const [users, setUsers] = useState<FmsUser[]>([])
   const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [selectedExhibitorEventId, setSelectedExhibitorEventId] = useState<string | null>(null)
   const [authView, setAuthView] = useState<'login' | 'register'>('login')
   const [view, setView] = useState<View>('dashboard')
   const [loading, setLoading] = useState(false)
@@ -53,18 +69,32 @@ function App() {
 
   const roles = me?.roles ?? []
   const isMainAdmin = roles.includes('MAIN_ADMIN')
-  const canManageUsers = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN'])
-  const canManageAffiliations = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN', 'ORGANIZATION_ADMIN'])
-  const canManageEvents = hasAnyRole(roles, ['MAIN_ADMIN', 'EVENT_ADMIN'])
+  const isUserAdmin = roles.includes('USER_ADMIN')
+  const isEventAdmin = roles.includes('EVENT_ADMIN')
+  const isOrganizationAdmin = roles.includes('ORGANIZATION_ADMIN')
+  const isExhibitor = roles.includes('EXHIBITOR')
+  const endUserOnly = isEndUserOnly(roles)
+  const canManageUsers = isMainAdmin || isUserAdmin
+  const canViewUsers = canManageUsers || isOrganizationAdmin
+  const canManageEvents = isMainAdmin || isEventAdmin
   const isInternalFapor7User = me?.organizationCode?.toUpperCase() === 'FAPOR7'
-  const canRegisterForEvents = hasAnyRole(roles, ['MAIN_ADMIN', 'END_USER']) && !isInternalFapor7User
-  const canViewDashboard = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN', 'END_USER'])
-  const canViewEvents = hasAnyRole(roles, ['MAIN_ADMIN', 'EVENT_ADMIN', 'END_USER'])
+  const canRegisterForEvents = endUserOnly && !isInternalFapor7User
+  const canViewProfile = endUserOnly
+  const canViewDashboard = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN', 'ORGANIZATION_ADMIN', 'EXHIBITOR', 'END_USER'])
+  const canViewEvents = canManageEvents || endUserOnly
   const canViewMyRegistrations = canRegisterForEvents
-  const canViewReports = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN'])
+  const canViewReports = isMainAdmin || isEventAdmin || isOrganizationAdmin
   const canReviewRegistrations = canManageEvents
-  const canViewOrganizations = canManageUsers
-  const canCreateOrganizations = isMainAdmin
+  const canViewAttendance = canManageEvents || isExhibitor
+  const canViewOrganizations = isMainAdmin || isOrganizationAdmin
+  const canCreateOrganizations = isMainAdmin || isOrganizationAdmin
+  const dashboardVariant = endUserOnly
+    ? 'end-user'
+    : isOrganizationAdmin && !isMainAdmin
+      ? 'organization-admin'
+      : isUserAdmin && !isMainAdmin
+        ? 'user-admin'
+        : 'operations'
 
   async function loadSession() {
     if (!tokenStore.get()) return
@@ -86,15 +116,21 @@ function App() {
 
   async function loadCore(profile = me) {
     const profileRoles = profile?.roles ?? []
-    const profileCanManageEvents = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'EVENT_ADMIN'])
-    const profileCanViewEvents = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'EVENT_ADMIN', 'END_USER'])
-    const profileCanViewOwnRegistrations = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'END_USER'])
+    const profileIsMainAdmin = profileRoles.includes('MAIN_ADMIN')
+    const profileIsEventAdmin = profileRoles.includes('EVENT_ADMIN')
+    const profileIsUserAdmin = profileRoles.includes('USER_ADMIN')
+    const profileIsOrganizationAdmin = profileRoles.includes('ORGANIZATION_ADMIN')
+    const profileIsExhibitor = profileRoles.includes('EXHIBITOR')
+    const profileEndUserOnly = isEndUserOnly(profileRoles)
+    const profileCanManageEvents = profileIsMainAdmin || profileIsEventAdmin
+    const profileCanViewEvents = profileCanManageEvents || profileEndUserOnly || profileIsExhibitor
+    const profileCanViewOwnRegistrations = profileEndUserOnly
       && profile?.organizationCode?.toUpperCase() !== 'FAPOR7'
-    const profileCanViewDashboard = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN', 'END_USER'])
-    const profileCanViewReports = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN'])
-    const profileCanManageAffiliations = hasAnyRole(profileRoles, ['MAIN_ADMIN', 'USER_ADMIN', 'ORGANIZATION_ADMIN'])
+    const profileCanViewReports = profileIsMainAdmin || profileIsEventAdmin || profileIsOrganizationAdmin
+    const profileCanManageAffiliations = profileIsMainAdmin || profileIsUserAdmin || profileIsOrganizationAdmin
+    const profileNeedsOrganizations = profileCanManageAffiliations || profileCanManageEvents || profileIsOrganizationAdmin
 
-    if (profileCanViewEvents || profileCanViewDashboard || profileCanViewReports) {
+    if (profileCanViewEvents || profileCanViewReports) {
       setEvents(await api.events.list())
     } else {
       setEvents([])
@@ -106,17 +142,23 @@ function App() {
       setMyRegistrations([])
     }
 
-    if (profileCanManageEvents || profileCanViewReports) {
+    if (profileCanManageEvents) {
       const [allRegistrations, logs] = await Promise.all([api.registrations.list(), api.attendance.list()])
       setRegistrations(allRegistrations)
       setAttendance(logs)
+    } else if (profileIsExhibitor) {
+      setRegistrations([])
+      setAttendance(await api.attendance.list())
     } else {
       setRegistrations([])
       setAttendance([])
     }
 
-    if (profileCanManageAffiliations) {
-      const [userData, orgData] = await Promise.all([api.users.list(), api.organizations.list()])
+    if (profileCanManageAffiliations || profileNeedsOrganizations) {
+      const [userData, orgData] = await Promise.all([
+        profileCanManageAffiliations ? api.users.list() : Promise.resolve([]),
+        api.organizations.list(),
+      ])
       setUsers(userData)
       setOrganizations(orgData)
     } else {
@@ -173,6 +215,31 @@ function App() {
     }
   }
 
+  async function uploadProfilePicture(file: File) {
+    setLoading(true)
+    try {
+      await api.uploadProfilePicture(file)
+      const profile = await api.me()
+      setMe(profile)
+      setNotice('Profile picture updated.')
+      setNoticeTone('CONFIRMED')
+    } catch (error) {
+      setNotice(getErrorMessage(error))
+      setNoticeTone('ERROR')
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function importOrganizations(rows: Array<{ name: string; code: string }>) {
+    for (const row of rows) {
+      await api.organizations.create(row)
+    }
+
+    await refresh(`${rows.length} organization${rows.length === 1 ? '' : 's'} imported.`)
+  }
+
   async function viewPaymentProof(registrationId: string) {
     const blob = await api.registrations.downloadPaymentProof(registrationId)
     const url = URL.createObjectURL(blob)
@@ -222,31 +289,44 @@ function App() {
 
   const navItems: { id: View; label: string }[] = [
     ...(canViewDashboard ? [{ id: 'dashboard' as View, label: 'Dashboard' }] : []),
-    { id: 'profile', label: 'Profile' },
+    ...(canViewProfile ? [{ id: 'profile' as View, label: 'Profile' }] : []),
     ...(canViewEvents ? [{ id: 'events' as View, label: 'Events' }] : []),
     ...(canViewMyRegistrations ? [{ id: 'my-registrations' as View, label: 'My registrations' }] : []),
     ...(canReviewRegistrations ? [{ id: 'registrations' as View, label: 'Payment review' }] : []),
-    ...(canReviewRegistrations ? [{ id: 'attendance' as View, label: 'Attendance' }] : []),
-    ...(canManageAffiliations ? [{ id: 'users' as View, label: 'Users' }] : []),
+    ...(canViewAttendance ? [{ id: 'attendance' as View, label: 'Attendance' }] : []),
+    ...(canViewUsers ? [{ id: 'users' as View, label: 'Users' }] : []),
     ...(canViewOrganizations ? [{ id: 'organizations' as View, label: 'Organizations' }] : []),
     ...(canViewReports ? [{ id: 'reports' as View, label: 'Reports' }] : []),
   ]
   const activeView = navItems.some((item) => item.id === view) ? view : navItems[0].id
 
   const currentPage = {
-    dashboard: (
+    dashboard: isExhibitor ? (
+      <AttendancePage
+        logs={selectedExhibitorEventId
+          ? attendance.filter((log) => log.eventId === selectedExhibitorEventId)
+          : attendance}
+        events={getAssignedExhibitorEvents(events, me)}
+        selectedEventId={selectedExhibitorEventId}
+        onSelectEvent={setSelectedExhibitorEventId}
+        title="Exhibitor Dashboard"
+        onCheckIn={(qrToken) => api.attendance.checkIn(qrToken).then(() => refresh('Attendance recorded.'))}
+      />
+    ) : (
       <DashboardPage
         events={events}
         registrations={canReviewRegistrations ? registrations : myRegistrations}
         attendance={attendance}
         users={users}
+        organizations={organizations}
+        me={me}
+        variant={dashboardVariant}
         canReviewRegistrations={canReviewRegistrations}
         canRegister={canRegisterForEvents}
-        isEndUserDashboard={roles.includes('END_USER') && !canReviewRegistrations}
         onRegister={(eventId) => api.registrations.create(eventId).then(() => refresh('Registration created.'))}
       />
     ),
-    profile: <ProfilePage me={me} onUpdate={updateProfile} />,
+    profile: <ProfilePage me={me} onUpdate={updateProfile} onUploadPicture={uploadProfilePicture} />,
     events: (
       <EventsPage
         events={events}
@@ -279,7 +359,13 @@ function App() {
     ),
     attendance: (
       <AttendancePage
-        logs={attendance}
+        logs={isExhibitor && selectedExhibitorEventId
+          ? attendance.filter((log) => log.eventId === selectedExhibitorEventId)
+          : attendance}
+        events={isExhibitor ? getAssignedExhibitorEvents(events, me) : undefined}
+        selectedEventId={isExhibitor ? selectedExhibitorEventId : undefined}
+        onSelectEvent={isExhibitor ? setSelectedExhibitorEventId : undefined}
+        title={isExhibitor ? 'Exhibitor Dashboard' : 'Attendance'}
         onCheckIn={(qrToken) => api.attendance.checkIn(qrToken).then(() => refresh('Attendance recorded.'))}
       />
     ),
@@ -291,18 +377,24 @@ function App() {
           ? organizations
           : organizations.filter((organization) => organization.id === me.organizationId)}
         canCreate={canManageUsers}
+        canDelete={canManageUsers}
+        currentUserId={me.id}
         onCreate={(payload) => api.users.create(payload).then(() => refresh('User account created.'))}
         onImport={(file) => api.users.importCsv(file).then(() => refresh('Users imported.'))}
         onUpdateOrganization={(userId, organizationId) =>
           api.users.updateOrganization(userId, organizationId).then(() => refresh('Organization affiliation updated.'))
         }
+        onDelete={(id) => api.users.delete(id).then(() => refresh('User deleted.'))}
       />
     ),
     organizations: (
       <OrganizationsPage
         organizations={organizations}
         canCreate={canCreateOrganizations}
+        canDelete={canCreateOrganizations}
         onCreate={(payload) => api.organizations.create(payload).then(() => refresh('Organization created.'))}
+        onImport={(rows) => importOrganizations(rows)}
+        onDelete={(id) => api.organizations.delete(id).then(() => refresh('Organization deleted.'))}
       />
     ),
     reports: (
@@ -311,6 +403,8 @@ function App() {
         registrations={canReviewRegistrations ? registrations : myRegistrations}
         attendance={attendance}
         users={users}
+        organizations={organizations}
+        me={me}
         roles={roles}
       />
     ),

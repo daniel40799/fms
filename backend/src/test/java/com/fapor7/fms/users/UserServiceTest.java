@@ -20,6 +20,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -28,6 +30,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -429,6 +432,152 @@ class UserServiceTest {
     }
 
     @Test
+    void updateProfileRejectsInvalidMobileNumber() {
+        assertThatThrownBy(() -> userService.updateProfile(
+                TestData.principal(TestData.activeUser(1)),
+                new UserProfileUpdateRequest("User", null, null, null, null, null, null, "0917123456", null)
+        ))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Mobile number must be in 09XXXXXXXXX or +639XXXXXXXXX format.");
+    }
+
+    @Test
+    void updateProfilePictureStoresImageUrlAndDeletesPreviousImage() throws IOException {
+        UserEntity user = TestData.activeUser(1);
+        when(userRepository.save(user)).thenReturn(user);
+
+        UserResponse firstResponse = userService.updateProfilePicture(
+                TestData.principal(user),
+                new MockMultipartFile("file", "avatar.jpeg", "image/jpeg", "first".getBytes())
+        );
+        Path firstPath = pathFromProfileImageUrl(firstResponse.profileImageUrl());
+
+        assertThat(firstResponse.profileImageUrl()).startsWith("/uploads/profile-pictures/");
+        assertThat(firstResponse.profileImageUrl()).endsWith(".jpg");
+        assertThat(Files.exists(firstPath)).isTrue();
+
+        UserResponse secondResponse = userService.updateProfilePicture(
+                TestData.principal(user),
+                new MockMultipartFile("file", "avatar.png", "image/png", "second".getBytes())
+        );
+        Path secondPath = pathFromProfileImageUrl(secondResponse.profileImageUrl());
+
+        assertThat(Files.exists(firstPath)).isFalse();
+        assertThat(Files.exists(secondPath)).isTrue();
+        Files.deleteIfExists(secondPath);
+    }
+
+    @Test
+    void updateProfilePictureFallsBackToContentTypeWhenFilenameHasNoExtension() throws IOException {
+        UserEntity user = TestData.activeUser(1);
+        when(userRepository.save(user)).thenReturn(user);
+
+        UserResponse response = userService.updateProfilePicture(
+                TestData.principal(user),
+                new MockMultipartFile("file", "avatar", "image/png", "image".getBytes())
+        );
+
+        assertThat(response.profileImageUrl()).endsWith(".png");
+        Files.deleteIfExists(pathFromProfileImageUrl(response.profileImageUrl()));
+    }
+
+    @Test
+    void updateProfilePictureUsesContentTypeForBlankFilenames() throws IOException {
+        UserEntity user = TestData.activeUser(1);
+        when(userRepository.save(user)).thenReturn(user);
+
+        for (String[] imageType : List.of(
+                new String[]{"image/jpeg", ".jpg"},
+                new String[]{"image/webp", ".webp"},
+                new String[]{"image/gif", ".gif"}
+        )) {
+            UserResponse response = userService.updateProfilePicture(
+                    TestData.principal(user),
+                    new MockMultipartFile("file", "", imageType[0], "image".getBytes())
+            );
+
+            assertThat(response.profileImageUrl()).endsWith(imageType[1]);
+            Files.deleteIfExists(pathFromProfileImageUrl(response.profileImageUrl()));
+            user.setProfileImageUrl(null);
+        }
+    }
+
+    @Test
+    void updateProfilePictureIgnoresPreviousImageCleanupErrors() throws IOException {
+        UserEntity user = TestData.activeUser(1);
+        Path staleDirectory = Path.of("uploads", "profile-pictures", "stale-directory");
+        Files.createDirectories(staleDirectory);
+        Files.writeString(staleDirectory.resolve("nested.txt"), "stale");
+        user.setProfileImageUrl("/uploads/profile-pictures/stale-directory");
+        when(userRepository.save(user)).thenReturn(user);
+
+        UserResponse response = userService.updateProfilePicture(
+                TestData.principal(user),
+                new MockMultipartFile("file", "avatar.png", "image/png", "image".getBytes())
+        );
+
+        assertThat(response.profileImageUrl()).endsWith(".png");
+        Files.deleteIfExists(pathFromProfileImageUrl(response.profileImageUrl()));
+        Files.deleteIfExists(staleDirectory.resolve("nested.txt"));
+        Files.deleteIfExists(staleDirectory);
+    }
+
+    @Test
+    void updateProfilePictureRejectsMissingFile() {
+        assertThatThrownBy(() -> userService.updateProfilePicture(
+                TestData.principal(TestData.activeUser(1)),
+                new MockMultipartFile("file", "avatar.png", "image/png", new byte[0])
+        ))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Profile picture is required");
+    }
+
+    @Test
+    void updateProfilePictureRejectsOversizedFile() {
+        MultipartFile file = org.mockito.Mockito.mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getSize()).thenReturn(5L * 1024L * 1024L + 1L);
+
+        assertThatThrownBy(() -> userService.updateProfilePicture(TestData.principal(TestData.activeUser(1)), file))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Profile picture must be 5 MB or smaller");
+    }
+
+    @Test
+    void updateProfilePictureRejectsNonImageContentType() {
+        assertThatThrownBy(() -> userService.updateProfilePicture(
+                TestData.principal(TestData.activeUser(1)),
+                new MockMultipartFile("file", "avatar.txt", "text/plain", "text".getBytes())
+        ))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Profile picture must be an image file");
+    }
+
+    @Test
+    void updateProfilePictureRejectsUnsupportedImageExtension() {
+        assertThatThrownBy(() -> userService.updateProfilePicture(
+                TestData.principal(TestData.activeUser(1)),
+                new MockMultipartFile("file", "avatar", "image/svg+xml", "<svg />".getBytes())
+        ))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Profile picture must be a JPG, PNG, WEBP, or GIF image");
+    }
+
+    @Test
+    void updateProfilePictureWrapsStorageErrors() throws IOException {
+        MultipartFile file = org.mockito.Mockito.mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getSize()).thenReturn(12L);
+        when(file.getContentType()).thenReturn("image/png");
+        when(file.getOriginalFilename()).thenReturn("avatar.png");
+        when(file.getInputStream()).thenThrow(new IOException("disk full"));
+
+        assertThatThrownBy(() -> userService.updateProfilePicture(TestData.principal(TestData.activeUser(1)), file))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Failed to upload profile picture");
+    }
+
+    @Test
     void updateOrganizationLetsOrganizationAdminAssignOwnOrganization() {
         OrganizationEntity organization = TestData.organization(2);
         UserEntity organizationAdmin = TestData.user(
@@ -518,7 +667,41 @@ class UserServiceTest {
                 .hasMessage("Only end-user affiliations can be managed");
     }
 
+    @Test
+    void deleteRemovesUser() {
+        UserEntity administrator = TestData.user(1, "admin@example.test", "Admin", UserStatus.ACTIVE, RoleName.MAIN_ADMIN);
+        UserEntity user = TestData.activeUser(2);
+        when(userRepository.findById(TestData.uuid(2))).thenReturn(Optional.of(user));
+
+        userService.delete(TestData.uuid(2), TestData.principal(administrator));
+
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void deleteRejectsCurrentUser() {
+        UserEntity administrator = TestData.user(1, "admin@example.test", "Admin", UserStatus.ACTIVE, RoleName.MAIN_ADMIN);
+
+        assertThatThrownBy(() -> userService.delete(TestData.uuid(1), TestData.principal(administrator)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("You cannot delete your own account");
+    }
+
+    @Test
+    void deleteRejectsMissingUser() {
+        UserEntity administrator = TestData.user(1, "admin@example.test", "Admin", UserStatus.ACTIVE, RoleName.MAIN_ADMIN);
+        when(userRepository.findById(TestData.uuid(99))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.delete(TestData.uuid(99), TestData.principal(administrator)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("User not found");
+    }
+
     private static UserProfileUpdateRequest profileRequest(String fullName) {
         return new UserProfileUpdateRequest(fullName, null, null, null, null, null, null, null, null);
+    }
+
+    private static Path pathFromProfileImageUrl(String profileImageUrl) {
+        return Path.of(profileImageUrl.substring(1));
     }
 }

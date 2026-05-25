@@ -120,19 +120,19 @@ export function CalendarDatePicker({
         type="button"
         disabled={disabled}
         onClick={togglePopover}
-        className={`flex w-full items-center justify-between rounded-md bg-white px-3 py-2 text-left text-sm ring-1 ring-inset ring-slate-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-700 ${
+        className={`flex w-full items-center justify-between rounded-md bg-white px-3 py-2 text-left text-sm ring-1 ring-inset ring-slate-300 transition-colors duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-700 dark:bg-slate-900 dark:ring-slate-700 dark:focus:ring-teal-400 motion-reduce:transition-none ${
           disabled ? 'cursor-not-allowed opacity-50' : ''
         }`}
       >
-        <span className={selectedDate ? 'text-slate-950' : 'text-slate-500'}>{selectedLabel}</span>
-        <span aria-hidden="true" className="text-slate-400">
+        <span className={selectedDate ? 'text-slate-950 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'}>{selectedLabel}</span>
+        <span aria-hidden="true" className="text-slate-400 dark:text-slate-500">
           Calendar
         </span>
       </button>
 
       {showPopover && (
         <div
-          className={`calendar-popover absolute left-0 top-full z-50 mt-2 w-80 rounded-lg border border-slate-200 bg-white p-3 shadow-xl ${
+          className={`calendar-popover absolute left-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-slate-200 bg-white p-3 text-slate-950 shadow-xl dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 ${
             closing ? 'motion-popover-out' : 'motion-popover-in'
           }`}
         >
@@ -140,7 +140,7 @@ export function CalendarDatePicker({
             <button
               type="button"
               onClick={() => setVisibleMonth(addMonths(visibleMonth, -1))}
-              className="rounded-md px-2 py-1 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              className="rounded-md px-2 py-1 text-sm font-semibold text-slate-700 transition-colors duration-150 ease-out hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 motion-reduce:transition-none"
               aria-label="Previous month"
             >
               &lt;
@@ -150,7 +150,7 @@ export function CalendarDatePicker({
                 type="button"
                 onClick={() => setView(view === 'months' ? 'days' : 'months')}
                 className={`rounded-md px-2 py-1.5 text-sm font-semibold ${
-                  view === 'months' ? 'bg-teal-50 text-teal-800' : 'text-slate-950 hover:bg-slate-100'
+                  view === 'months' ? 'bg-teal-50 text-teal-800 dark:bg-teal-400/10 dark:text-teal-200' : 'text-slate-950 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 {monthLabels[visibleMonthIndex]}
@@ -162,7 +162,7 @@ export function CalendarDatePicker({
                   setView(view === 'years' ? 'days' : 'years')
                 }}
                 className={`rounded-md px-2 py-1.5 text-sm font-semibold ${
-                  view === 'years' ? 'bg-teal-50 text-teal-800' : 'text-slate-950 hover:bg-slate-100'
+                  view === 'years' ? 'bg-teal-50 text-teal-800 dark:bg-teal-400/10 dark:text-teal-200' : 'text-slate-950 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 {visibleYear}
@@ -171,7 +171,7 @@ export function CalendarDatePicker({
             <button
               type="button"
               onClick={() => setVisibleMonth(addMonths(visibleMonth, 1))}
-              className="rounded-md px-2 py-1 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              className="rounded-md px-2 py-1 text-sm font-semibold text-slate-700 transition-colors duration-150 ease-out hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 motion-reduce:transition-none"
               aria-label="Next month"
             >
               &gt;
@@ -181,7 +181,7 @@ export function CalendarDatePicker({
           {view === 'days' && (
             <div className="mt-3 grid grid-cols-7 gap-1 text-center">
               {weekdayLabels.map((weekday) => (
-                <div key={weekday} className="py-1 text-xs font-medium text-slate-500">
+                <div key={weekday} className="py-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                   {weekday}
                 </div>
               ))}
@@ -201,11 +201,11 @@ export function CalendarDatePicker({
                       selected
                         ? 'bg-teal-700 text-white'
                         : today
-                          ? 'bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-200'
+                          ? 'bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-200 dark:bg-teal-400/10 dark:text-teal-200 dark:ring-teal-400/20'
                           : inactive
-                            ? 'text-slate-300 hover:bg-slate-50'
-                            : 'text-slate-800 hover:bg-slate-100'
-                    } ${blocked ? 'cursor-not-allowed text-slate-300 hover:bg-transparent' : ''}`}
+                            ? 'text-slate-300 hover:bg-slate-50 dark:text-slate-600 dark:hover:bg-slate-800'
+                            : 'text-slate-800 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800'
+                    } ${blocked ? 'cursor-not-allowed text-slate-300 hover:bg-transparent dark:text-slate-700 dark:hover:bg-transparent' : ''}`}
                   >
                     {date.getDate()}
                   </button>
@@ -233,8 +233,8 @@ export function CalendarDatePicker({
                     className={`rounded-md px-3 py-3 text-sm font-semibold ${
                       selected
                         ? 'bg-teal-700 text-white'
-                        : 'bg-slate-50 text-slate-800 hover:bg-teal-50 hover:text-teal-800'
-                    } ${blocked ? 'cursor-not-allowed bg-slate-50 text-slate-300 hover:bg-slate-50 hover:text-slate-300' : ''}`}
+                        : 'bg-slate-50 text-slate-800 hover:bg-teal-50 hover:text-teal-800 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-teal-400/10 dark:hover:text-teal-200'
+                    } ${blocked ? 'cursor-not-allowed bg-slate-50 text-slate-300 hover:bg-slate-50 hover:text-slate-300 dark:bg-slate-800 dark:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-600' : ''}`}
                   >
                     {month}
                   </button>
@@ -249,17 +249,17 @@ export function CalendarDatePicker({
                 <button
                   type="button"
                   onClick={() => setYearRangeStart((current) => current - 12)}
-                  className="rounded-md px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                  className="rounded-md px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Earlier
                 </button>
-                <p className="text-xs font-semibold uppercase text-slate-500">
+                <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
                   {yearRangeStart} - {yearRangeStart + 11}
                 </p>
                 <button
                   type="button"
                   onClick={() => setYearRangeStart((current) => current + 12)}
-                  className="rounded-md px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                  className="rounded-md px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Later
                 </button>
@@ -282,8 +282,8 @@ export function CalendarDatePicker({
                         className={`rounded-md px-3 py-3 text-sm font-semibold ${
                           selected
                             ? 'bg-teal-700 text-white'
-                            : 'bg-slate-50 text-slate-800 hover:bg-teal-50 hover:text-teal-800'
-                        } ${blocked ? 'cursor-not-allowed bg-slate-50 text-slate-300 hover:bg-slate-50 hover:text-slate-300' : ''}`}
+                            : 'bg-slate-50 text-slate-800 hover:bg-teal-50 hover:text-teal-800 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-teal-400/10 dark:hover:text-teal-200'
+                        } ${blocked ? 'cursor-not-allowed bg-slate-50 text-slate-300 hover:bg-slate-50 hover:text-slate-300 dark:bg-slate-800 dark:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-600' : ''}`}
                       >
                         {year}
                       </button>
@@ -294,11 +294,11 @@ export function CalendarDatePicker({
             </div>
           )}
 
-          <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-3">
+          <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
             <button
               type="button"
               onClick={() => selectDate(new Date())}
-              className="rounded-md px-2 py-1 text-sm font-medium text-teal-800 hover:bg-teal-50"
+              className="rounded-md px-2 py-1 text-sm font-medium text-teal-800 hover:bg-teal-50 dark:text-teal-200 dark:hover:bg-teal-400/10"
             >
               Today
             </button>
@@ -308,7 +308,7 @@ export function CalendarDatePicker({
                 onChange('')
                 closePopover()
               }}
-              className="rounded-md px-2 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              className="rounded-md px-2 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               Clear
             </button>

@@ -22,10 +22,10 @@ export function Input({
   void className;
   const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
-  const inputClasses = `block w-full min-w-0 flex-1 border-0 py-1.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 ${
+  const inputClasses = `block w-full min-w-0 flex-1 border-0 bg-white py-1.5 text-slate-950 ring-1 ring-inset placeholder:text-slate-400 focus:ring-2 focus:ring-inset dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 sm:text-sm sm:leading-6 ${
     error
-      ? 'ring-red-300 focus:ring-red-500'
-      : 'ring-gray-300 focus:ring-indigo-600'
+      ? 'ring-red-300 focus:ring-red-500 dark:ring-red-400/40 dark:focus:ring-red-400'
+      : 'ring-slate-300 focus:ring-sky-700 dark:ring-slate-700 dark:focus:ring-sky-400'
   } ${leadingAddon ? 'rounded-none rounded-r-md' : trailingAddon ? 'rounded-none rounded-l-md' : 'rounded-md'} ${className}`;
 
   return (
@@ -33,29 +33,29 @@ export function Input({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium leading-6 text-gray-900"
+          className="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-200"
         >
           {label}
         </label>
       )}
       <div className={`${label ? 'mt-2' : ''} flex rounded-md shadow-sm`}>
         {leadingAddon && (
-          <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 px-3 text-gray-500 sm:text-sm">
+          <span className="inline-flex items-center rounded-l-md border border-r-0 border-slate-300 bg-slate-50 px-3 text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400 sm:text-sm">
             {leadingAddon}
           </span>
         )}
         <input id={inputId} className={inputClasses} {...rest} />
         {trailingAddon && (
-          <span className="inline-flex items-center rounded-r-md border border-l-0 border-gray-300 px-3 text-gray-500 sm:text-sm">
+          <span className="inline-flex items-center rounded-r-md border border-l-0 border-slate-300 bg-slate-50 px-3 text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400 sm:text-sm">
             {trailingAddon}
           </span>
         )}
       </div>
       {hint && !error && (
-        <p className="mt-2 text-sm text-gray-500">{hint}</p>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{hint}</p>
       )}
       {error && (
-        <p className="mt-2 text-sm text-red-600">{error}</p>
+        <p className="mt-2 text-sm text-red-600 dark:text-red-300">{error}</p>
       )}
     </div>
   );

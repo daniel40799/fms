@@ -27,11 +27,11 @@ textarea {
 
 @layer components {
   .input {
-    @apply block w-full rounded-md border-0 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm ring-1 ring-inset ring-slate-300 transition-all duration-200 ease-out placeholder:text-slate-400 hover:ring-slate-400 focus:ring-2 focus:ring-inset focus:ring-sky-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500 motion-reduce:transition-none;
+    @apply block w-full rounded-md border-0 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm ring-1 ring-inset ring-slate-300 transition-all duration-200 ease-out placeholder:text-slate-400 hover:ring-slate-400 focus:ring-2 focus:ring-inset focus:ring-sky-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500 dark:bg-slate-950 dark:text-white dark:ring-slate-700 dark:placeholder:text-slate-500 dark:hover:ring-slate-500 dark:focus:ring-sky-400 dark:disabled:bg-slate-900 dark:disabled:text-slate-500 motion-reduce:transition-none;
   }
 
   .link {
-    @apply font-semibold text-sky-700 transition-colors duration-200 ease-out hover:text-sky-900 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 motion-reduce:transition-none;
+    @apply font-semibold text-sky-700 transition-colors duration-200 ease-out hover:text-sky-900 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:text-sky-300 dark:hover:text-sky-100 dark:focus-visible:outline-sky-400 motion-reduce:transition-none;
   }
 }
 
@@ -43,6 +43,7 @@ textarea {
 .fms-datepicker {
   border: 1px solid #cbd5e1;
   border-radius: 0.5rem;
+  background: #fff;
   box-shadow: 0 10px 25px rgb(15 23 42 / 0.12);
   font-family: inherit;
   overflow: hidden;
@@ -73,6 +74,19 @@ textarea {
   background: #e0f2fe;
 }
 
+.fms-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:hover {
+  background: #e0f2fe;
+  color: #0f172a;
+}
+
+.fms-datepicker .react-datepicker__day--selected:hover,
+.fms-datepicker .react-datepicker__day--keyboard-selected:hover,
+.fms-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected,
+.fms-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected:hover {
+  background: #0369a1;
+  color: #fff;
+}
+
 .fms-datepicker select {
   border-radius: 0.375rem;
   border: 1px solid #cbd5e1;
@@ -92,6 +106,75 @@ textarea {
 .fms-datepicker select:focus-visible {
   outline: 2px solid #0369a1;
   outline-offset: 2px;
+}
+
+.dark .fms-datepicker {
+  border-color: #334155;
+  background: #0f172a;
+  color: #f8fafc;
+  box-shadow: 0 20px 45px rgb(2 6 23 / 0.45);
+}
+
+.dark .fms-datepicker .react-datepicker__header,
+.dark .fms-datepicker .react-datepicker__month-container,
+.dark .fms-datepicker .react-datepicker__time-container,
+.dark .fms-datepicker .react-datepicker__time,
+.dark .fms-datepicker .react-datepicker__time-box {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+.dark .fms-datepicker .react-datepicker__current-month,
+.dark .fms-datepicker .react-datepicker-time__header,
+.dark .fms-datepicker .react-datepicker-year-header,
+.dark .fms-datepicker .react-datepicker__day-name,
+.dark .fms-datepicker .react-datepicker__day,
+.dark .fms-datepicker .react-datepicker__time-list-item {
+  color: #e2e8f0;
+}
+
+.dark .fms-datepicker .react-datepicker__day--outside-month,
+.dark .fms-datepicker .react-datepicker__day--disabled,
+.dark .fms-datepicker .react-datepicker__time-list-item--disabled {
+  color: #64748b;
+}
+
+.dark .fms-datepicker .react-datepicker__day:hover,
+.dark .fms-datepicker .react-datepicker__month-text:hover,
+.dark .fms-datepicker .react-datepicker__quarter-text:hover,
+.dark .fms-datepicker .react-datepicker__year-text:hover,
+.dark .fms-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:not(.react-datepicker__time-list-item--selected):hover {
+  background: #1e293b;
+  color: #fff;
+}
+
+.dark .fms-datepicker .react-datepicker__day--selected,
+.dark .fms-datepicker .react-datepicker__day--keyboard-selected,
+.dark .fms-datepicker .react-datepicker__day--selected:hover,
+.dark .fms-datepicker .react-datepicker__day--keyboard-selected:hover,
+.dark .fms-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected,
+.dark .fms-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected:hover {
+  background: #0284c7;
+  color: #fff;
+}
+
+.dark .fms-datepicker select,
+.dark .fms-datepicker .react-datepicker__month-select,
+.dark .fms-datepicker .react-datepicker__year-select,
+.dark .fms-datepicker .react-datepicker__month-dropdown,
+.dark .fms-datepicker .react-datepicker__year-dropdown,
+.dark .fms-datepicker .react-datepicker__month-year-dropdown {
+  border-color: #334155;
+  background: #020617;
+  color: #e2e8f0;
+}
+
+.dark .fms-datepicker select:hover {
+  border-color: #64748b;
+}
+
+.dark .fms-datepicker select:focus-visible {
+  outline-color: #38bdf8;
 }
 
 .fms-datepicker-popper {

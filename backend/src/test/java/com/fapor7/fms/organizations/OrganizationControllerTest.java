@@ -9,6 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class OrganizationControllerTest {
@@ -31,6 +32,13 @@ class OrganizationControllerTest {
         when(organizationService.create(request)).thenReturn(response);
 
         assertThat(controller.create(request)).isSameAs(response);
+    }
+
+    @Test
+    void deleteDelegatesToService() {
+        controller.delete(TestData.uuid(1));
+
+        verify(organizationService).delete(TestData.uuid(1));
     }
 
     private static OrganizationResponse response() {
