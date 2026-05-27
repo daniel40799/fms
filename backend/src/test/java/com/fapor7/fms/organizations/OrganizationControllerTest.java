@@ -20,9 +20,9 @@ class OrganizationControllerTest {
     @Test
     void findAllDelegatesToService() {
         OrganizationResponse response = response();
-        when(organizationService.findAll()).thenReturn(List.of(response));
+        when(organizationService.findAll(false)).thenReturn(List.of(response));
 
-        assertThat(controller.findAll()).containsExactly(response);
+        assertThat(controller.findAll(null)).containsExactly(response);
     }
 
     @Test

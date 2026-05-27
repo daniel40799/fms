@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, Field, InlineError, Select } from '../components/ui'
+import { Button, Field, InlineError } from '../components/ui'
 import { useAsyncAction } from '../hooks/useAsyncAction'
 import { api } from '../lib/api'
 import { getErrorMessage } from '../lib/errors'
@@ -9,7 +9,8 @@ export function RegisterPage({ onBackToLogin, onRegistered }: { onBackToLogin: (
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [organizationId, setOrganizationId] = useState('')
+  const [mobileNumber, setMobileNumber] = useState('')
+  const [organizationIds, setOrganizationIds] = useState<string[]>([])
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [loadingOrganizations, setLoadingOrganizations] = useState(true)
   const [organizationError, setOrganizationError] = useState('')
@@ -38,14 +39,30 @@ export function RegisterPage({ onBackToLogin, onRegistered }: { onBackToLogin: (
   }, [])
 
   const register = useAsyncAction(async () => {
+    if (!fullName.trim() || !email.trim() || !password.trim()) {
+      throw new Error('Full name, email, and password are required.')
+    }
+
+    if (organizationIds.length === 0) {
+      throw new Error('Select at least one organization.')
+    }
+
     await api.auth.register({
       fullName,
       email,
       password,
-      organizationId: organizationId || null,
+      mobileNumber: mobileNumber.trim() || null,
+      organizationIds,
+      organizationId: organizationIds[0] ?? null,
     })
     onRegistered()
   })
+
+  const toggleOrganization = (id: string) => {
+    setOrganizationIds((current) => current.includes(id)
+      ? current.filter((item) => item !== id)
+      : [...current, id])
+  }
 
   return (
     <main className="grid min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100 lg:grid-cols-[1fr_520px]">
@@ -84,20 +101,27 @@ export function RegisterPage({ onBackToLogin, onRegistered }: { onBackToLogin: (
             <Field label="Password">
               <input className="input" value={password} onChange={(event) => setPassword(event.target.value)} type="password" required />
             </Field>
-            <Field label="Organization">
-              <Select
-                value={organizationId}
-                onChange={(event) => setOrganizationId(event.target.value)}
-                disabled={loadingOrganizations || organizations.length === 0}
-                required
-              >
-                <option value="">{loadingOrganizations ? 'Loading organizations...' : 'Select organization'}</option>
-                {organizations.map((organization) => (
-                  <option key={organization.id} value={organization.id}>
-                    {organization.name}
-                  </option>
-                ))}
-              </Select>
+            <Field label="Mobile number">
+              <input className="input" value={mobileNumber} onChange={(event) => setMobileNumber(event.target.value)} placeholder="09XXXXXXXXX" />
+            </Field>
+            <Field label="Organizations">
+              <div className="max-h-44 space-y-2 overflow-y-auto rounded-md border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-950">
+                {loadingOrganizations ? (
+                  <p className="px-2 py-1 text-sm text-slate-500 dark:text-slate-400">Loading organizations...</p>
+                ) : organizations.length ? organizations.map((organization) => (
+                  <label key={organization.id} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/5">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-slate-300 text-sky-700 focus:ring-sky-700 dark:border-slate-600 dark:bg-slate-900 dark:focus:ring-sky-400"
+                      checked={organizationIds.includes(organization.id)}
+                      onChange={() => toggleOrganization(organization.id)}
+                    />
+                    <span>{organization.name}</span>
+                  </label>
+                )) : (
+                  <p className="px-2 py-1 text-sm text-slate-500 dark:text-slate-400">No organizations available.</p>
+                )}
+              </div>
             </Field>
           </div>
           <Button className="mt-6 w-full justify-center" loading={register.loading || loadingOrganizations}>

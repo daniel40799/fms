@@ -40,6 +40,9 @@ class AuthServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private TwoFactorService twoFactorService;
+
     @InjectMocks
     private AuthService authService;
 
@@ -111,14 +114,14 @@ class AuthServiceTest {
                 "Organization 4",
                 Set.of("END_USER")
         );
-        when(userService.create(org.mockito.ArgumentMatchers.any(UserCreateRequest.class))).thenReturn(expected);
+        when(userService.createPendingEndUser(org.mockito.ArgumentMatchers.any(UserCreateRequest.class))).thenReturn(expected);
 
         UserResponse response = authService.register(request);
 
         assertThat(response).isSameAs(expected);
 
         ArgumentCaptor<UserCreateRequest> captor = ArgumentCaptor.forClass(UserCreateRequest.class);
-        verify(userService).create(captor.capture());
+        verify(userService).createPendingEndUser(captor.capture());
         assertThat(captor.getValue().email()).isEqualTo("new@example.test");
         assertThat(captor.getValue().password()).isEqualTo("secret");
         assertThat(captor.getValue().fullName()).isEqualTo("New User");

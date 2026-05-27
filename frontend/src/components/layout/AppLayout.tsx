@@ -14,7 +14,9 @@ import {
   SunIcon,
   TicketIcon,
   UserCircleIcon,
+  UserPlusIcon,
   UsersIcon,
+  ClipboardDocumentCheckIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -34,12 +36,14 @@ const THEME_STORAGE_KEY = 'fms-theme'
 const navigationIcons: Record<View, NavIcon> = {
   dashboard: Squares2X2Icon,
   profile: UserCircleIcon,
+  'create-account': UserPlusIcon,
   events: CalendarDaysIcon,
   'my-registrations': TicketIcon,
   registrations: CreditCardIcon,
   attendance: QrCodeIcon,
   users: UsersIcon,
   organizations: BuildingOffice2Icon,
+  'organization-confirmations': ClipboardDocumentCheckIcon,
   reports: ChartBarIcon,
 }
 
@@ -126,17 +130,27 @@ function SidebarContent({
   view,
   navItems,
   collapsed,
+  loading,
+  theme,
   onNavigate,
   onCollapseToggle,
   onClose,
+  onRefresh,
+  onLogout,
+  onThemeToggle,
 }: {
   me: Me
   view: View
   navItems: NavItem[]
   collapsed: boolean
+  loading?: boolean
+  theme?: ThemePreference
   onNavigate: (view: View) => void
   onCollapseToggle?: () => void
   onClose?: () => void
+  onRefresh?: () => void
+  onLogout?: () => void
+  onThemeToggle?: () => void
 }) {
   return (
     <div
@@ -174,7 +188,7 @@ function SidebarContent({
         </div>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 py-5" aria-label="Primary navigation">
+      <nav className="flex flex-1 flex-col gap-1 py-4 sm:py-5" aria-label="Primary navigation">
         {navItems.map((item) => {
           const Icon = navigationIcons[item.id]
           const active = view === item.id
@@ -187,7 +201,7 @@ function SidebarContent({
               title={collapsed ? item.label : undefined}
               aria-current={active ? 'page' : undefined}
               className={classNames(
-                'group flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition-all duration-200 ease-out hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:focus-visible:outline-sky-400 motion-reduce:transition-none motion-reduce:hover:translate-x-0',
+                'group flex min-h-10 w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold transition-all duration-200 ease-out hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:focus-visible:outline-sky-400 motion-reduce:transition-none motion-reduce:hover:translate-x-0 sm:min-h-11 sm:py-2.5',
                 collapsed && 'justify-center px-0',
                 active
                   ? 'bg-sky-50 text-sky-800 shadow-sm dark:bg-sky-400/10 dark:text-sky-100'
@@ -219,6 +233,47 @@ function SidebarContent({
           )
         })}
       </nav>
+
+      {onClose && onRefresh && onLogout && onThemeToggle && theme ? (
+        <div className="space-y-4 border-t border-slate-200 py-4 dark:border-white/10 lg:hidden">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Roles</p>
+            <div className="flex flex-wrap gap-2">
+              {me.roles.map((role) => <Badge key={role}>{roleLabels[role]}</Badge>)}
+            </div>
+          </div>
+          <div className="grid gap-2">
+            <button
+              type="button"
+              onClick={onThemeToggle}
+              className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 ease-out hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white motion-reduce:transition-none motion-reduce:active:scale-100"
+            >
+              {theme === 'dark' ? <SunIcon className="h-5 w-5" aria-hidden /> : <MoonIcon className="h-5 w-5" aria-hidden />}
+              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            </button>
+            <Button
+              type="button"
+              variant="secondary"
+              loading={loading}
+              leftIcon={<ArrowPathIcon className="h-4 w-4" aria-hidden />}
+              onClick={onRefresh}
+            >
+              Refresh
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              leftIcon={<ArrowRightOnRectangleIcon className="h-4 w-4" aria-hidden />}
+              onClick={() => {
+                onClose()
+                onLogout()
+              }}
+            >
+              Sign out
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -281,15 +336,20 @@ export function AppLayout({
               animate={{ x: 0 }}
               exit={{ x: -320 }}
               transition={pageTransition}
-              className="relative flex h-full w-[min(20rem,calc(100vw-2rem))] flex-col"
+              className="relative flex h-full w-[min(18rem,calc(100vw-1.25rem))] flex-col sm:w-[min(20rem,calc(100vw-2rem))]"
             >
               <SidebarContent
                 me={me}
                 view={view}
                 navItems={navItems}
                 collapsed={false}
+                loading={loading}
+                theme={theme}
                 onNavigate={navigateFromSidebar}
                 onClose={() => setMobileSidebarOpen(false)}
+                onRefresh={onRefresh}
+                onLogout={onLogout}
+                onThemeToggle={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
               />
             </motion.aside>
           </motion.div>
@@ -318,25 +378,25 @@ export function AppLayout({
           sidebarCollapsed ? 'lg:pl-[5.5rem]' : 'lg:pl-72',
         )}
       >
-        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur transition-colors duration-200 ease-out dark:border-white/10 dark:bg-slate-950/90 motion-reduce:transition-none">
-          <div className="flex min-h-16 flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur transition-colors duration-200 ease-out dark:border-white/10 dark:bg-slate-950/90 motion-reduce:transition-none">
+          <div className="flex min-h-14 flex-row items-center justify-between gap-3 px-3 py-2 sm:min-h-16 sm:px-6 sm:py-3 lg:px-8">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
                 onClick={() => setMobileSidebarOpen(true)}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 ease-out hover:bg-slate-50 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:border-white/10 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-white/10 motion-reduce:transition-none motion-reduce:active:scale-100 lg:hidden"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 ease-out hover:bg-slate-50 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:border-white/10 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-white/10 motion-reduce:transition-none motion-reduce:active:scale-100 sm:h-10 sm:w-10 lg:hidden"
                 aria-label="Open navigation"
               >
                 <Bars3Icon className="h-5 w-5" aria-hidden />
               </button>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
+                <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400 sm:text-sm">
                   {me.organization ?? 'No organization assigned'}
                 </p>
-                <p className="truncate text-base font-semibold text-slate-950 dark:text-white">{me.fullName}</p>
+                <p className="truncate text-sm font-semibold text-slate-950 dark:text-white sm:text-base">{me.fullName}</p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="hidden flex-wrap items-center gap-2 lg:flex">
               {me.roles.map((role) => <Badge key={role}>{roleLabels[role]}</Badge>)}
               <button
                 type="button"
@@ -368,7 +428,7 @@ export function AppLayout({
           </div>
         </header>
 
-        <main className="px-4 py-6 sm:px-6 lg:px-8">
+        <main className="px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={view}

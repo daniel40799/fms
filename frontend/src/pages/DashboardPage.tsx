@@ -1,249 +1,18 @@
 import {
-  ArrowTopRightOnSquareIcon,
-  BuildingOffice2Icon,
-  CalendarDaysIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ClockIcon,
-  MapPinIcon,
 } from '@heroicons/react/24/outline'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useMemo, useState, type ComponentType, type ReactNode, type SVGProps } from 'react'
-import fallbackHero from '../assets/hero.png'
+import { AnimatePresence, motion, type PanInfo } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { EventDetailView, formatEventPrice, getEventPosterUrl } from '../components/events/EventDetailView'
 import { Page } from '../components/layout'
-import { Button, EmptyState, InlineError, Panel, Stat, StatusBadge, Table } from '../components/ui'
-import { useAsyncAction } from '../hooks/useAsyncAction'
+import { EmptyState, Panel, Stat, StatusBadge, Table } from '../components/ui'
 import { formatDateTime } from '../lib/datetime'
 import { pageTransition } from '../lib/motion'
 import type { AttendanceLog, EventRecord, FmsUser, Me, Organization, Registration, RoleName } from '../types'
 
 const CAROUSEL_INTERVAL_MS = 6000
 type DashboardVariant = 'operations' | 'end-user' | 'organization-admin' | 'user-admin'
-
-function formatPrice(price: number) {
-  return `PHP ${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-
-function RegisterButton({
-  event,
-  onRegister,
-}: {
-  event: EventRecord
-  onRegister: (eventId: string) => Promise<void>
-}) {
-  const action = useAsyncAction(() => onRegister(event.id))
-
-  return (
-    <div className="space-y-2">
-      <Button
-        type="button"
-        className="min-h-11 w-full rounded-lg text-base"
-        loading={action.loading}
-        onClick={() => void action.run()}
-      >
-        Register for {formatPrice(event.registrationPrice)}
-      </Button>
-      {action.error && <InlineError message={action.error} />}
-    </div>
-  )
-}
-
-function DetailSection({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900 sm:p-8">
-      <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-white">{title}</h2>
-      <div className="mt-4">{children}</div>
-    </section>
-  )
-}
-
-function MetadataCard({
-  label,
-  value,
-  detail,
-  icon: Icon,
-}: {
-  label: string
-  value: string
-  detail?: string
-  icon: ComponentType<SVGProps<SVGSVGElement>>
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-900">
-      <div className="flex items-start gap-3">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-50 text-sky-700 dark:bg-sky-400/10 dark:text-sky-200">
-          <Icon className="h-5 w-5" aria-hidden />
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
-          <p className="mt-1 break-words text-sm font-bold leading-6 text-slate-950 dark:text-white">{value}</p>
-          {detail ? <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{detail}</p> : null}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function EventDetail({
-  event,
-  canRegister,
-  onBack,
-  onRegister,
-}: {
-  event: EventRecord
-  canRegister: boolean
-  onBack: () => void
-  onRegister: (eventId: string) => Promise<void>
-}) {
-  const mapSrc = event.venue
-    ? `https://www.google.com/maps?q=${encodeURIComponent(event.venue)}&output=embed`
-    : ''
-  const mapsLink = event.venue
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.venue)}`
-    : ''
-
-  return (
-    <section className="bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-white">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Button type="button" variant="secondary" onClick={onBack}>
-            Back to events
-          </Button>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            {formatDateTime(event.startDate)}
-          </p>
-        </div>
-
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-1 shadow-sm dark:border-white/10 dark:bg-slate-900">
-          <img
-            className="aspect-[16/7] w-full rounded-[1.35rem] object-cover sm:aspect-[16/6]"
-            src={event.horizontalPosterUrl ?? fallbackHero}
-            alt=""
-          />
-        </div>
-
-        <header className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
-            {event.organizationName ?? 'FAPOR7'}
-          </p>
-          <h1 className="max-w-5xl text-3xl font-black tracking-tight text-slate-950 dark:text-white sm:text-4xl">
-            {event.title}
-          </h1>
-          <p className="max-w-3xl text-base leading-7 text-slate-700 dark:text-slate-300">
-            {event.venue || 'Venue to be announced'} | {formatDateTime(event.startDate)}
-          </p>
-        </header>
-
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <MetadataCard label="Date" value={formatDateTime(event.startDate)} icon={CalendarDaysIcon} />
-          <MetadataCard label="Venue" value={event.venue || 'TBA'} icon={MapPinIcon} />
-          <MetadataCard label="Organizer" value={event.organizationName ?? 'FAPOR7'} icon={BuildingOffice2Icon} />
-          <MetadataCard
-            label="Schedule"
-            value={formatDateTime(event.startDate)}
-            detail={`Ends ${formatDateTime(event.endDate)}`}
-            icon={ClockIcon}
-          />
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-          <main className="space-y-6">
-            <DetailSection title="About this Event">
-              <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700 dark:text-slate-300">
-                {event.description || 'Event details will be posted soon.'}
-              </p>
-            </DetailSection>
-
-            <DetailSection title="Event Details">
-              <dl className="grid gap-4 text-sm sm:grid-cols-2">
-                <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
-                  <dt className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Starts</dt>
-                  <dd className="mt-1 font-semibold text-slate-950 dark:text-white">{formatDateTime(event.startDate)}</dd>
-                </div>
-                <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
-                  <dt className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Ends</dt>
-                  <dd className="mt-1 font-semibold text-slate-950 dark:text-white">{formatDateTime(event.endDate)}</dd>
-                </div>
-                <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
-                  <dt className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Registration</dt>
-                  <dd className="mt-1 font-semibold text-slate-950 dark:text-white">{formatPrice(event.registrationPrice)}</dd>
-                </div>
-                <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
-                  <dt className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Capacity</dt>
-                  <dd className="mt-1 font-semibold text-slate-950 dark:text-white">{event.capacity ?? 'No limit'}</dd>
-                </div>
-              </dl>
-            </DetailSection>
-
-            <DetailSection title="Location">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm leading-6 text-slate-700 dark:text-slate-300">
-                  {event.venue || 'Location to be announced.'}
-                </p>
-                {mapsLink ? (
-                  <a
-                    className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition-all duration-200 ease-out hover:border-slate-400 hover:bg-slate-50 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:outline-sky-400 motion-reduce:transition-none"
-                    href={mapsLink}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    Open in Google Maps
-                    <ArrowTopRightOnSquareIcon className="h-4 w-4" aria-hidden />
-                  </a>
-                ) : null}
-              </div>
-              <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-slate-950">
-                {mapSrc ? (
-                  <iframe
-                    className="h-80 w-full border-0 sm:h-96"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    src={mapSrc}
-                    title={`${event.title} location`}
-                  />
-                ) : (
-                  <div className="grid h-80 place-items-center px-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                    Location to be announced.
-                  </div>
-                )}
-              </div>
-            </DetailSection>
-          </main>
-
-          <aside className="self-start xl:sticky xl:top-6">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900">
-              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-slate-950">
-                <img
-                  className="aspect-[3/4] w-full object-cover"
-                  src={event.verticalPosterUrl ?? fallbackHero}
-                  alt=""
-                />
-              </div>
-              <div className="mt-5">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Starts at</p>
-                <p className="mt-1 text-3xl font-black tracking-tight text-slate-950 dark:text-white">
-                  {formatPrice(event.registrationPrice)}
-                </p>
-              </div>
-              <div className="mt-5">
-                {canRegister ? (
-                  <RegisterButton event={event} onRegister={onRegister} />
-                ) : (
-                  <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600 dark:border-white/10 dark:bg-slate-950 dark:text-slate-300">
-                    Registration is currently unavailable.
-                  </p>
-                )}
-              </div>
-              <p className="mt-4 text-xs leading-5 text-slate-500 dark:text-slate-400">
-                Registration is processed through your FAPOR7/FMS account and follows the event organizer's approval workflow.
-              </p>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
-  )
-}
 
 function EventCard({
   event,
@@ -256,22 +25,22 @@ function EventCard({
 }) {
   return (
     <article className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:bg-slate-900 dark:hover:border-white/20 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-      <button className="group block h-full w-full text-left" type="button" onClick={() => onOpen(event)}>
-        <div className="aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-950">
+      <button className="group flex h-full w-full text-left sm:block" type="button" onClick={() => onOpen(event)}>
+        <div className="aspect-[3/4] w-28 shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-950 sm:w-full">
           <img
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-            src={event.verticalPosterUrl ?? fallbackHero}
+            src={getEventPosterUrl(event, 'portrait')}
             alt=""
           />
         </div>
-        <div className="space-y-2 p-4">
-          <h3 className="line-clamp-2 min-h-12 text-base font-bold text-slate-950 dark:text-white">{event.title}</h3>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{event.venue || 'TBA'}</p>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{formatDateTime(event.startDate)}</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">{event.organizationName ?? 'FAPOR7'}</p>
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
-            <span className="text-sm font-bold text-slate-950 dark:text-white">{formatPrice(event.registrationPrice)}</span>
-            <span className="inline-flex min-h-9 items-center rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-200 ease-out group-hover:bg-sky-800 dark:bg-sky-600 dark:group-hover:bg-sky-500 motion-reduce:transition-none">
+        <div className="min-w-0 flex-1 space-y-1.5 p-3 sm:space-y-2 sm:p-4">
+          <h3 className="line-clamp-2 text-sm font-bold leading-5 text-slate-950 dark:text-white sm:min-h-12 sm:text-base sm:leading-6">{event.title}</h3>
+          <p className="line-clamp-1 text-xs text-slate-600 dark:text-slate-300 sm:text-sm">{event.venue || 'TBA'}</p>
+          <p className="line-clamp-1 text-xs text-slate-600 dark:text-slate-300 sm:text-sm">{formatDateTime(event.startDate)}</p>
+          <p className="hidden text-sm text-slate-500 dark:text-slate-400 sm:block">{event.organizationName ?? 'FAPOR7'}</p>
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 sm:pt-2">
+            <span className="text-xs font-bold text-slate-950 dark:text-white sm:text-sm">{formatEventPrice(event.registrationPrice)}</span>
+            <span className="inline-flex min-h-8 items-center rounded-md bg-sky-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors duration-200 ease-out group-hover:bg-sky-800 dark:bg-sky-600 dark:group-hover:bg-sky-500 motion-reduce:transition-none sm:min-h-9 sm:px-3 sm:py-2 sm:text-sm">
               {canRegister ? 'Register' : 'View details'}
             </span>
           </div>
@@ -301,6 +70,7 @@ function EndUserDashboard({
   const [featuredIndex, setFeaturedIndex] = useState(0)
   const [carouselTick, setCarouselTick] = useState(0)
   const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null)
+  const suppressFeaturedClickRef = useRef(false)
   const featuredEvent = featuredEvents.length ? featuredEvents[featuredIndex % featuredEvents.length] : null
   const nextOrganizer = upcomingEvents.find((event) => event.organizationName)?.organizationName
   const organizerEvents = nextOrganizer
@@ -323,9 +93,32 @@ function EndUserDashboard({
     setCarouselTick((tick) => tick + 1)
   }
 
+  const handleFeaturedDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    void event
+    if (featuredEvents.length <= 1) return
+
+    const swiped = Math.abs(info.offset.x) > 45 || Math.abs(info.velocity.x) > 500
+    if (!swiped) return
+
+    suppressFeaturedClickRef.current = true
+    navigateFeatured(featuredIndex + (info.offset.x < 0 ? 1 : -1))
+    window.setTimeout(() => {
+      suppressFeaturedClickRef.current = false
+    }, 0)
+  }
+
+  const openFeaturedEvent = (event: EventRecord) => {
+    if (suppressFeaturedClickRef.current) {
+      suppressFeaturedClickRef.current = false
+      return
+    }
+
+    setSelectedEvent(event)
+  }
+
   if (selectedEvent) {
     return (
-      <EventDetail
+      <EventDetailView
         event={selectedEvent}
         canRegister={canRegister}
         onBack={() => setSelectedEvent(null)}
@@ -338,32 +131,69 @@ function EndUserDashboard({
     <Page title="Events" description="Published events open for FAPOR7 participants.">
       {featuredEvent ? (
         <div className="mx-auto max-w-7xl">
-          <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-sm dark:border-white/10">
+          <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-slate-900 sm:rounded-3xl sm:bg-slate-950">
             <AnimatePresence mode="wait">
               <motion.button
                 key={featuredEvent.id}
                 type="button"
-                className="group relative block w-full overflow-hidden text-left"
-                onClick={() => setSelectedEvent(featuredEvent)}
+                className="group relative block w-full touch-pan-y overflow-hidden text-left"
+                drag={featuredEvents.length > 1 ? 'x' : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.08}
+                onDragEnd={handleFeaturedDragEnd}
+                onClick={() => openFeaturedEvent(featuredEvent)}
                 initial={{ opacity: 0, x: 28 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -28 }}
                 transition={pageTransition}
               >
-                <img
-                  className="aspect-[16/9] min-h-72 w-full object-cover opacity-85 transition-transform duration-700 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100 sm:aspect-[16/7] lg:aspect-[16/6]"
-                  src={featuredEvent.horizontalPosterUrl ?? fallbackHero}
-                  alt=""
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/5" />
-                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
-                  <p className="text-sm font-semibold text-sky-100">{featuredEvent.organizationName ?? 'FAPOR7'}</p>
-                  <h1 className="mt-2 max-w-4xl text-3xl font-black tracking-tight text-white sm:text-5xl">
-                    {featuredEvent.title}
-                  </h1>
-                  <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-100 sm:text-base">
-                    {formatDateTime(featuredEvent.startDate)} | {featuredEvent.venue || 'TBA'}
-                  </p>
+                <div className="sm:hidden">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-slate-100 dark:bg-slate-950">
+                    <img
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                      src={getEventPosterUrl(featuredEvent, 'portrait')}
+                      alt=""
+                    />
+                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/45 to-transparent" />
+                  </div>
+                  <div className="space-y-3 p-4">
+                    <p className="line-clamp-1 text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
+                      {featuredEvent.organizationName ?? 'FAPOR7'}
+                    </p>
+                    <h1 className="line-clamp-2 text-xl font-black tracking-tight text-slate-950 dark:text-white">
+                      {featuredEvent.title}
+                    </h1>
+                    <div className="grid gap-1.5 text-sm leading-5 text-slate-600 dark:text-slate-300">
+                      <p className="line-clamp-1">{formatDateTime(featuredEvent.startDate)}</p>
+                      <p className="line-clamp-1">{featuredEvent.venue || 'TBA'}</p>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 pt-1">
+                      <span className="text-sm font-bold text-slate-950 dark:text-white">
+                        {formatEventPrice(featuredEvent.registrationPrice)}
+                      </span>
+                      <span className="inline-flex min-h-9 shrink-0 items-center rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-200 ease-out group-hover:bg-sky-800 dark:bg-sky-600 dark:group-hover:bg-sky-500 motion-reduce:transition-none">
+                        {canRegister ? 'Register' : 'View details'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="hidden sm:block">
+                  <img
+                    className="aspect-[16/7] min-h-72 w-full object-cover opacity-85 transition-transform duration-700 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100 lg:aspect-[16/6]"
+                    src={getEventPosterUrl(featuredEvent, 'landscape')}
+                    alt=""
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/5" />
+                  <div className="absolute inset-x-0 bottom-0 p-8">
+                    <p className="text-sm font-semibold text-sky-100">{featuredEvent.organizationName ?? 'FAPOR7'}</p>
+                    <h1 className="mt-2 max-w-4xl text-5xl font-black tracking-tight text-white">
+                      {featuredEvent.title}
+                    </h1>
+                    <p className="mt-3 max-w-3xl text-base leading-6 text-slate-100">
+                      {formatDateTime(featuredEvent.startDate)} | {featuredEvent.venue || 'TBA'}
+                    </p>
+                  </div>
                 </div>
               </motion.button>
             </AnimatePresence>
@@ -373,7 +203,7 @@ function EndUserDashboard({
                 <button
                   type="button"
                   onClick={() => navigateFeatured(featuredIndex - 1)}
-                  className="absolute left-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/90 text-slate-900 shadow-sm backdrop-blur transition-all duration-200 ease-out hover:scale-105 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100 sm:left-5"
+                  className="absolute left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/90 text-slate-900 shadow-sm backdrop-blur transition-all duration-200 ease-out hover:scale-105 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100 sm:left-5 sm:inline-flex"
                   aria-label="Previous event"
                 >
                   <ChevronLeftIcon className="h-5 w-5" aria-hidden />
@@ -381,7 +211,7 @@ function EndUserDashboard({
                 <button
                   type="button"
                   onClick={() => navigateFeatured(featuredIndex + 1)}
-                  className="absolute right-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/90 text-slate-900 shadow-sm backdrop-blur transition-all duration-200 ease-out hover:scale-105 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100 sm:right-5"
+                  className="absolute right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/90 text-slate-900 shadow-sm backdrop-blur transition-all duration-200 ease-out hover:scale-105 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100 sm:right-5 sm:inline-flex"
                   aria-label="Next event"
                 >
                   <ChevronRightIcon className="h-5 w-5" aria-hidden />
@@ -418,21 +248,21 @@ function EndUserDashboard({
       )}
       {publishedEvents.length ? (
         <>
-          <section className="mx-auto mt-8 max-w-7xl">
+          <section className="mx-auto mt-6 max-w-7xl sm:mt-8">
             <div className="flex items-end justify-between gap-4">
-              <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-white">Upcoming events</h2>
+              <h2 className="text-lg font-bold tracking-tight text-slate-950 dark:text-white sm:text-xl">Upcoming events</h2>
               <p className="text-sm text-slate-500 dark:text-slate-400">{publishedEvents.length} published</p>
             </div>
-            <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            <div className="mt-3 grid gap-3 sm:mt-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 2xl:grid-cols-4">
               {(upcomingEvents.length ? upcomingEvents : publishedEvents).map((event) => (
                 <EventCard key={event.id} event={event} canRegister={canRegister} onOpen={setSelectedEvent} />
               ))}
             </div>
           </section>
           {organizerEvents.length ? (
-            <section className="mx-auto mt-10 max-w-7xl">
-              <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-white">Events by {nextOrganizer}</h2>
-              <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            <section className="mx-auto mt-8 max-w-7xl sm:mt-10">
+              <h2 className="text-lg font-bold tracking-tight text-slate-950 dark:text-white sm:text-xl">Events by {nextOrganizer}</h2>
+              <div className="mt-3 grid gap-3 sm:mt-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 2xl:grid-cols-4">
                 {organizerEvents.map((event) => (
                   <EventCard key={`${event.id}-organizer`} event={event} canRegister={canRegister} onOpen={setSelectedEvent} />
                 ))}
@@ -530,46 +360,35 @@ function OrganizationAdminDashboard({
   users: FmsUser[]
   me: Me
 }) {
-  const activeOrganizations = organizations.filter((organization) => organization.status === 'ACTIVE').length
-  const affiliatedUsers = users.filter((user) => user.organizationId).length
-  const totalAdmins = organizations.reduce((total, organization) => total + countOrganizationAdmins(organization, users, me), 0)
+  const heldOrganizations = organizations.filter((organization) => organization.holders?.some((holder) => holder.id === me.id))
+  const visibleOrganizationIds = new Set((heldOrganizations.length ? heldOrganizations : me.organizations).map((organization) => organization.id))
+  const memberships = users.flatMap((user) => (user.organizations ?? [])
+    .filter((membership) => visibleOrganizationIds.size === 0 || visibleOrganizationIds.has(membership.id))
+    .map((membership) => ({ user, membership })))
+  const pendingMemberships = memberships.filter((item) => item.membership.status === 'PENDING').length
+  const confirmedMemberships = memberships.filter((item) => item.membership.status === 'CONFIRMED').length
 
   return (
-    <Page title="Organization Dashboard" description="Organization coverage, affiliation, and administrator summary.">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Total organizations" value={organizations.length} tone="INFORMATION" />
-        <Stat label="Active organizations" value={activeOrganizations} tone="ACTIVE" />
-        <Stat label="Organization admins" value={totalAdmins} tone="DEFAULT" />
-        <Stat label="Affiliated users" value={affiliatedUsers} tone="CONFIRMED" />
+    <Page title="Organization Confirmation Dashboard" description="Submitted memberships for the organizations you hold.">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <Stat label="Held organizations" value={heldOrganizations.length || me.organizations.length} tone="INFORMATION" />
+        <Stat label="Pending review" value={pendingMemberships} tone="PENDING" />
+        <Stat label="Confirmed" value={confirmedMemberships} tone="CONFIRMED" />
       </div>
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <Panel title="Organization summaries">
-          <Table
-            columns={['Organization', 'Code', 'Status', 'Users', 'Admins']}
-            rows={organizations.map((organization) => [
-              organization.name,
-              organization.code,
-              <StatusBadge key={organization.id} value={organization.status} />,
-              users.filter((user) => user.organizationId === organization.id).length,
-              countOrganizationAdmins(organization, users, me),
-            ])}
-            empty="No organizations yet."
-            filterableColumns={[true, true, true, false, false]}
-            pageSize={8}
-          />
-        </Panel>
-        <Panel title="User affiliation summary">
-          <Table
-            columns={['User', 'Organization', 'Status']}
-            rows={users.slice(0, 8).map((user) => [
-              user.fullName,
-              user.organizationName ?? 'Unassigned',
-              <StatusBadge key={user.id} value={user.status} />,
-            ])}
-            empty="No users available for organization administration."
-          />
-        </Panel>
-      </div>
+      <Panel title="Recent submitted memberships" className="mt-6">
+        <Table
+          columns={['User', 'Email', 'Organization', 'Status']}
+          rows={memberships.slice(0, 8).map(({ user, membership }) => [
+            user.fullName,
+            user.email,
+            membership.name,
+            <StatusBadge key={`${user.id}-${membership.id}`} value={membership.status} />,
+          ])}
+          empty="No submitted memberships are available for review."
+          filterableColumns={[true, true, true, true]}
+          pageSize={8}
+        />
+      </Panel>
     </Page>
   )
 }
@@ -615,17 +434,6 @@ function UserAdminDashboard({ users }: { users: FmsUser[] }) {
       </div>
     </Page>
   )
-}
-
-function countOrganizationAdmins(organization: Organization, users: FmsUser[], me: Me) {
-  const listedAdmins = users.filter((user) =>
-    user.organizationId === organization.id && user.roles.some(isAdministrativeRole)
-  ).length
-  const includeCurrentAdmin = me.organizationId === organization.id
-    && me.roles.includes('ORGANIZATION_ADMIN')
-    && !users.some((user) => user.id === me.id && user.roles.some(isAdministrativeRole))
-
-  return listedAdmins + (includeCurrentAdmin ? 1 : 0)
 }
 
 function isAdministrativeRole(role: RoleName) {

@@ -3,6 +3,7 @@ package com.fapor7.fms.users.dto;
 import java.util.Set;
 import java.util.UUID;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * User profile returned by administrative and profile APIs.
@@ -22,6 +23,7 @@ import java.time.LocalDate;
  * @param status account lifecycle state
  * @param organizationId affiliated organization id, if any
  * @param organizationName affiliated organization name, if any
+ * @param organizations all submitted organization memberships
  * @param roles assigned role names used for authorization
  */
 public record UserResponse(
@@ -40,6 +42,7 @@ public record UserResponse(
         String status,
         UUID organizationId,
         String organizationName,
+        List<UserOrganizationResponse> organizations,
         Set<String> roles
 ) {
     public UserResponse(
@@ -75,6 +78,50 @@ public record UserResponse(
                 status,
                 organizationId,
                 organizationName,
+                organizationId != null
+                        ? List.of(new UserOrganizationResponse(organizationId, organizationName, null, "CONFIRMED"))
+                        : List.of(),
+                roles
+        );
+    }
+
+    public UserResponse(
+            UUID id,
+            String email,
+            String fullName,
+            String firstName,
+            String middleName,
+            String lastName,
+            LocalDate birthday,
+            String sex,
+            String address,
+            String mobileNumber,
+            String prcNumber,
+            String profileImageUrl,
+            String status,
+            UUID organizationId,
+            String organizationName,
+            Set<String> roles
+    ) {
+        this(
+                id,
+                email,
+                fullName,
+                firstName,
+                middleName,
+                lastName,
+                birthday,
+                sex,
+                address,
+                mobileNumber,
+                prcNumber,
+                profileImageUrl,
+                status,
+                organizationId,
+                organizationName,
+                organizationId != null
+                        ? List.of(new UserOrganizationResponse(organizationId, organizationName, null, "CONFIRMED"))
+                        : List.of(),
                 roles
         );
     }

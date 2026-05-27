@@ -1,22 +1,32 @@
 import { useState } from 'react'
-import { OrganizationCreateForm, OrganizationImportForm, type OrganizationImportRow } from '../components/forms'
+import { OrganizationForm, OrganizationImportForm, type OrganizationImportRow } from '../components/forms'
 import { Page } from '../components/layout'
-import { ConfirmDeleteModal, FormModal } from '../components/modals'
+import { FormModal } from '../components/modals'
 import { Button, Panel, StatusBadge, Table } from '../components/ui'
-import type { Organization } from '../types'
+import type { FmsUser, Organization } from '../types'
+
+function holderSummary(organization: Organization) {
+  return organization.holders?.length
+    ? organization.holders.map((holder) => holder.fullName).join(', ')
+    : 'None'
+}
 
 export function OrganizationsPage({
   organizations,
+  users,
   canCreate,
   canDelete,
   onCreate,
+  onUpdate,
   onImport,
   onDelete,
 }: {
   organizations: Organization[]
+  users: FmsUser[]
   canCreate: boolean
   canDelete: boolean
-  onCreate: (payload: { name: string; code: string }) => Promise<void>
+  onCreate: (payload: { name: string; code: string; status: string; holderIds: string[] }) => Promise<void>
+  onUpdate: (id: string, payload: { name: string; code: string; status: string; holderIds: string[] }) => Promise<void>
   onImport: (organizations: OrganizationImportRow[]) => Promise<void>
   onDelete: (id: string) => Promise<void>
 }) {
@@ -41,40 +51,49 @@ export function OrganizationsPage({
             <OrganizationImportForm onImport={onImport} onCancel={() => setIsImportModalOpen(false)} />
           </FormModal>
           <FormModal title="Create organization" isOpen={isFormModalOpen} onClose={() => setIsFormModalOpen(false)}>
-            <OrganizationCreateForm onCreate={onCreate} onCancel={() => setIsFormModalOpen(false)} />
+            <OrganizationForm
+              organization={null}
+              users={users}
+              onSubmit={async (payload) => {
+                await onCreate(payload)
+                setIsFormModalOpen(false)
+              }}
+              onCancel={() => setIsFormModalOpen(false)}
+            />
           </FormModal>
         </>
       )}
-      {canDelete && (
-        <ConfirmDeleteModal
-          actionLabel="Delete organization"
-          description="This permanently removes the organization. Existing users or events may block deletion."
-          isOpen={Boolean(selectedOrganization)}
-          objectName={selectedOrganization?.name ?? ''}
-          title="Delete organization"
-          onClose={() => setSelectedOrganization(null)}
-          onConfirm={async () => {
-            if (!selectedOrganization) return
-            await onDelete(selectedOrganization.id)
-            setSelectedOrganization(null)
-          }}
-        />
+      {selectedOrganization && (
+        <FormModal title={`Edit ${selectedOrganization.name}`} isOpen={Boolean(selectedOrganization)} onClose={() => setSelectedOrganization(null)}>
+          <OrganizationForm
+            organization={selectedOrganization}
+            users={users}
+            onSubmit={async (payload) => {
+              await onUpdate(selectedOrganization.id, payload)
+              setSelectedOrganization(null)
+            }}
+            onCancel={() => setSelectedOrganization(null)}
+            onDelete={canDelete ? async () => {
+              await onDelete(selectedOrganization.id)
+              setSelectedOrganization(null)
+            } : undefined}
+          />
+        </FormModal>
       )}
       <Panel title="Organization directory">
         <Table
-          columns={['Name', 'Code', 'Status', ...(canDelete ? ['Actions'] : [])]}
+          columns={['Name', 'Code', 'Status', 'Holders', 'Action']}
           rows={organizations.map((org) => [
             org.name,
             org.code,
             <StatusBadge key={org.id} value={org.status} />,
-            ...(canDelete ? [
-              <Button key={`${org.id}-delete`} type="button" variant="danger" onClick={() => setSelectedOrganization(org)}>
-                Delete
-              </Button>,
-            ] : []),
+            holderSummary(org),
+            <Button key={`${org.id}-edit`} type="button" variant="secondary" onClick={() => setSelectedOrganization(org)}>
+              Edit
+            </Button>,
           ])}
           empty="No organizations found."
-          filterableColumns={[true, true, true, false]}
+          filterableColumns={[true, true, true, true, false]}
           pageSize={10}
         />
       </Panel>

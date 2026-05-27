@@ -10,13 +10,23 @@ export function EventForm({
   organizations,
   onSubmit,
   onCancel,
+  onArchive,
+  onDelete,
 }: {
   event: EventRecord | null
   organizations: Organization[]
   onSubmit: (payload: EventPayload) => Promise<void>
   onCancel: () => void
+  onArchive?: () => Promise<void>
+  onDelete?: () => Promise<void>
 }) {
   const action = useAsyncAction(onSubmit)
+  const archiveAction = useAsyncAction(async () => {
+    if (onArchive) await onArchive()
+  })
+  const deleteAction = useAsyncAction(async () => {
+    if (onDelete) await onDelete()
+  })
   const [form, setForm] = useState({
     title: event?.title ?? '',
     description: event?.description ?? '',
@@ -37,7 +47,7 @@ export function EventForm({
 
   return (
     <>
-      {action.error && <InlineError message={action.error} />}
+      {(action.error || archiveAction.error || deleteAction.error) && <InlineError message={action.error || archiveAction.error || deleteAction.error} />}
       <form
         className="grid gap-4 lg:grid-cols-2"
         onSubmit={(submitEvent) => {
@@ -100,6 +110,16 @@ export function EventForm({
         <div className="sticky bottom-0 z-10 -mx-5 -mb-4 flex flex-wrap gap-2 border-t border-slate-200 bg-white/95 px-5 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 lg:col-span-2">
           <Button loading={action.loading}>{action.loading ? 'Saving...' : event ? 'Save changes' : 'Create event'}</Button>
           <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+          {event?.status === 'PUBLISHED' && onArchive ? (
+            <Button type="button" variant="danger" loading={archiveAction.loading} onClick={() => void archiveAction.run()}>
+              Archive
+            </Button>
+          ) : null}
+          {event?.status === 'DRAFT' && onDelete ? (
+            <Button type="button" variant="danger" loading={deleteAction.loading} onClick={() => void deleteAction.run()}>
+              Delete
+            </Button>
+          ) : null}
         </div>
       </form>
     </>

@@ -7,8 +7,10 @@ import com.fapor7.fms.roles.RoleName;
 import com.fapor7.fms.roles.RoleRepository;
 import com.fapor7.fms.users.dto.UserCreateRequest;
 import com.fapor7.fms.users.dto.UserOrganizationUpdateRequest;
+import com.fapor7.fms.users.dto.UserOrganizationResponse;
 import com.fapor7.fms.users.dto.UserProfileUpdateRequest;
 import com.fapor7.fms.users.dto.UserResponse;
+import com.fapor7.fms.users.dto.UserUpdateRequest;
 import com.fapor7.fms.auth.AuthenticatedUser;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +26,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -95,13 +99,12 @@ public class UserService {
             return findAll();
         }
 
-        UUID organizationId = requireOrganizationAdminOrganization(currentUser).getId();
+        Set<UUID> organizationIds = requireHeldOrganizationIds(currentUser);
 
         return userRepository.findAll()
                 .stream()
                 .filter(this::isEndUser)
-                .filter(user -> user.getOrganization() == null
-                        || user.getOrganization().getId().equals(organizationId))
+                .filter(user -> hasAnyOrganization(user, organizationIds))
                 .map(this::toResponse)
                 .toList();
     }
@@ -118,41 +121,53 @@ public class UserService {
      * @throws RuntimeException when the email, organization, or role data is invalid
      */
     public UserResponse create(UserCreateRequest request) {
-        userRepository.findByEmail(request.email()).ifPresent(user -> {
+        return create(request, UserOrganizationStatus.CONFIRMED, null);
+    }
+
+    /**
+     * Creates a self-registered end-user account with submitted organization
+     * memberships waiting for holder confirmation.
+     *
+     * @param request public registration payload
+     * @return created user response
+     */
+    public UserResponse createPendingEndUser(UserCreateRequest request) {
+        return create(request, UserOrganizationStatus.PENDING, null);
+    }
+
+    private UserResponse create(
+            UserCreateRequest request,
+            UserOrganizationStatus organizationStatus,
+            UserEntity confirmedBy
+    ) {
+        String email = requireEmail(request.email());
+        userRepository.findByEmail(email).ifPresent(user -> {
             throw new RuntimeException("Email already exists");
         });
 
-        OrganizationEntity organization = null;
+        Set<OrganizationEntity> organizations = resolveOrganizations(request.effectiveOrganizationIds());
 
-        if (request.organizationId() != null) {
-            organization = organizationRepository.findById(request.organizationId())
-                    .orElseThrow(() -> new RuntimeException("Organization not found"));
-        }
-
-        Set<RoleEntity> roles = new HashSet<>();
-
-        if (request.roles() != null && !request.roles().isEmpty()) {
-            for (RoleName roleName : request.roles()) {
-                RoleEntity role = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
-                roles.add(role);
-            }
-        } else {
-            RoleEntity defaultRole = roleRepository.findByName(RoleName.END_USER)
-                    .orElseThrow(() -> new RuntimeException("Default role not found"));
-            roles.add(defaultRole);
-        }
+        Set<RoleEntity> roles = resolveRoles(request.roles());
+        String fullName = resolveFullName(request.fullName(), request.firstName(), request.middleName(), request.lastName());
 
         UserEntity user = new UserEntity();
         user.setId(UUID.randomUUID());
-        user.setEmail(request.email());
-        user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setFullName(request.fullName());
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(requireText(request.password(), "Password")));
+        user.setFullName(fullName);
+        user.setFirstName(trimToNull(request.firstName()));
+        user.setMiddleName(trimToNull(request.middleName()));
+        user.setLastName(trimToNull(request.lastName()));
+        user.setBirthday(request.birthday());
+        user.setSex(trimToNull(request.sex()));
+        user.setAddress(trimToNull(request.address()));
+        user.setMobileNumber(validateMobileNumber(request.mobileNumber()));
+        user.setPrcNumber(validatePrcNumber(request.prcNumber()));
         user.setStatus(UserStatus.ACTIVE);
-        user.setOrganization(organization);
         user.setRoles(roles);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
+        replaceOrganizationMemberships(user, organizations, organizationStatus, confirmedBy);
 
         return toResponse(userRepository.save(user));
     }
@@ -327,6 +342,11 @@ public class UserService {
             UserOrganizationUpdateRequest request,
             AuthenticatedUser authenticatedUser
     ) {
+        UserEntity currentUser = authenticatedUser.getUser();
+        if (!canManageAllUsers(currentUser)) {
+            throw new AccessDeniedException("Use organization confirmation actions for holder-scoped changes");
+        }
+
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -334,24 +354,117 @@ public class UserService {
             throw new AccessDeniedException("Only end-user affiliations can be managed");
         }
 
-        OrganizationEntity organization = null;
-
-        if (request.organizationId() != null) {
-            organization = organizationRepository.findById(request.organizationId())
-                    .orElseThrow(() -> new RuntimeException("Organization not found"));
-        }
-
-        UserEntity currentUser = authenticatedUser.getUser();
-
-        if (!canManageAllUsers(currentUser)) {
-            OrganizationEntity currentOrganization = requireOrganizationAdminOrganization(currentUser);
-            enforceOrganizationAdminAffiliationScope(user, organization, currentOrganization);
-        }
-
-        user.setOrganization(organization);
+        replaceOrganizationMemberships(
+                user,
+                resolveOrganizations(request.effectiveOrganizationIds()),
+                UserOrganizationStatus.CONFIRMED,
+                currentUser
+        );
         user.setUpdatedAt(LocalDateTime.now());
 
         return toResponse(userRepository.save(user));
+    }
+
+    /**
+     * Updates administrative account fields, role assignments, and memberships.
+     *
+     * @param id user id
+     * @param request replacement account details
+     * @param authenticatedUser administrator applying the change
+     * @return updated user response
+     */
+    public UserResponse update(UUID id, UserUpdateRequest request, AuthenticatedUser authenticatedUser) {
+        UserEntity currentUser = authenticatedUser.getUser();
+        if (!canManageAllUsers(currentUser)) {
+            throw new AccessDeniedException("Only main and user administrators can edit accounts");
+        }
+
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String email = requireEmail(request.email());
+        if (!email.equalsIgnoreCase(user.getEmail())) {
+            userRepository.findByEmail(email).ifPresent(existing -> {
+                if (!existing.getId().equals(user.getId())) {
+                    throw new RuntimeException("Email already exists");
+                }
+            });
+            user.setEmail(email);
+        }
+
+        String fullName = resolveFullName(request.fullName(), request.firstName(), request.middleName(), request.lastName());
+        user.setFullName(fullName);
+        user.setFirstName(trimToNull(request.firstName()));
+        user.setMiddleName(trimToNull(request.middleName()));
+        user.setLastName(trimToNull(request.lastName()));
+        user.setBirthday(request.birthday());
+        user.setSex(trimToNull(request.sex()));
+        user.setAddress(trimToNull(request.address()));
+        user.setMobileNumber(validateMobileNumber(request.mobileNumber()));
+        user.setPrcNumber(validatePrcNumber(request.prcNumber()));
+
+        if (request.password() != null && !request.password().isBlank()) {
+            user.setPasswordHash(passwordEncoder.encode(request.password()));
+        }
+
+        if (request.roles() != null) {
+            user.setRoles(resolveRoles(request.roles()));
+        }
+
+        if (request.organizationIds() != null) {
+            replaceOrganizationMemberships(
+                    user,
+                    resolveOrganizations(request.organizationIds()),
+                    UserOrganizationStatus.CONFIRMED,
+                    currentUser
+            );
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+
+        return toResponse(userRepository.save(user));
+    }
+
+    /**
+     * Confirms a user's submitted organization membership.
+     *
+     * @param userId user id
+     * @param organizationId organization id being confirmed
+     * @param authenticatedUser confirming administrator or holder
+     * @return updated user response
+     */
+    public UserResponse confirmOrganization(
+            UUID userId,
+            UUID organizationId,
+            AuthenticatedUser authenticatedUser
+    ) {
+        return setOrganizationConfirmationStatus(
+                userId,
+                organizationId,
+                UserOrganizationStatus.CONFIRMED,
+                authenticatedUser
+        );
+    }
+
+    /**
+     * Rejects a user's submitted organization membership.
+     *
+     * @param userId user id
+     * @param organizationId organization id being rejected
+     * @param authenticatedUser rejecting administrator or holder
+     * @return updated user response
+     */
+    public UserResponse rejectOrganization(
+            UUID userId,
+            UUID organizationId,
+            AuthenticatedUser authenticatedUser
+    ) {
+        return setOrganizationConfirmationStatus(
+                userId,
+                organizationId,
+                UserOrganizationStatus.REJECTED,
+                authenticatedUser
+        );
     }
 
     /**
@@ -377,30 +490,81 @@ public class UserService {
         return hasRole(user, RoleName.MAIN_ADMIN) || hasRole(user, RoleName.USER_ADMIN);
     }
 
-    private OrganizationEntity requireOrganizationAdminOrganization(UserEntity user) {
-        if (!hasRole(user, RoleName.ORGANIZATION_ADMIN) || user.getOrganization() == null) {
-            throw new AccessDeniedException("Organization administrator must be assigned to an organization");
+    private Set<UUID> requireHeldOrganizationIds(UserEntity user) {
+        if (!hasRole(user, RoleName.ORGANIZATION_ADMIN)) {
+            throw new AccessDeniedException("Organization confirmation requires an organization administrator");
         }
 
-        return user.getOrganization();
+        Set<UUID> holderOrganizationIds = organizationRepository.findByHolders_Id(user.getId())
+                .stream()
+                .map(OrganizationEntity::getId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        if (holderOrganizationIds.isEmpty() && user.getOrganization() != null) {
+            holderOrganizationIds.add(user.getOrganization().getId());
+        }
+
+        if (holderOrganizationIds.isEmpty()) {
+            throw new AccessDeniedException("Organization administrator must be assigned as an organization holder");
+        }
+
+        return holderOrganizationIds;
     }
 
-    private void enforceOrganizationAdminAffiliationScope(
-            UserEntity user,
-            OrganizationEntity requestedOrganization,
-            OrganizationEntity currentOrganization
+    private boolean hasAnyOrganization(UserEntity user, Set<UUID> organizationIds) {
+        return user.getOrganizationMemberships()
+                .stream()
+                .anyMatch(membership -> organizationIds.contains(membership.getOrganization().getId()))
+                || (user.getOrganization() != null && organizationIds.contains(user.getOrganization().getId()));
+    }
+
+    private void enforceCanConfirmOrganization(UserEntity currentUser, UUID organizationId) {
+        if (canManageAllUsers(currentUser)) {
+            return;
+        }
+
+        Set<UUID> holderOrganizationIds = requireHeldOrganizationIds(currentUser);
+        if (!holderOrganizationIds.contains(organizationId)) {
+            throw new AccessDeniedException("Cannot confirm another organization's users");
+        }
+    }
+
+    private UserResponse setOrganizationConfirmationStatus(
+            UUID userId,
+            UUID organizationId,
+            UserOrganizationStatus status,
+            AuthenticatedUser authenticatedUser
     ) {
-        UUID currentOrganizationId = currentOrganization.getId();
+        UserEntity currentUser = authenticatedUser.getUser();
+        enforceCanConfirmOrganization(currentUser, organizationId);
 
-        if (user.getOrganization() != null
-                && !user.getOrganization().getId().equals(currentOrganizationId)) {
-            throw new AccessDeniedException("Cannot manage another organization's users");
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!isEndUser(user)) {
+            throw new AccessDeniedException("Only end-user affiliations can be confirmed");
         }
 
-        if (requestedOrganization != null
-                && !requestedOrganization.getId().equals(currentOrganizationId)) {
-            throw new AccessDeniedException("Cannot assign users to another organization");
+        OrganizationEntity organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new RuntimeException("Organization not found"));
+
+        UserOrganizationEntity membership = findMembership(user, organizationId);
+        if (membership == null) {
+            if (!canManageAllUsers(currentUser)) {
+                throw new RuntimeException("User did not submit this organization");
+            }
+            membership = newMembership(user, organization, UserOrganizationStatus.PENDING, null);
+            user.getOrganizationMemberships().add(membership);
         }
+
+        membership.setStatus(status);
+        membership.setConfirmedBy(currentUser);
+        membership.setConfirmedAt(LocalDateTime.now());
+        membership.setUpdatedAt(LocalDateTime.now());
+        syncLegacyOrganization(user);
+        user.setUpdatedAt(LocalDateTime.now());
+
+        return toResponse(userRepository.save(user));
     }
 
     private boolean isEndUser(UserEntity user) {
@@ -411,6 +575,132 @@ public class UserService {
         return user.getRoles()
                 .stream()
                 .anyMatch(role -> role.getName() == roleName);
+    }
+
+    private Set<RoleEntity> resolveRoles(Set<RoleName> requestedRoles) {
+        Set<RoleEntity> roles = new HashSet<>();
+
+        if (requestedRoles != null && !requestedRoles.isEmpty()) {
+            for (RoleName roleName : requestedRoles) {
+                RoleEntity role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+                roles.add(role);
+            }
+        } else {
+            RoleEntity defaultRole = roleRepository.findByName(RoleName.END_USER)
+                    .orElseThrow(() -> new RuntimeException("Default role not found"));
+            roles.add(defaultRole);
+        }
+
+        return roles;
+    }
+
+    private Set<OrganizationEntity> resolveOrganizations(Set<UUID> organizationIds) {
+        if (organizationIds == null || organizationIds.isEmpty()) {
+            return new LinkedHashSet<>();
+        }
+
+        Set<OrganizationEntity> organizations = new LinkedHashSet<>();
+        for (UUID organizationId : organizationIds) {
+            OrganizationEntity organization = organizationRepository.findById(organizationId)
+                    .orElseThrow(() -> new RuntimeException("Organization not found"));
+            organizations.add(organization);
+        }
+
+        return organizations;
+    }
+
+    private void replaceOrganizationMemberships(
+            UserEntity user,
+            Set<OrganizationEntity> organizations,
+            UserOrganizationStatus status,
+            UserEntity confirmedBy
+    ) {
+        user.getOrganizationMemberships().clear();
+
+        for (OrganizationEntity organization : organizations) {
+            user.getOrganizationMemberships().add(newMembership(user, organization, status, confirmedBy));
+        }
+
+        syncLegacyOrganization(user);
+    }
+
+    private UserOrganizationEntity newMembership(
+            UserEntity user,
+            OrganizationEntity organization,
+            UserOrganizationStatus status,
+            UserEntity confirmedBy
+    ) {
+        LocalDateTime now = LocalDateTime.now();
+        UserOrganizationEntity membership = new UserOrganizationEntity();
+        membership.setId(UUID.randomUUID());
+        membership.setUser(user);
+        membership.setOrganization(organization);
+        membership.setStatus(status);
+        membership.setCreatedAt(now);
+        membership.setUpdatedAt(now);
+
+        if (status == UserOrganizationStatus.CONFIRMED || status == UserOrganizationStatus.REJECTED) {
+            membership.setConfirmedBy(confirmedBy);
+            membership.setConfirmedAt(now);
+        }
+
+        return membership;
+    }
+
+    private UserOrganizationEntity findMembership(UserEntity user, UUID organizationId) {
+        return user.getOrganizationMemberships()
+                .stream()
+                .filter(membership -> membership.getOrganization().getId().equals(organizationId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void syncLegacyOrganization(UserEntity user) {
+        user.setOrganization(user.getOrganizationMemberships()
+                .stream()
+                .filter(membership -> membership.getStatus() != UserOrganizationStatus.REJECTED)
+                .min(Comparator.comparing(membership -> membership.getOrganization().getName()))
+                .map(UserOrganizationEntity::getOrganization)
+                .orElse(null));
+    }
+
+    private String requireEmail(String email) {
+        String normalized = trimToNull(email);
+        if (normalized == null) {
+            throw new RuntimeException("Email is required");
+        }
+
+        if (!normalized.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            throw new RuntimeException("Email must be valid");
+        }
+
+        return normalized.toLowerCase(Locale.ROOT);
+    }
+
+    private String requireText(String value, String label) {
+        String normalized = trimToNull(value);
+        if (normalized == null) {
+            throw new RuntimeException(label + " is required");
+        }
+
+        return normalized;
+    }
+
+    private String resolveFullName(String fullName, String firstName, String middleName, String lastName) {
+        String normalizedFirstName = trimToNull(firstName);
+        String normalizedMiddleName = trimToNull(middleName);
+        String normalizedLastName = trimToNull(lastName);
+
+        if (normalizedFirstName != null || normalizedMiddleName != null || normalizedLastName != null) {
+            if (normalizedFirstName == null || normalizedLastName == null) {
+                throw new RuntimeException("First and last names are required");
+            }
+
+            return joinName(normalizedFirstName, normalizedMiddleName, normalizedLastName);
+        }
+
+        return requireText(fullName, "Full name");
     }
 
     private List<List<String>> readCsvRecords(MultipartFile file) {
@@ -569,6 +859,12 @@ public class UserService {
      * @return user response without password hash
      */
     private UserResponse toResponse(UserEntity user) {
+        List<UserOrganizationResponse> organizations = organizationResponses(user);
+        UserOrganizationResponse primaryOrganization = organizations.stream()
+                .filter(organization -> !"REJECTED".equals(organization.status()))
+                .findFirst()
+                .orElse(null);
+
         return new UserResponse(
                 user.getId(),
                 user.getEmail(),
@@ -583,13 +879,38 @@ public class UserService {
                 user.getPrcNumber(),
                 user.getProfileImageUrl(),
                 user.getStatus().name(),
-                user.getOrganization() != null ? user.getOrganization().getId() : null,
-                user.getOrganization() != null ? user.getOrganization().getName() : null,
+                primaryOrganization != null ? primaryOrganization.id() : null,
+                primaryOrganization != null ? primaryOrganization.name() : null,
+                organizations,
                 user.getRoles()
                         .stream()
                         .map(role -> role.getName().name())
                         .collect(Collectors.toSet())
         );
+    }
+
+    private List<UserOrganizationResponse> organizationResponses(UserEntity user) {
+        List<UserOrganizationResponse> organizations = user.getOrganizationMemberships()
+                .stream()
+                .sorted(Comparator.comparing(membership -> membership.getOrganization().getName()))
+                .map(membership -> new UserOrganizationResponse(
+                        membership.getOrganization().getId(),
+                        membership.getOrganization().getName(),
+                        membership.getOrganization().getCode(),
+                        membership.getStatus().name()
+                ))
+                .toList();
+
+        if (!organizations.isEmpty() || user.getOrganization() == null) {
+            return organizations;
+        }
+
+        return List.of(new UserOrganizationResponse(
+                user.getOrganization().getId(),
+                user.getOrganization().getName(),
+                user.getOrganization().getCode(),
+                UserOrganizationStatus.CONFIRMED.name()
+        ));
     }
 
     private String validatePrcNumber(String prcNumber) {

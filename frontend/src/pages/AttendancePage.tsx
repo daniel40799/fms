@@ -1,5 +1,7 @@
+import { QrCodeIcon } from '@heroicons/react/24/outline'
 import { useEffect, useMemo, useState } from 'react'
 import { Page } from '../components/layout'
+import { QrCameraScanner } from '../components/qr/QrCameraScanner'
 import { Button, InlineError, Panel, StatusBadge, Table } from '../components/ui'
 import { useAsyncAction } from '../hooks/useAsyncAction'
 import { formatDateTime } from '../lib/datetime'
@@ -21,14 +23,16 @@ export function AttendancePage({
   title?: string
 }) {
   const [qrToken, setQrToken] = useState('')
+  const [scannerOpen, setScannerOpen] = useState(false)
   const assignedEvents = useMemo(() => events ?? [], [events])
   const todayEvents = useMemo(() => assignedEvents.filter(isEventToday), [assignedEvents])
   const selectedEvent = assignedEvents.find((event) => event.id === selectedEventId) ?? null
   const eventSelectorEnabled = Boolean(events && onSelectEvent)
   const fallbackEvent = todayEvents[0] ?? assignedEvents[0] ?? null
   const selectableEvents = todayEvents.length ? todayEvents : fallbackEvent ? [fallbackEvent] : []
-  const action = useAsyncAction(async () => {
-    await onCheckIn(qrToken)
+  const action = useAsyncAction(async (tokenOverride?: string) => {
+    const token = tokenOverride ?? qrToken
+    await onCheckIn(token)
     setQrToken('')
   })
 
@@ -89,19 +93,39 @@ export function AttendancePage({
         </Panel>
       ) : null}
       <Panel title="QR check-in">
+        <QrCameraScanner
+          open={scannerOpen}
+          onClose={() => setScannerOpen(false)}
+          onDetected={(token) => {
+            setQrToken(token)
+            setScannerOpen(false)
+            void action.run(token)
+          }}
+        />
         {selectedEvent ? (
           <div className="mb-4 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
             <span className="font-semibold text-slate-950 dark:text-white">{selectedEvent.title}</span>
             <span className="block text-xs text-slate-500 dark:text-slate-400">{formatDateTime(selectedEvent.startDate)}</span>
           </div>
         ) : null}
-        <form className="flex flex-col gap-3 sm:flex-row" onSubmit={(event) => {
-          event.preventDefault()
-          void action.run()
-        }}>
-          <input className="input" value={qrToken} onChange={(event) => setQrToken(event.target.value)} placeholder="Paste or scan QR token" disabled={eventSelectorEnabled && !selectedEvent} required />
-          <Button loading={action.loading} disabled={eventSelectorEnabled && !selectedEvent}>{action.loading ? 'Checking in...' : 'Check in'}</Button>
-        </form>
+        <div className="grid gap-3">
+          <Button
+            type="button"
+            className="min-h-12 w-full text-base sm:w-fit"
+            leftIcon={<QrCodeIcon className="h-5 w-5" aria-hidden />}
+            disabled={eventSelectorEnabled && !selectedEvent}
+            onClick={() => setScannerOpen(true)}
+          >
+            Scan QR Code
+          </Button>
+          <form className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]" onSubmit={(event) => {
+            event.preventDefault()
+            void action.run()
+          }}>
+            <input className="input" value={qrToken} onChange={(event) => setQrToken(event.target.value)} placeholder="Paste QR token" disabled={eventSelectorEnabled && !selectedEvent} required />
+            <Button loading={action.loading} disabled={eventSelectorEnabled && !selectedEvent}>{action.loading ? 'Checking in...' : 'Check in'}</Button>
+          </form>
+        </div>
         {action.error && <InlineError message={action.error} />}
       </Panel>
       <Panel className="mt-6" title="Attendance logs">

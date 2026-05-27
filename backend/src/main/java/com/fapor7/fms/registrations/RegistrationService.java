@@ -7,6 +7,7 @@ import com.fapor7.fms.events.EventStatus;
 import com.fapor7.fms.registrations.dto.RegistrationCreateRequest;
 import com.fapor7.fms.registrations.dto.RegistrationResponse;
 import com.fapor7.fms.users.UserEntity;
+import com.fapor7.fms.users.UserOrganizationStatus;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -257,8 +258,12 @@ public class RegistrationService {
     }
 
     private boolean isInternalFapor7User(UserEntity user) {
-        return user.getOrganization() != null
-                && "FAPOR7".equalsIgnoreCase(user.getOrganization().getCode());
+        return user.getOrganizationMemberships()
+                .stream()
+                .anyMatch(membership -> membership.getStatus() != UserOrganizationStatus.REJECTED
+                        && "FAPOR7".equalsIgnoreCase(membership.getOrganization().getCode()))
+                || (user.getOrganization() != null
+                && "FAPOR7".equalsIgnoreCase(user.getOrganization().getCode()));
     }
 
 }

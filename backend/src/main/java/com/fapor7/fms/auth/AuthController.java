@@ -31,6 +31,28 @@ public class AuthController {
     }
 
     /**
+     * Verifies a pending login 2FA code and returns the normal JWT.
+     *
+     * @param request challenge id and submitted code
+     * @return bearer token response
+     */
+    @PostMapping("/2fa/verify")
+    public LoginResponse verifyTwoFactor(@RequestBody VerifyTwoFactorRequest request) {
+        return authService.verifyTwoFactor(request);
+    }
+
+    /**
+     * Resends a code for a pending login 2FA challenge.
+     *
+     * @param request challenge id
+     * @return updated challenge response
+     */
+    @PostMapping("/2fa/resend")
+    public LoginResponse resendTwoFactor(@RequestBody ResendTwoFactorRequest request) {
+        return authService.resendTwoFactor(request);
+    }
+
+    /**
      * Creates a public end-user account without issuing a JWT.
      *
      * @param request self-registration payload

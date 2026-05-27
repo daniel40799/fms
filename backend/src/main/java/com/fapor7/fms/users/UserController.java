@@ -3,8 +3,10 @@ package com.fapor7.fms.users;
 import com.fapor7.fms.auth.AuthenticatedUser;
 import com.fapor7.fms.users.dto.UserCreateRequest;
 import com.fapor7.fms.users.dto.UserOrganizationUpdateRequest;
+import com.fapor7.fms.users.dto.UserOrganizationResponse;
 import com.fapor7.fms.users.dto.UserProfileUpdateRequest;
 import com.fapor7.fms.users.dto.UserResponse;
+import com.fapor7.fms.users.dto.UserUpdateRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -60,6 +62,15 @@ public class UserController {
         profile.put("organizationId", user.getOrganization() != null ? user.getOrganization().getId() : null);
         profile.put("organization", user.getOrganization() != null ? user.getOrganization().getName() : null);
         profile.put("organizationCode", user.getOrganization() != null ? user.getOrganization().getCode() : null);
+        profile.put("organizations", user.getOrganizationMemberships()
+                .stream()
+                .map(membership -> new UserOrganizationResponse(
+                        membership.getOrganization().getId(),
+                        membership.getOrganization().getName(),
+                        membership.getOrganization().getCode(),
+                        membership.getStatus().name()
+                ))
+                .toList());
         profile.put("roles", user.getRoles()
                 .stream()
                 .map(role -> role.getName().name())
@@ -123,6 +134,24 @@ public class UserController {
     }
 
     /**
+     * Updates a user account.
+     *
+     * @param id user id to edit
+     * @param request replacement account fields
+     * @param authenticatedUser administrator applying the edit
+     * @return updated user projection
+     */
+    @PutMapping("/api/users/{id}")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('USER_ADMIN')")
+    public UserResponse update(
+            @PathVariable UUID id,
+            @RequestBody UserUpdateRequest request,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return userService.update(id, request, authenticatedUser);
+    }
+
+    /**
      * Creates users from a CSV upload.
      *
      * @param file CSV file containing user rows
@@ -143,13 +172,49 @@ public class UserController {
      * @return updated user projection
      */
     @PatchMapping("/api/users/{id}/organization")
-    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('USER_ADMIN') or hasRole('ORGANIZATION_ADMIN')")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('USER_ADMIN')")
     public UserResponse updateOrganization(
             @PathVariable UUID id,
             @RequestBody UserOrganizationUpdateRequest request,
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
         return userService.updateOrganization(id, request, authenticatedUser);
+    }
+
+    /**
+     * Confirms one submitted user organization membership.
+     *
+     * @param id user id
+     * @param organizationId organization id
+     * @param authenticatedUser holder or administrator applying the decision
+     * @return updated user projection
+     */
+    @PatchMapping("/api/users/{id}/organizations/{organizationId}/confirm")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('USER_ADMIN') or hasRole('ORGANIZATION_ADMIN')")
+    public UserResponse confirmOrganization(
+            @PathVariable UUID id,
+            @PathVariable UUID organizationId,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return userService.confirmOrganization(id, organizationId, authenticatedUser);
+    }
+
+    /**
+     * Rejects one submitted user organization membership.
+     *
+     * @param id user id
+     * @param organizationId organization id
+     * @param authenticatedUser holder or administrator applying the decision
+     * @return updated user projection
+     */
+    @PatchMapping("/api/users/{id}/organizations/{organizationId}/reject")
+    @PreAuthorize("hasRole('MAIN_ADMIN') or hasRole('USER_ADMIN') or hasRole('ORGANIZATION_ADMIN')")
+    public UserResponse rejectOrganization(
+            @PathVariable UUID id,
+            @PathVariable UUID organizationId,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return userService.rejectOrganization(id, organizationId, authenticatedUser);
     }
 
     /**

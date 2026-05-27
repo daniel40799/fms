@@ -1,4 +1,4 @@
-import type { AttendanceLog, EventPayload, EventRecord, FmsUser, Me, Organization, ProfilePayload, Registration, RoleName } from '../types'
+import type { AttendanceLog, EventPayload, EventRecord, FmsUser, Me, Organization, ProfilePayload, Registration, RoleName, UserAccountPayload } from '../types'
 import { ApiError, parseApiError } from './errors'
 
 const TOKEN_KEY = 'fapor7.jwt'
@@ -59,11 +59,35 @@ async function download(path: string, forbiddenMessage?: string) {
 export const api = {
   auth: {
     login: (email: string, password: string) =>
-      request<{ token: string }>('/api/auth/login', {
+      request<{
+        token: string | null
+        twoFactorRequired: boolean
+        challengeId: string | null
+        channel: 'EMAIL' | 'SMS' | null
+        maskedDestination: string | null
+        expiresAt: string | null
+      }>('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       }),
-    register: (payload: { fullName: string; email: string; password: string; organizationId: string | null }) =>
+    verifyTwoFactor: (challengeId: string, code: string) =>
+      request<{ token: string }>('/api/auth/2fa/verify', {
+        method: 'POST',
+        body: JSON.stringify({ challengeId, code }),
+      }),
+    resendTwoFactor: (challengeId: string) =>
+      request<{
+        token: string | null
+        twoFactorRequired: boolean
+        challengeId: string
+        channel: 'EMAIL' | 'SMS'
+        maskedDestination: string
+        expiresAt: string
+      }>('/api/auth/2fa/resend', {
+        method: 'POST',
+        body: JSON.stringify({ challengeId }),
+      }),
+    register: (payload: { fullName: string; email: string; password: string; mobileNumber: string | null; organizationIds: string[]; organizationId: string | null }) =>
       request<FmsUser>('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -85,9 +109,14 @@ export const api = {
   },
   organizations: {
     list: () => request<Organization[]>('/api/organizations'),
-    create: (payload: { name: string; code: string }) =>
+    create: (payload: { name: string; code: string; holderIds?: string[] }) =>
       request<Organization>('/api/organizations', {
         method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    update: (id: string, payload: { name: string; code: string; status: string; holderIds: string[] }) =>
+      request<Organization>(`/api/organizations/${id}`, {
+        method: 'PUT',
         body: JSON.stringify(payload),
       }),
     delete: (id: string) =>
@@ -101,11 +130,25 @@ export const api = {
       email: string
       password: string
       fullName: string
-      organizationId: string | null
+      firstName?: string | null
+      middleName?: string | null
+      lastName?: string | null
+      birthday?: string | null
+      sex?: string | null
+      address?: string | null
+      mobileNumber?: string | null
+      prcNumber?: string | null
+      organizationIds: string[]
+      organizationId?: string | null
       roles: RoleName[]
     }) =>
       request<FmsUser>('/api/users', {
         method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    update: (id: string, payload: UserAccountPayload) =>
+      request<FmsUser>(`/api/users/${id}`, {
+        method: 'PUT',
         body: JSON.stringify(payload),
       }),
     importCsv: (file: File) => {
@@ -116,10 +159,23 @@ export const api = {
         body,
       })
     },
+    updateOrganizations: (id: string, organizationIds: string[]) =>
+      request<FmsUser>(`/api/users/${id}/organization`, {
+        method: 'PATCH',
+        body: JSON.stringify({ organizationIds }),
+      }),
     updateOrganization: (id: string, organizationId: string | null) =>
       request<FmsUser>(`/api/users/${id}/organization`, {
         method: 'PATCH',
-        body: JSON.stringify({ organizationId }),
+        body: JSON.stringify({ organizationIds: organizationId ? [organizationId] : [] }),
+      }),
+    confirmOrganization: (id: string, organizationId: string) =>
+      request<FmsUser>(`/api/users/${id}/organizations/${organizationId}/confirm`, {
+        method: 'PATCH',
+      }),
+    rejectOrganization: (id: string, organizationId: string) =>
+      request<FmsUser>(`/api/users/${id}/organizations/${organizationId}/reject`, {
+        method: 'PATCH',
       }),
     delete: (id: string) =>
       request<void>(`/api/users/${id}`, {

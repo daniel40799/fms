@@ -6,10 +6,12 @@ import { api, tokenStore } from './lib/api'
 import { getErrorMessage } from './lib/errors'
 import {
 AttendancePage,
+CreateAccountPage,
 DashboardPage,
 EventsPage,
 LoginPage,
 MyRegistrationsPage,
+OrganizationConfirmationsPage,
 OrganizationsPage,
 ProfilePage,
 RegisterPage,
@@ -17,7 +19,7 @@ RegistrationReviewPage,
 ReportsPage,
 UsersPage,
 } from './pages'
-import type { AttendanceLog, EventRecord, FmsUser, Me, Organization, ProfilePayload, Registration, RoleName, View } from './types'
+import type { AttendanceLog, EventRecord, FmsUser, Me, Organization, ProfilePayload, Registration, RoleName, UserAccountPayload, View } from './types'
 
 function hasAnyRole(roles: RoleName[], expectedRoles: RoleName[]) {
   return roles.some((role) => expectedRoles.includes(role))
@@ -75,7 +77,7 @@ function App() {
   const isExhibitor = roles.includes('EXHIBITOR')
   const endUserOnly = isEndUserOnly(roles)
   const canManageUsers = isMainAdmin || isUserAdmin
-  const canViewUsers = canManageUsers || isOrganizationAdmin
+  const canViewUsers = canManageUsers
   const canManageEvents = isMainAdmin || isEventAdmin
   const isInternalFapor7User = me?.organizationCode?.toUpperCase() === 'FAPOR7'
   const canRegisterForEvents = endUserOnly && !isInternalFapor7User
@@ -83,11 +85,12 @@ function App() {
   const canViewDashboard = hasAnyRole(roles, ['MAIN_ADMIN', 'USER_ADMIN', 'EVENT_ADMIN', 'ORGANIZATION_ADMIN', 'EXHIBITOR', 'END_USER'])
   const canViewEvents = canManageEvents || endUserOnly
   const canViewMyRegistrations = canRegisterForEvents
-  const canViewReports = isMainAdmin || isEventAdmin || isOrganizationAdmin
+  const canViewReports = isMainAdmin || isEventAdmin
   const canReviewRegistrations = canManageEvents
-  const canViewAttendance = canManageEvents || isExhibitor
-  const canViewOrganizations = isMainAdmin || isOrganizationAdmin
-  const canCreateOrganizations = isMainAdmin || isOrganizationAdmin
+  const canViewAttendance = canManageEvents
+  const canViewOrganizations = isMainAdmin || isUserAdmin
+  const canCreateOrganizations = isMainAdmin || isUserAdmin
+  const canViewOrganizationConfirmations = isOrganizationAdmin && !isMainAdmin && !isUserAdmin
   const dashboardVariant = endUserOnly
     ? 'end-user'
     : isOrganizationAdmin && !isMainAdmin
@@ -126,9 +129,10 @@ function App() {
     const profileCanViewEvents = profileCanManageEvents || profileEndUserOnly || profileIsExhibitor
     const profileCanViewOwnRegistrations = profileEndUserOnly
       && profile?.organizationCode?.toUpperCase() !== 'FAPOR7'
-    const profileCanViewReports = profileIsMainAdmin || profileIsEventAdmin || profileIsOrganizationAdmin
-    const profileCanManageAffiliations = profileIsMainAdmin || profileIsUserAdmin || profileIsOrganizationAdmin
-    const profileNeedsOrganizations = profileCanManageAffiliations || profileCanManageEvents || profileIsOrganizationAdmin
+    const profileCanViewReports = profileIsMainAdmin || profileIsEventAdmin
+    const profileCanManageAffiliations = profileIsMainAdmin || profileIsUserAdmin
+    const profileCanConfirmOrganizations = profileIsOrganizationAdmin && !profileIsMainAdmin && !profileIsUserAdmin
+    const profileNeedsOrganizations = profileCanManageAffiliations || profileCanManageEvents || profileCanConfirmOrganizations
 
     if (profileCanViewEvents || profileCanViewReports) {
       setEvents(await api.events.list())
@@ -154,9 +158,9 @@ function App() {
       setAttendance([])
     }
 
-    if (profileCanManageAffiliations || profileNeedsOrganizations) {
+    if (profileCanManageAffiliations || profileCanConfirmOrganizations || profileNeedsOrganizations) {
       const [userData, orgData] = await Promise.all([
-        profileCanManageAffiliations ? api.users.list() : Promise.resolve([]),
+        profileCanManageAffiliations || profileCanConfirmOrganizations ? api.users.list() : Promise.resolve([]),
         api.organizations.list(),
       ])
       setUsers(userData)
@@ -247,6 +251,21 @@ function App() {
     window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
   }
 
+  async function createUserAccount(payload: UserAccountPayload) {
+    await api.users.create({
+      ...payload,
+      password: payload.password ?? '',
+      organizationId: payload.organizationIds[0] ?? null,
+    })
+    setView('users')
+    await refresh('User account created.')
+  }
+
+  async function updateUserAccount(userId: string, payload: UserAccountPayload) {
+    await api.users.update(userId, payload)
+    await refresh('User account updated.')
+  }
+
   if (!token || !me) {
     if (authView === 'register') {
       return (
@@ -295,7 +314,9 @@ function App() {
     ...(canReviewRegistrations ? [{ id: 'registrations' as View, label: 'Payment review' }] : []),
     ...(canViewAttendance ? [{ id: 'attendance' as View, label: 'Attendance' }] : []),
     ...(canViewUsers ? [{ id: 'users' as View, label: 'Users' }] : []),
+    ...(canManageUsers ? [{ id: 'create-account' as View, label: 'Create account' }] : []),
     ...(canViewOrganizations ? [{ id: 'organizations' as View, label: 'Organizations' }] : []),
+    ...(canViewOrganizationConfirmations ? [{ id: 'organization-confirmations' as View, label: 'Confirm organizations' }] : []),
     ...(canViewReports ? [{ id: 'reports' as View, label: 'Reports' }] : []),
   ]
   const activeView = navItems.some((item) => item.id === view) ? view : navItems[0].id
@@ -327,6 +348,13 @@ function App() {
       />
     ),
     profile: <ProfilePage me={me} onUpdate={updateProfile} onUploadPicture={uploadProfilePicture} />,
+    'create-account': (
+      <CreateAccountPage
+        organizations={organizations}
+        onCreate={createUserAccount}
+        onCancel={() => setView('users')}
+      />
+    ),
     events: (
       <EventsPage
         events={events}
@@ -373,28 +401,42 @@ function App() {
       <UsersPage
         users={users}
         organizations={organizations}
-        affiliationOrganizations={canManageUsers
-          ? organizations
-          : organizations.filter((organization) => organization.id === me.organizationId)}
         canCreate={canManageUsers}
         canDelete={canManageUsers}
         currentUserId={me.id}
-        onCreate={(payload) => api.users.create(payload).then(() => refresh('User account created.'))}
+        onCreateAccount={() => setView('create-account')}
         onImport={(file) => api.users.importCsv(file).then(() => refresh('Users imported.'))}
-        onUpdateOrganization={(userId, organizationId) =>
-          api.users.updateOrganization(userId, organizationId).then(() => refresh('Organization affiliation updated.'))
-        }
+        onUpdate={updateUserAccount}
         onDelete={(id) => api.users.delete(id).then(() => refresh('User deleted.'))}
       />
     ),
     organizations: (
       <OrganizationsPage
         organizations={organizations}
+        users={users}
         canCreate={canCreateOrganizations}
         canDelete={canCreateOrganizations}
-        onCreate={(payload) => api.organizations.create(payload).then(() => refresh('Organization created.'))}
+        onCreate={(payload) => api.organizations.create({
+          name: payload.name,
+          code: payload.code,
+          holderIds: payload.holderIds,
+        }).then(() => refresh('Organization created.'))}
+        onUpdate={(id, payload) => api.organizations.update(id, payload).then(() => refresh('Organization updated.'))}
         onImport={(rows) => importOrganizations(rows)}
         onDelete={(id) => api.organizations.delete(id).then(() => refresh('Organization deleted.'))}
+      />
+    ),
+    'organization-confirmations': (
+      <OrganizationConfirmationsPage
+        users={users}
+        organizations={organizations}
+        me={me}
+        onConfirm={(userId, organizationId) =>
+          api.users.confirmOrganization(userId, organizationId).then(() => refresh('Organization membership confirmed.'))
+        }
+        onReject={(userId, organizationId) =>
+          api.users.rejectOrganization(userId, organizationId).then(() => refresh('Organization membership rejected.'))
+        }
       />
     ),
     reports: (

@@ -15,7 +15,7 @@ import java.util.UUID;
 /**
  * User account persisted by the FAPOR7 backend.
  *
- * <p>A user may belong to one organization and can hold multiple security
+ * <p>A user may belong to one or more organizations and can hold multiple security
  * roles. This entity backs login, role-based access, registration ownership,
  * payment approvals, and QR attendance audit data.</p>
  */
@@ -66,6 +66,9 @@ public class UserEntity {
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private OrganizationEntity organization;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<UserOrganizationEntity> organizationMemberships = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

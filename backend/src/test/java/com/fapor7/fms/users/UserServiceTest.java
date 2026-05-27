@@ -65,7 +65,7 @@ class UserServiceTest {
     }
 
     @Test
-    void findAllScopesOrganizationAdministratorToOwnAndUnaffiliatedEndUsers() {
+    void findAllScopesOrganizationAdministratorToHeldOrganizationEndUsers() {
         OrganizationEntity organization = TestData.organization(2);
         UserEntity organizationAdmin = TestData.user(
                 10,
@@ -89,7 +89,7 @@ class UserServiceTest {
 
         assertThat(responses)
                 .extracting(UserResponse::email)
-                .containsExactly(ownEndUser.getEmail(), unaffiliatedEndUser.getEmail());
+                .containsExactly(ownEndUser.getEmail());
     }
 
     @Test
@@ -115,7 +115,7 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.findAll(TestData.principal(organizationAdmin)))
                 .isInstanceOf(AccessDeniedException.class)
-                .hasMessage("Organization administrator must be assigned to an organization");
+                .hasMessage("Organization administrator must be assigned as an organization holder");
     }
 
     @Test
@@ -578,7 +578,7 @@ class UserServiceTest {
     }
 
     @Test
-    void updateOrganizationLetsOrganizationAdminAssignOwnOrganization() {
+    void confirmOrganizationLetsOrganizationHolderConfirmOwnOrganization() {
         OrganizationEntity organization = TestData.organization(2);
         UserEntity organizationAdmin = TestData.user(
                 10,
@@ -589,13 +589,19 @@ class UserServiceTest {
         );
         organizationAdmin.setOrganization(organization);
         UserEntity user = TestData.activeUser(1);
+        UserOrganizationEntity membership = new UserOrganizationEntity();
+        membership.setId(TestData.uuid(20));
+        membership.setUser(user);
+        membership.setOrganization(organization);
+        membership.setStatus(UserOrganizationStatus.PENDING);
+        user.getOrganizationMemberships().add(membership);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(organizationRepository.findById(organization.getId())).thenReturn(Optional.of(organization));
         when(userRepository.save(user)).thenReturn(user);
 
-        UserResponse response = userService.updateOrganization(
+        UserResponse response = userService.confirmOrganization(
                 user.getId(),
-                new UserOrganizationUpdateRequest(organization.getId()),
+                organization.getId(),
                 TestData.principal(organizationAdmin)
         );
 
@@ -616,7 +622,6 @@ class UserServiceTest {
         organizationAdmin.setOrganization(organization);
         UserEntity user = TestData.activeUser(1);
         user.setOrganization(TestData.organization(3));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         assertThatThrownBy(() -> userService.updateOrganization(
                 user.getId(),
@@ -624,7 +629,7 @@ class UserServiceTest {
                 TestData.principal(organizationAdmin)
         ))
                 .isInstanceOf(AccessDeniedException.class)
-                .hasMessage("Cannot manage another organization's users");
+                .hasMessage("Use organization confirmation actions for holder-scoped changes");
     }
 
     @Test
@@ -640,8 +645,6 @@ class UserServiceTest {
         );
         organizationAdmin.setOrganization(currentOrganization);
         UserEntity user = TestData.activeUser(1);
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(organizationRepository.findById(requestedOrganization.getId())).thenReturn(Optional.of(requestedOrganization));
 
         assertThatThrownBy(() -> userService.updateOrganization(
                 user.getId(),
@@ -649,7 +652,7 @@ class UserServiceTest {
                 TestData.principal(organizationAdmin)
         ))
                 .isInstanceOf(AccessDeniedException.class)
-                .hasMessage("Cannot assign users to another organization");
+                .hasMessage("Use organization confirmation actions for holder-scoped changes");
     }
 
     @Test

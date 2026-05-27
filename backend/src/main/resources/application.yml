@@ -23,6 +23,20 @@ app:
   jwt:
     secret: ${APP_JWT_SECRET:CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_CHANGE_THIS_TO_A_LONG_RANDOM_SECRET}
     expiration-ms: ${APP_JWT_EXPIRATION_MS:86400000}
+  two-factor:
+    email:
+      enabled: ${APP_2FA_EMAIL_ENABLED:true}
+    code-length: ${APP_2FA_CODE_LENGTH:6}
+    expiry-minutes: ${APP_2FA_EXPIRY_MINUTES:10}
+    resend-cooldown-seconds: ${APP_2FA_RESEND_COOLDOWN_SECONDS:60}
+    max-failed-attempts: ${APP_2FA_MAX_FAILED_ATTEMPTS:5}
+    max-challenges-per-hour: ${APP_2FA_MAX_CHALLENGES_PER_HOUR:5}
+  sms:
+    semaphore:
+      enabled: ${SEMAPHORE_SMS_ENABLED:false}
+      api-key: ${SEMAPHORE_API_KEY:}
+      sender-name: ${SEMAPHORE_SENDER_NAME:}
+      base-url: ${SEMAPHORE_BASE_URL:https://api.semaphore.co/api/v4/messages}
   sso:
     enabled: false
     frontend-success-uri: http://127.0.0.1:5173/

@@ -3,6 +3,7 @@ package com.fapor7.fms.organizations;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,4 +21,12 @@ public interface OrganizationRepository extends JpaRepository<@NonNull Organizat
      * @return matching organization when present
      */
     Optional<@NonNull OrganizationEntity> findByCode(String code);
+
+    /**
+     * Finds organizations held by the supplied confirmation user.
+     *
+     * @param holderId holder user id
+     * @return organizations where the user can confirm memberships
+     */
+    List<OrganizationEntity> findByHolders_Id(UUID holderId);
 }

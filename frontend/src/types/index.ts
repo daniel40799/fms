@@ -23,7 +23,14 @@ export interface Me {
   organizationId: string | null
   organization: string | null
   organizationCode: string | null
+  organizations: UserOrganization[]
   roles: RoleName[]
+}
+
+export interface OrganizationHolder {
+  id: string
+  fullName: string
+  email: string
 }
 
 export interface Organization {
@@ -31,6 +38,16 @@ export interface Organization {
   name: string
   code: string
   status: string
+  holders: OrganizationHolder[]
+}
+
+export type UserOrganizationStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED'
+
+export interface UserOrganization {
+  id: string
+  name: string
+  code: string | null
+  status: UserOrganizationStatus
 }
 
 export interface FmsUser {
@@ -49,6 +66,23 @@ export interface FmsUser {
   status: string
   organizationId: string | null
   organizationName: string | null
+  organizations: UserOrganization[]
+  roles: RoleName[]
+}
+
+export interface UserAccountPayload {
+  email: string
+  password?: string
+  fullName: string
+  firstName: string | null
+  middleName: string | null
+  lastName: string | null
+  birthday: string | null
+  sex: string | null
+  address: string | null
+  mobileNumber: string | null
+  prcNumber: string | null
+  organizationIds: string[]
   roles: RoleName[]
 }
 
@@ -134,10 +168,12 @@ export interface AttendanceLog {
 export type View =
   | 'dashboard'
   | 'profile'
+  | 'create-account'
   | 'events'
   | 'my-registrations'
   | 'registrations'
   | 'attendance'
   | 'users'
   | 'organizations'
+  | 'organization-confirmations'
   | 'reports'

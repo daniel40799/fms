@@ -26,17 +26,20 @@ public class AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final TwoFactorService twoFactorService;
 
     public AuthService(
             UserRepository userRepository,
             UserService userService,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService
+            JwtService jwtService,
+            TwoFactorService twoFactorService
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.twoFactorService = twoFactorService;
     }
 
     /**
@@ -58,9 +61,34 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
+        if (twoFactorService.isEmailEnabled()) {
+            return twoFactorService.startEmailChallenge(user);
+        }
+
         String token = jwtService.generateToken(user.getId(), user.getEmail());
 
         return new LoginResponse(token);
+    }
+
+    /**
+     * Completes a 2FA challenge and issues the normal app token.
+     *
+     * @param request challenge id and submitted code
+     * @return bearer token response
+     */
+    public LoginResponse verifyTwoFactor(VerifyTwoFactorRequest request) {
+        UserEntity user = twoFactorService.verify(request.challengeId(), request.code());
+        return new LoginResponse(jwtService.generateToken(user.getId(), user.getEmail()));
+    }
+
+    /**
+     * Resends an email 2FA code for a pending login challenge.
+     *
+     * @param request challenge id
+     * @return updated challenge response
+     */
+    public LoginResponse resendTwoFactor(ResendTwoFactorRequest request) {
+        return twoFactorService.resend(request.challengeId());
     }
 
     /**
@@ -73,10 +101,19 @@ public class AuthService {
      * @return created user profile
      */
     public UserResponse register(RegisterRequest request) {
-        return userService.create(new UserCreateRequest(
+        return userService.createPendingEndUser(new UserCreateRequest(
                 request.email(),
                 request.password(),
                 request.fullName(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                request.mobileNumber(),
+                null,
+                request.organizationIds(),
                 request.organizationId(),
                 null
         ));

@@ -58,6 +58,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.GET, "/api/organizations").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/uploads/profile-pictures/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/auth/2fa/verify").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/auth/2fa/resend").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll();
 
                     if (ssoEnabled) {

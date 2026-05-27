@@ -3,6 +3,13 @@ import { Button, Field } from '../components/ui';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { api } from '../lib/api';
 
+type TwoFactorChallenge = {
+  challengeId: string
+  channel: 'EMAIL' | 'SMS'
+  maskedDestination: string
+  expiresAt: string
+}
+
 export function LoginPage({
   loading,
   notice,
@@ -18,9 +25,37 @@ export function LoginPage({
 }) {
   const [email, setEmail] = useState('daniel@fapor7.org')
   const [password, setPassword] = useState('')
+  const [verificationCode, setVerificationCode] = useState('')
+  const [challenge, setChallenge] = useState<TwoFactorChallenge | null>(null)
   const login = useAsyncAction(async () => {
     const response = await api.auth.login(email, password)
+    if (response.twoFactorRequired && response.challengeId && response.channel && response.maskedDestination && response.expiresAt) {
+      setChallenge({
+        challengeId: response.challengeId,
+        channel: response.channel,
+        maskedDestination: response.maskedDestination,
+        expiresAt: response.expiresAt,
+      })
+      return
+    }
+
+    if (response.token) onLoggedIn(response.token)
+  })
+  const verify = useAsyncAction(async () => {
+    if (!challenge) return
+    const response = await api.auth.verifyTwoFactor(challenge.challengeId, verificationCode)
     onLoggedIn(response.token)
+  })
+  const resend = useAsyncAction(async () => {
+    if (!challenge) return
+    const response = await api.auth.resendTwoFactor(challenge.challengeId)
+    setChallenge({
+      challengeId: response.challengeId,
+      channel: response.channel,
+      maskedDestination: response.maskedDestination,
+      expiresAt: response.expiresAt,
+    })
+    setVerificationCode('')
   })
 
   return (
@@ -43,43 +78,79 @@ export function LoginPage({
           className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-shadow duration-200 ease-out hover:shadow-md dark:border-slate-800 dark:bg-slate-900 motion-reduce:transition-none"
           onSubmit={(event) => {
             event.preventDefault()
-            void login.run()
+            void (challenge ? verify.run() : login.run())
           }}
         >
           <p className="text-sm font-semibold uppercase tracking-wide text-sky-700">FAPOR7</p>
           <h2 className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">Sign in</h2>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Use your email and password to access the event management workspace.</p>
-          {(notice || login.error) && (
-            <div className={`mt-4 rounded-md px-3 py-2 text-sm ${login.error || noticeTone === 'ERROR' ? 'bg-red-50 text-red-700 dark:bg-red-400/10 dark:text-red-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200'}`}>
-              {login.error || notice}
+          {(notice || login.error || verify.error || resend.error) && (
+            <div className={`mt-4 rounded-md px-3 py-2 text-sm ${login.error || verify.error || resend.error || noticeTone === 'ERROR' ? 'bg-red-50 text-red-700 dark:bg-red-400/10 dark:text-red-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200'}`}>
+              {login.error || verify.error || resend.error || notice}
             </div>
           )}
-          <div className="mt-6 space-y-4">
-            <Field label="Email">
-              <input className="input" value={email} onChange={(event) => setEmail(event.target.value)} type="email" required />
-            </Field>
-            <Field label="Password">
-              <input className="input" value={password} onChange={(event) => setPassword(event.target.value)} type="password" required />
-            </Field>
-          </div>
-          <Button className="mt-6 w-full justify-center" loading={loading || login.loading}>
-            {login.loading ? 'Signing in...' : 'Sign in'}
-          </Button>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            <Button type="button" variant="secondary" onClick={() => window.location.assign('/oauth2/authorization/entra')}>
-              Microsoft
-            </Button>
-            <Button type="button" variant="secondary" onClick={() => window.location.assign('/oauth2/authorization/google')}>
-              Google
-            </Button>
-          </div>
-          <button
-            type="button"
-            className="mt-4 w-full rounded-md px-3 py-2 text-sm font-semibold text-sky-700 transition-colors duration-150 ease-out hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:text-sky-300 dark:hover:bg-sky-400/10 dark:focus-visible:outline-sky-400 motion-reduce:transition-none"
-            onClick={onCreateAccount}
-          >
-            Create an account
-          </button>
+          {challenge ? (
+            <>
+              <div className="mt-6 space-y-4">
+                <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200">
+                  Verification code sent to {challenge.maskedDestination}.
+                </div>
+                <Field label="Verification code">
+                  <input
+                    className="input"
+                    value={verificationCode}
+                    onChange={(event) => setVerificationCode(event.target.value)}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    required
+                  />
+                </Field>
+              </div>
+              <Button className="mt-6 w-full justify-center" loading={verify.loading}>
+                {verify.loading ? 'Verifying...' : 'Verify code'}
+              </Button>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <Button type="button" variant="secondary" loading={resend.loading} onClick={() => void resend.run()}>
+                  Resend code
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => {
+                  setChallenge(null)
+                  setVerificationCode('')
+                }}>
+                  Back
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mt-6 space-y-4">
+                <Field label="Email">
+                  <input className="input" value={email} onChange={(event) => setEmail(event.target.value)} type="email" required />
+                </Field>
+                <Field label="Password">
+                  <input className="input" value={password} onChange={(event) => setPassword(event.target.value)} type="password" required />
+                </Field>
+              </div>
+              <Button className="mt-6 w-full justify-center" loading={loading || login.loading}>
+                {login.loading ? 'Signing in...' : 'Sign in'}
+              </Button>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <Button type="button" variant="secondary" onClick={() => window.location.assign('/oauth2/authorization/entra')}>
+                  Microsoft
+                </Button>
+                <Button type="button" variant="secondary" onClick={() => window.location.assign('/oauth2/authorization/google')}>
+                  Google
+                </Button>
+              </div>
+              <button
+                type="button"
+                className="mt-4 w-full rounded-md px-3 py-2 text-sm font-semibold text-sky-700 transition-colors duration-150 ease-out hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:text-sky-300 dark:hover:bg-sky-400/10 dark:focus-visible:outline-sky-400 motion-reduce:transition-none"
+                onClick={onCreateAccount}
+              >
+                Create an account
+              </button>
+            </>
+          )}
         </form>
       </section>
     </main>
