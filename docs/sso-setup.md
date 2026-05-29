@@ -36,11 +36,11 @@ Use the production public origin and the same callback path when deployed. Redir
 Local PowerShell backend setup:
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE='sso,sso-entra'
+$env:SPRING_PROFILES_ACTIVE='local,sso,sso-entra'
 $env:ENTRA_TENANT_ID='<directory-tenant-id>'
 $env:ENTRA_CLIENT_ID='<application-client-id>'
 $env:ENTRA_CLIENT_SECRET='<client-secret-value>'
-$env:APP_JWT_SECRET='<long-random-jwt-signing-secret-at-least-32-bytes>'
+$env:JWT_SECRET='<long-random-jwt-signing-secret-at-least-32-bytes>'
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -63,17 +63,17 @@ Google sign-in uses OAuth client credentials, not an API key.
 Local PowerShell backend setup:
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE='sso,sso-google'
+$env:SPRING_PROFILES_ACTIVE='local,sso,sso-google'
 $env:GOOGLE_CLIENT_ID='<oauth-client-id>'
 $env:GOOGLE_CLIENT_SECRET='<oauth-client-secret>'
-$env:APP_JWT_SECRET='<long-random-jwt-signing-secret-at-least-32-bytes>'
+$env:JWT_SECRET='<long-random-jwt-signing-secret-at-least-32-bytes>'
 .\mvnw.cmd spring-boot:run
 ```
 
 Use both providers together with:
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE='sso,sso-entra,sso-google'
+$env:SPRING_PROFILES_ACTIVE='local,sso,sso-entra,sso-google'
 ```
 
 ## Current App Behavior
@@ -95,7 +95,7 @@ $env:SPRING_PROFILES_ACTIVE='sso,sso-entra,sso-google'
 ## Production Checklist
 
 1. Use HTTPS public callback URIs for deployed environments.
-2. Store provider secrets and `APP_JWT_SECRET` in Azure configuration or a secret store, not in committed files.
+2. Store provider secrets and `JWT_SECRET` in Azure configuration or a secret store, not in committed files.
 3. Replace local frontend success URI with the deployed frontend origin:
 
 ```powershell

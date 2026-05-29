@@ -12,6 +12,7 @@ import com.fapor7.fms.users.dto.UserProfileUpdateRequest;
 import com.fapor7.fms.users.dto.UserResponse;
 import com.fapor7.fms.users.dto.UserUpdateRequest;
 import com.fapor7.fms.auth.AuthenticatedUser;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,6 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    private static final Path PROFILE_PICTURE_UPLOAD_DIR = Path.of("uploads", "profile-pictures");
     private static final String PROFILE_PICTURE_URL_PREFIX = "/uploads/profile-pictures/";
     private static final long MAX_PROFILE_PICTURE_BYTES = 5 * 1024 * 1024;
     private static final Set<String> ALLOWED_PROFILE_PICTURE_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif");
@@ -57,17 +57,20 @@ public class UserService {
     private final OrganizationRepository organizationRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Path uploadBasePath;
 
     public UserService(
             UserRepository userRepository,
             OrganizationRepository organizationRepository,
             RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            @Value("${app.upload.base-path:uploads}") String uploadBasePath
     ) {
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.uploadBasePath = resolveUploadBasePath(uploadBasePath);
     }
 
     /**
@@ -303,7 +306,7 @@ public class UserService {
         String previousUrl = user.getProfileImageUrl();
 
         try {
-            Path uploadDir = PROFILE_PICTURE_UPLOAD_DIR.toAbsolutePath().normalize();
+            Path uploadDir = uploadBasePath.resolve("profile-pictures").toAbsolutePath().normalize();
             Files.createDirectories(uploadDir);
 
             String filename = user.getId() + "_" + System.currentTimeMillis() + "." + extension;
@@ -985,6 +988,14 @@ public class UserService {
         } catch (IOException ignored) {
             // A stale old image should not fail an otherwise successful upload.
         }
+    }
+
+    private Path resolveUploadBasePath(String value) {
+        if (value == null || value.isBlank()) {
+            return Path.of("uploads");
+        }
+
+        return Path.of(value);
     }
 
     private String joinName(String firstName, String middleName, String lastName) {

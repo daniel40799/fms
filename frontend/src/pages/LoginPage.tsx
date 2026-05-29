@@ -23,7 +23,7 @@ export function LoginPage({
   onCreateAccount: () => void
   onLoggedIn: (token: string) => void
 }) {
-  const [email, setEmail] = useState('daniel@fapor7.org')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [verificationCode, setVerificationCode] = useState('')
   const [challenge, setChallenge] = useState<TwoFactorChallenge | null>(null)

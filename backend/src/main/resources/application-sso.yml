@@ -1,7 +1,6 @@
 app:
   sso:
-    enabled: true
-    frontend-success-uri: ${SSO_FRONTEND_SUCCESS_URI:http://127.0.0.1:5173/}
+    enabled: ${APP_SSO_ENABLED:true}
 
 spring:
   security:

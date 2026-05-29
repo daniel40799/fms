@@ -6,8 +6,8 @@ spring:
           entra:
             provider: entra
             client-name: Microsoft Entra ID
-            client-id: ${ENTRA_CLIENT_ID}
-            client-secret: ${ENTRA_CLIENT_SECRET}
+            client-id: ${ENTRA_CLIENT_ID:}
+            client-secret: ${ENTRA_CLIENT_SECRET:}
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
@@ -16,4 +16,4 @@ spring:
               - email
         provider:
           entra:
-            issuer-uri: https://login.microsoftonline.com/${ENTRA_TENANT_ID}/v2.0
+            issuer-uri: https://login.microsoftonline.com/${ENTRA_TENANT_ID:}/v2.0

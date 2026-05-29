@@ -12,6 +12,6 @@ public class NoOpSmsSender implements SmsSender {
 
     @Override
     public void send(String mobileNumber, String message) {
-        LOGGER.info("SMS sending disabled. Would send to {}: {}", mobileNumber, message);
+        LOGGER.info("SMS sending disabled for {}", mobileNumber);
     }
 }

@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fms_dev}
+    username: ${DB_USERNAME:fms}
+    password: ${DB_PASSWORD:fmspass}
+
+  jpa:
+    show-sql: ${JPA_SHOW_SQL:true}
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.fapor7.fms: ${LOGGING_LEVEL_APP:DEBUG}
+    org.hibernate.SQL: ${LOGGING_LEVEL_SQL:DEBUG}
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  upload:
+    base-path: ${APP_UPLOAD_BASE_PATH:uploads}
+  jwt:
+    secret: ${JWT_SECRET:local-development-jwt-secret-change-before-nonlocal-use}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  two-factor:
+    email:
+      enabled: ${APP_2FA_EMAIL_ENABLED:true}
+      log-codes: ${APP_2FA_EMAIL_LOG_CODES:true}
+  sms:
+    semaphore:
+      enabled: ${APP_2FA_SMS_ENABLED:false}
+  sso:
+    frontend-success-uri: ${SSO_FRONTEND_SUCCESS_URI:http://127.0.0.1:5173/}
+  dev-seed:
+    enabled: ${APP_DEV_SEED_ENABLED:true}
+    password: ${APP_DEV_SEED_PASSWORD:local-dev-only-password}

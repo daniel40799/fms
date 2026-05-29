@@ -9,6 +9,7 @@ import com.fapor7.fms.registrations.dto.RegistrationResponse;
 import com.fapor7.fms.users.UserEntity;
 import com.fapor7.fms.users.UserOrganizationStatus;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,13 +36,16 @@ public class RegistrationService {
 
     private final RegistrationRepository registrationRepository;
     private final EventRepository eventRepository;
+    private final Path uploadBasePath;
 
     public RegistrationService(
             RegistrationRepository registrationRepository,
-            EventRepository eventRepository
+            EventRepository eventRepository,
+            @Value("${app.upload.base-path:uploads}") String uploadBasePath
     ) {
         this.registrationRepository = registrationRepository;
         this.eventRepository = eventRepository;
+        this.uploadBasePath = resolveUploadBasePath(uploadBasePath);
     }
 
     /**
@@ -144,7 +148,7 @@ public class RegistrationService {
         }
 
         try {
-            Path uploadDir = Path.of("uploads", "payment-proofs");
+            Path uploadDir = uploadBasePath.resolve("payment-proofs").normalize();
             Files.createDirectories(uploadDir);
 
             String originalFilename = file.getOriginalFilename();
@@ -264,6 +268,14 @@ public class RegistrationService {
                         && "FAPOR7".equalsIgnoreCase(membership.getOrganization().getCode()))
                 || (user.getOrganization() != null
                 && "FAPOR7".equalsIgnoreCase(user.getOrganization().getCode()));
+    }
+
+    private Path resolveUploadBasePath(String value) {
+        if (value == null || value.isBlank()) {
+            return Path.of("uploads");
+        }
+
+        return Path.of(value);
     }
 
 }

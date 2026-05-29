@@ -128,6 +128,7 @@ The local database defaults are:
 
 ```powershell
 cd backend
+$env:SPRING_PROFILES_ACTIVE='local'
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -157,18 +158,17 @@ The Vite development server prints the local frontend URL after startup.
 
 ## Configuration
 
-Backend configuration lives in `backend/src/main/resources/application.yml`.
+Backend configuration is split across:
 
-Key values:
+- `backend/src/main/resources/application.yml` for shared safe defaults
+- `backend/src/main/resources/application-local.yml`
+- `backend/src/main/resources/application-dev.yml`
+- `backend/src/main/resources/application-prod.yml`
 
-- `spring.datasource.url`
-- `spring.datasource.username`
-- `spring.datasource.password`
-- `server.port`
-- `app.jwt.secret`
-- `app.jwt.expiration-ms`
+Select profiles with `SPRING_PROFILES_ACTIVE=local`, `SPRING_PROFILES_ACTIVE=dev`, or `SPRING_PROFILES_ACTIVE=prod`.
 
-For production, replace the default JWT secret and database credentials with secure environment-specific values.
+Standard environment variables include `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_EXPIRATION_MS`, `CORS_ALLOWED_ORIGINS`, and `APP_UPLOAD_BASE_PATH`.
+See `docs/azure-environments.md` for Azure setup, GitHub Actions secrets, and production constraints.
 
 ## Database Migrations
 
@@ -185,9 +185,9 @@ Current migrations initialize:
 - Registration QR fields
 - Attendance logs
 
-### Seeded RBAC Test Users
+### Local/Dev Seeded RBAC Test Users
 
-The database migrations seed one FAPOR7 account for each RBAC role. The role-specific accounts below copy the stored password hash from the seeded main administrator, so sign in with the same password used for `daniel@fapor7.org`.
+Old Flyway seed history is preserved, but unsafe seed rows are cleaned up by a forward-only migration and recreated only by the local/dev seeder when enabled. The default local seed password is `local-dev-only-password` unless `APP_DEV_SEED_PASSWORD` is set.
 
 | Role | Email |
 | --- | --- |

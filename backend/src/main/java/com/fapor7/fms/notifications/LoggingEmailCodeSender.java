@@ -2,6 +2,7 @@ package com.fapor7.fms.notifications;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,9 +12,19 @@ import org.springframework.stereotype.Service;
 public class LoggingEmailCodeSender implements EmailCodeSender {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggingEmailCodeSender.class);
+    private final boolean logCodes;
+
+    public LoggingEmailCodeSender(@Value("${app.two-factor.email.log-codes:false}") boolean logCodes) {
+        this.logCodes = logCodes;
+    }
 
     @Override
     public void sendVerificationCode(String email, String code) {
-        LOGGER.info("Email 2FA code for {} is {}", email, code);
+        if (logCodes) {
+            LOGGER.info("Email 2FA code for {} is {}", email, code);
+            return;
+        }
+
+        LOGGER.info("Email 2FA delivery is not configured for {}", email);
     }
 }
