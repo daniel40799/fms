@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import com.fapor7.fms.storage.StorageProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -25,7 +26,7 @@ public class ProdEnvironmentValidator implements ApplicationRunner {
     private final String datasourceUrl;
     private final String jwtSecret;
     private final String corsAllowedOrigins;
-    private final String uploadBasePath;
+    private final StorageProperties.StorageType storageType;
     private final boolean showSql;
     private final boolean logTwoFactorCodes;
 
@@ -33,14 +34,14 @@ public class ProdEnvironmentValidator implements ApplicationRunner {
             @Value("${spring.datasource.url:}") String datasourceUrl,
             @Value("${app.jwt.secret:}") String jwtSecret,
             @Value("${app.cors.allowed-origins:}") String corsAllowedOrigins,
-            @Value("${app.upload.base-path:}") String uploadBasePath,
+            StorageProperties storageProperties,
             @Value("${spring.jpa.show-sql:false}") boolean showSql,
             @Value("${app.two-factor.email.log-codes:false}") boolean logTwoFactorCodes
     ) {
         this.datasourceUrl = datasourceUrl;
         this.jwtSecret = jwtSecret;
         this.corsAllowedOrigins = corsAllowedOrigins;
-        this.uploadBasePath = uploadBasePath;
+        this.storageType = storageProperties.getType();
         this.showSql = showSql;
         this.logTwoFactorCodes = logTwoFactorCodes;
     }
@@ -71,8 +72,8 @@ public class ProdEnvironmentValidator implements ApplicationRunner {
             validateCorsOrigin(origin, errors);
         }
 
-        if (hasUnsafeUploadBasePath(uploadBasePath)) {
-            errors.add("APP_UPLOAD_BASE_PATH must not use default, source-tree, or temp upload paths in prod");
+        if (storageType != StorageProperties.StorageType.AZURE_BLOB) {
+            errors.add("APP_STORAGE_TYPE must be azure-blob in prod");
         }
 
         if (showSql) {
@@ -149,34 +150,6 @@ public class ProdEnvironmentValidator implements ApplicationRunner {
                 || normalized.equals("::1")
                 || normalized.equals("[::1]")
                 || normalized.equals("host.docker.internal");
-    }
-
-    private boolean hasUnsafeUploadBasePath(String value) {
-        if (isBlank(value)) {
-            return true;
-        }
-
-        String normalized = value.trim()
-                .replace('\\', '/')
-                .replaceAll("/+", "/")
-                .toLowerCase(Locale.ROOT);
-
-        return normalized.equals("uploads")
-                || normalized.equals("./uploads")
-                || normalized.equals("backend/uploads")
-                || normalized.equals("./backend/uploads")
-                || normalized.equals("src/main/resources")
-                || normalized.startsWith("src/main/resources/")
-                || normalized.endsWith("/src/main/resources")
-                || normalized.contains("/src/main/resources/")
-                || normalized.equals("tmp")
-                || normalized.equals("temp")
-                || normalized.startsWith("tmp/")
-                || normalized.startsWith("temp/")
-                || normalized.endsWith("/tmp")
-                || normalized.endsWith("/temp")
-                || normalized.contains("/tmp/")
-                || normalized.contains("/temp/");
     }
 
     private boolean isBlank(String value) {

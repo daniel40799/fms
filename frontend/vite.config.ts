@@ -13,8 +13,8 @@ export default defineConfig({
     },
   },
   server: {
-    // Keep app calls relative (/api, /oauth2, /uploads). Production must route /api through
-    // Azure Static Web Apps linked API/backend routing or an explicit VITE_API_BASE_URL strategy.
+    // Keep app calls relative (/api, /oauth2, /uploads). Azure deployments must route
+    // /api, /uploads, /oauth2, and /login/oauth2 to the backend, currently via Front Door.
     proxy: {
       '/api': 'http://localhost:8080',
       '/oauth2': 'http://localhost:8080',

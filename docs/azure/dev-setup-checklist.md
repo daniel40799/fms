@@ -1,0 +1,233 @@
+# FAPOR7/FMS Azure Dev Setup Checklist
+
+This checklist prepares the dev environment only. It does not deploy from this repository and does not contain real secrets.
+
+Use the companion command draft at `docs/azure/dev-setup-commands.example.azcli` as a copy-and-edit reference. Run Azure CLI commands manually only after replacing every placeholder.
+
+## Current Repo Requirements
+
+- Backend runtime profile: `SPRING_PROFILES_ACTIVE=dev`.
+- Backend storage type: `app.storage.type=azure-blob`, configured by `APP_STORAGE_TYPE=azure-blob` for clarity.
+- Frontend uses relative paths only. There is no `VITE_API_BASE_URL`.
+- Local Vite proxies `/api`, `/uploads`, `/oauth2`, and `/login/oauth2` to `http://localhost:8080`.
+- Dev deployment workflow is `.github/workflows/azure-dev.yml`.
+- The dev workflow deploys from `develop`; manual dispatch is blocked unless the selected ref is `develop`.
+- The dev workflow uses publish profiles and Static Web Apps deployment tokens, not OIDC.
+- No `staticwebapp.config.json` is currently present.
+
+## Dev Setup Order
+
+1. Resource group
+   - Create or identify the dev resource group.
+   - Verify the Azure region is acceptable for App Service, PostgreSQL, Storage, Static Web Apps, and Front Door.
+
+2. Azure PostgreSQL Flexible Server
+   - Create a dev PostgreSQL Flexible Server.
+   - Create the dev database, for example `fms_dev`.
+   - Configure network access from App Service using approved firewall rules, VNet integration, or private endpoint.
+   - Use a JDBC URL with `sslmode=require`.
+   - Verify the username format required by the server.
+
+3. Azure App Service backend
+   - Create a Linux App Service Plan and Web App for the Spring Boot backend.
+   - Use Java 21.
+   - Configure the Application Settings listed below before first startup.
+   - Do not put database passwords, JWT secrets, storage connection strings, or provider secrets in source control.
+
+4. Azure Blob Storage
+   - Create a dev Storage Account.
+   - Disable public blob access at the account level when possible.
+   - Create private containers:
+     - `payment-proofs`
+     - `profile-pictures`
+     - `event-resources`
+     - `certificates`
+   - Use a connection string in App Service settings for the current implementation.
+
+5. Azure Static Web App frontend
+   - Create a dev Static Web App.
+   - The current GitHub workflow uploads the already-built `frontend/dist` directory.
+   - Capture the Static Web Apps deployment token for the GitHub secret.
+   - Optional but recommended before production: add `staticwebapp.config.json` for SPA fallback and security headers. It is not a substitute for Front Door routing.
+
+6. Azure Front Door
+   - Create a Front Door Standard or Premium profile and endpoint.
+   - Add the backend App Service as one origin.
+   - Add the Static Web App default hostname as another origin.
+   - Add backend path routes before the frontend catch-all route:
+     - `/api/*`
+     - `/uploads/*`
+     - `/oauth2/*`
+     - `/login/oauth2/*`
+   - Add the frontend catch-all route:
+     - `/*`
+   - Verify backend-specific routes are not masked by the catch-all frontend route.
+
+7. GitHub secrets
+   - Create or update the `dev` GitHub Environment.
+   - Add the required dev workflow secrets listed below.
+   - Do not add App Service Application Settings as GitHub secrets unless the workflow is later changed to manage Azure settings.
+
+8. GitHub Environment: `dev`
+   - Confirm `.github/workflows/azure-dev.yml` uses `environment: dev` for backend and frontend jobs.
+   - Optional: add reviewers or deployment rules for the dev environment.
+
+9. First dev deployment
+   - Push the intended code to `develop`, or run manual dispatch from `develop`.
+   - Confirm backend test, package, and App Service deployment steps pass.
+   - Confirm frontend install, build, and Static Web Apps deployment steps pass.
+
+10. Dev smoke test
+   - Use the Front Door dev domain as the browser entry point.
+   - Run the smoke test checklist at the end of this document.
+
+## Azure App Service Dev Settings
+
+Set these on the backend App Service as Application Settings. Values below are placeholders only.
+
+Required:
+
+| Setting | Value |
+| --- | --- |
+| `SPRING_PROFILES_ACTIVE` | `dev` |
+| `SERVER_FORWARD_HEADERS_STRATEGY` | `framework` |
+| `DB_URL` | `jdbc:postgresql://<postgres-server-name>.postgres.database.azure.com:5432/<database>?sslmode=require` |
+| `DB_USERNAME` | `<db-username>` |
+| `DB_PASSWORD` | `<db-password>` |
+| `JWT_SECRET` | `<strong-random-secret>` |
+| `JWT_EXPIRATION_MS` | `86400000` |
+| `CORS_ALLOWED_ORIGINS` | `https://<front-door-dev-domain>` |
+| `APP_STORAGE_TYPE` | `azure-blob` |
+| `AZURE_STORAGE_CONNECTION_STRING` | `<storage-connection-string>` |
+| `AZURE_STORAGE_CONTAINER_PAYMENT_PROOFS` | `payment-proofs` |
+| `AZURE_STORAGE_CONTAINER_PROFILE_PICTURES` | `profile-pictures` |
+| `AZURE_STORAGE_CONTAINER_EVENT_RESOURCES` | `event-resources` |
+| `AZURE_STORAGE_CONTAINER_CERTIFICATES` | `certificates` |
+| `APP_PAYMENT_PROOF_MAX_SIZE_BYTES` | `10485760` |
+| `APP_PAYMENT_PROOF_ALLOWED_CONTENT_TYPES` | `image/jpeg,image/png,application/pdf` |
+| `APP_PAYMENT_PROOF_ALLOWED_EXTENSIONS` | `jpg,jpeg,png,pdf` |
+
+Optional/dev:
+
+| Setting | Use |
+| --- | --- |
+| `INITIAL_ADMIN_EMAIL` | One-time admin bootstrap if no main admin exists |
+| `INITIAL_ADMIN_PASSWORD` | One-time admin bootstrap password |
+| `INITIAL_ADMIN_FULL_NAME` | One-time admin bootstrap full name |
+| `APP_DEV_SEED_ENABLED` | Optional dev seed data, usually `false` for shared dev |
+| `APP_DEV_SEED_PASSWORD` | Required only when dev seed is enabled |
+| `APP_2FA_EMAIL_ENABLED` | Enable email 2FA only after email delivery is configured |
+| `APP_2FA_EMAIL_LOG_CODES` | Dev debugging only; keep `false` for shared dev |
+| `APP_2FA_SMS_ENABLED` | Enable SMS 2FA only after Semaphore settings are configured |
+| `SEMAPHORE_API_KEY` | Required only if SMS 2FA is enabled |
+| `SEMAPHORE_SENDER_NAME` | Required only if SMS 2FA is enabled |
+| `SEMAPHORE_BASE_URL` | Optional Semaphore override |
+| `APP_SSO_ENABLED` | Required only when SSO profiles are active |
+| `SSO_FRONTEND_SUCCESS_URI` | Required if SSO is enabled: `https://<front-door-dev-domain>/` |
+| `ENTRA_CLIENT_ID` | Required only for Entra SSO |
+| `ENTRA_CLIENT_SECRET` | Required only for Entra SSO |
+| `ENTRA_TENANT_ID` | Required only for Entra SSO |
+| `GOOGLE_CLIENT_ID` | Required only for Google SSO |
+| `GOOGLE_CLIENT_SECRET` | Required only for Google SSO |
+
+## Azure Front Door Routing Plan
+
+Origins:
+
+| Origin | Host |
+| --- | --- |
+| Backend | `<backend-app-service-name>.azurewebsites.net` |
+| Frontend | `<static-web-app-name-or-generated-host>.azurestaticapps.net` |
+
+Routes:
+
+| Route | Patterns | Origin group | Notes |
+| --- | --- | --- | --- |
+| Backend API | `/api/*` | Backend App Service | REST API, health, uploads under `/api`, payment proof download |
+| Backend uploads | `/uploads/*` | Backend App Service | Profile images streamed by backend |
+| Backend SSO authorize | `/oauth2/*` | Backend App Service | Provider authorization entry points |
+| Backend SSO callback | `/login/oauth2/*` | Backend App Service | OAuth2 callback endpoints |
+| Frontend catch-all | `/*` | Static Web App | SPA assets and client-side routes |
+
+Route priority/order:
+
+- Backend-specific routes must be evaluated before the frontend catch-all route.
+- In Front Door, keep backend patterns more specific than the `/*` frontend route and verify each path in the smoke test.
+- Do not attach `/uploads/*`, `/oauth2/*`, or `/login/oauth2/*` to the Static Web App origin.
+
+Recommended domain strategy:
+
+- Dev: use a dedicated dev subdomain such as `dev.<domain>` or the Front Door endpoint hostname.
+- Prod later: use a separate prod hostname such as `app.<domain>` or `<domain>`.
+- Keep dev and prod Front Door endpoints, App Services, databases, and Storage Accounts separated.
+- Enable HTTPS/TLS on the Front Door endpoint and any custom domain.
+- Redirect HTTP to HTTPS.
+
+## GitHub Dev Secrets
+
+The current dev workflow requires exactly these GitHub secrets in the `dev` Environment:
+
+| Secret | Source |
+| --- | --- |
+| `AZURE_WEBAPP_NAME_DEV` | Backend App Service name |
+| `AZURE_WEBAPP_PUBLISH_PROFILE_DEV` | Backend App Service publish profile |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_DEV` | Static Web Apps deployment token |
+
+Workflow behavior:
+
+- Pushes to `develop` deploy dev.
+- Manual `workflow_dispatch` is available, but the guard job fails unless the selected ref is `refs/heads/develop`.
+- Backend job runs Maven tests, packages the JAR, and deploys with `azure/webapps-deploy@v3`.
+- Frontend job runs `npm ci`, `npm run build`, and deploys `frontend/dist` with `Azure/static-web-apps-deploy@v1`.
+- Current workflow expects publish profiles. OIDC is not wired.
+
+## Dev Smoke Test Checklist
+
+Backend:
+
+- App Service starts.
+- Logs show the `dev` profile.
+- Flyway migrations complete successfully.
+- Database connection works.
+- Blob Storage environment validation passes.
+- `GET https://<front-door-dev-domain>/api/health` returns healthy status.
+- Initial admin or dev admin can log in.
+- `GET /api/me` works with a JWT.
+- Payment proof upload accepts JPG, PNG, or PDF under 10 MB.
+- Payment proof upload writes a blob to `payment-proofs`.
+- Payment proof download works for `MAIN_ADMIN` or `EVENT_ADMIN`.
+- Profile image upload writes a blob to `profile-pictures`.
+- Profile image URL loads through `https://<front-door-dev-domain>/uploads/profile-pictures/<filename>`.
+
+Frontend:
+
+- Static Web App loads through the Front Door dev domain.
+- Login works through the frontend.
+- Browser Network tab shows no `localhost` requests.
+- `/api` requests hit the backend through Front Door.
+- `/uploads` requests hit the backend through Front Door.
+- Payment proof upload works from the UI.
+- Profile image upload and display work from the UI.
+- Refreshing a nested frontend route does not break SPA navigation.
+
+SSO, if enabled:
+
+- `/oauth2/authorization/entra` or `/oauth2/authorization/google` reaches the backend through Front Door.
+- Provider callback returns to `/login/oauth2/code/<provider>` through Front Door.
+- Success redirect returns to `https://<front-door-dev-domain>/#sso_token=<jwt>`.
+- The frontend stores the JWT and loads the authenticated session.
+
+GitHub Actions:
+
+- Dev workflow runs from `develop`.
+- Backend deploy succeeds.
+- Frontend deploy succeeds.
+- Manual dispatch from a non-`develop` ref fails at the guard job.
+
+## Open Questions Before Manual Dev Configuration
+
+- What dev domain will be used: Front Door default endpoint or a custom `dev.<domain>` hostname?
+- Will PostgreSQL use public firewall rules, VNet integration, or private endpoint?
+- Will SSO be enabled in dev immediately, or after the basic JWT login flow is verified?
+- Will shared dev use `INITIAL_ADMIN_*`, `APP_DEV_SEED_ENABLED`, or both?
+- Will 2FA email/SMS be enabled in dev, and which delivery providers/settings will be used?

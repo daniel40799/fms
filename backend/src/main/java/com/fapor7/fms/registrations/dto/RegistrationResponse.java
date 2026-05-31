@@ -14,7 +14,7 @@ import java.util.UUID;
  * @param status registration lifecycle status
  * @param registeredAt registration creation timestamp
  * @param paymentReference participant-supplied payment reference
- * @param paymentFilePath server path of uploaded proof, when present
+ * @param paymentFilePath stable storage reference of uploaded proof, when present
  * @param paymentUploadedAt payment proof upload timestamp
  * @param approvedById administrator id that approved the registration
  * @param approvedByName administrator name that approved the registration

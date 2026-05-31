@@ -12,7 +12,9 @@ import com.fapor7.fms.users.dto.UserProfileUpdateRequest;
 import com.fapor7.fms.users.dto.UserResponse;
 import com.fapor7.fms.users.dto.UserUpdateRequest;
 import com.fapor7.fms.auth.AuthenticatedUser;
-import org.springframework.beans.factory.annotation.Value;
+import com.fapor7.fms.storage.StorageContainer;
+import com.fapor7.fms.storage.StorageService;
+import com.fapor7.fms.storage.StoredFile;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,11 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,20 +55,20 @@ public class UserService {
     private final OrganizationRepository organizationRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final Path uploadBasePath;
+    private final StorageService storageService;
 
     public UserService(
             UserRepository userRepository,
             OrganizationRepository organizationRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
-            @Value("${app.upload.base-path:uploads}") String uploadBasePath
+            StorageService storageService
     ) {
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.uploadBasePath = resolveUploadBasePath(uploadBasePath);
+        this.storageService = storageService;
     }
 
     /**
@@ -282,7 +280,7 @@ public class UserService {
 
     /**
      * Stores a profile image for the authenticated user and exposes it through
-     * the public uploads resource handler.
+     * the backend uploads route.
      *
      * @param authenticatedUser current user principal
      * @param file selected image file
@@ -306,20 +304,13 @@ public class UserService {
         String previousUrl = user.getProfileImageUrl();
 
         try {
-            Path uploadDir = uploadBasePath.resolve("profile-pictures").toAbsolutePath().normalize();
-            Files.createDirectories(uploadDir);
-
             String filename = user.getId() + "_" + System.currentTimeMillis() + "." + extension;
-            Path targetPath = uploadDir.resolve(filename).normalize();
+            StoredFile storedFile = storageService.store(StorageContainer.PROFILE_PICTURES, file, filename);
 
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            user.setProfileImageUrl(PROFILE_PICTURE_URL_PREFIX + filename);
+            user.setProfileImageUrl(storageService.publicUrl(StorageContainer.PROFILE_PICTURES, storedFile.filename()));
             user.setUpdatedAt(LocalDateTime.now());
             UserResponse response = toResponse(userRepository.save(user));
-            deletePreviousProfilePicture(previousUrl, uploadDir);
+            deletePreviousProfilePicture(previousUrl);
             return response;
         } catch (IOException exception) {
             throw new RuntimeException("Failed to upload profile picture", exception);
@@ -975,27 +966,17 @@ public class UserService {
         };
     }
 
-    private void deletePreviousProfilePicture(String previousUrl, Path uploadDir) {
+    private void deletePreviousProfilePicture(String previousUrl) {
         if (previousUrl == null || !previousUrl.startsWith(PROFILE_PICTURE_URL_PREFIX)) {
             return;
         }
 
         try {
-            Path previousPath = uploadDir.resolve(previousUrl.substring(PROFILE_PICTURE_URL_PREFIX.length())).normalize();
-            if (previousPath.startsWith(uploadDir)) {
-                Files.deleteIfExists(previousPath);
-            }
+            String previousFilename = previousUrl.substring(PROFILE_PICTURE_URL_PREFIX.length());
+            storageService.delete(StorageContainer.PROFILE_PICTURES, previousFilename);
         } catch (IOException ignored) {
             // A stale old image should not fail an otherwise successful upload.
         }
-    }
-
-    private Path resolveUploadBasePath(String value) {
-        if (value == null || value.isBlank()) {
-            return Path.of("uploads");
-        }
-
-        return Path.of(value);
     }
 
     private String joinName(String firstName, String middleName, String lastName) {

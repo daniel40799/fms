@@ -5,6 +5,9 @@ import com.fapor7.fms.organizations.OrganizationEntity;
 import com.fapor7.fms.organizations.OrganizationRepository;
 import com.fapor7.fms.roles.RoleName;
 import com.fapor7.fms.roles.RoleRepository;
+import com.fapor7.fms.storage.StorageContainer;
+import com.fapor7.fms.storage.StorageService;
+import com.fapor7.fms.storage.StoredFile;
 import com.fapor7.fms.users.dto.UserCreateRequest;
 import com.fapor7.fms.users.dto.UserOrganizationUpdateRequest;
 import com.fapor7.fms.users.dto.UserProfileUpdateRequest;
@@ -20,8 +23,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -29,7 +30,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +51,9 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private StorageService storageService;
 
     @InjectMocks
     private UserService userService;
@@ -444,32 +451,30 @@ class UserServiceTest {
     @Test
     void updateProfilePictureStoresImageUrlAndDeletesPreviousImage() throws IOException {
         UserEntity user = TestData.activeUser(1);
+        stubProfilePictureStoreEcho();
         when(userRepository.save(user)).thenReturn(user);
 
         UserResponse firstResponse = userService.updateProfilePicture(
                 TestData.principal(user),
                 new MockMultipartFile("file", "avatar.jpeg", "image/jpeg", "first".getBytes())
         );
-        Path firstPath = pathFromProfileImageUrl(firstResponse.profileImageUrl());
 
         assertThat(firstResponse.profileImageUrl()).startsWith("/uploads/profile-pictures/");
         assertThat(firstResponse.profileImageUrl()).endsWith(".jpg");
-        assertThat(Files.exists(firstPath)).isTrue();
 
         UserResponse secondResponse = userService.updateProfilePicture(
                 TestData.principal(user),
                 new MockMultipartFile("file", "avatar.png", "image/png", "second".getBytes())
         );
-        Path secondPath = pathFromProfileImageUrl(secondResponse.profileImageUrl());
 
-        assertThat(Files.exists(firstPath)).isFalse();
-        assertThat(Files.exists(secondPath)).isTrue();
-        Files.deleteIfExists(secondPath);
+        assertThat(secondResponse.profileImageUrl()).endsWith(".png");
+        verify(storageService).delete(StorageContainer.PROFILE_PICTURES, profileFilename(firstResponse.profileImageUrl()));
     }
 
     @Test
     void updateProfilePictureFallsBackToContentTypeWhenFilenameHasNoExtension() throws IOException {
         UserEntity user = TestData.activeUser(1);
+        stubProfilePictureStoreEcho();
         when(userRepository.save(user)).thenReturn(user);
 
         UserResponse response = userService.updateProfilePicture(
@@ -478,12 +483,12 @@ class UserServiceTest {
         );
 
         assertThat(response.profileImageUrl()).endsWith(".png");
-        Files.deleteIfExists(pathFromProfileImageUrl(response.profileImageUrl()));
     }
 
     @Test
     void updateProfilePictureUsesContentTypeForBlankFilenames() throws IOException {
         UserEntity user = TestData.activeUser(1);
+        stubProfilePictureStoreEcho();
         when(userRepository.save(user)).thenReturn(user);
 
         for (String[] imageType : List.of(
@@ -497,7 +502,6 @@ class UserServiceTest {
             );
 
             assertThat(response.profileImageUrl()).endsWith(imageType[1]);
-            Files.deleteIfExists(pathFromProfileImageUrl(response.profileImageUrl()));
             user.setProfileImageUrl(null);
         }
     }
@@ -505,10 +509,9 @@ class UserServiceTest {
     @Test
     void updateProfilePictureIgnoresPreviousImageCleanupErrors() throws IOException {
         UserEntity user = TestData.activeUser(1);
-        Path staleDirectory = Path.of("uploads", "profile-pictures", "stale-directory");
-        Files.createDirectories(staleDirectory);
-        Files.writeString(staleDirectory.resolve("nested.txt"), "stale");
         user.setProfileImageUrl("/uploads/profile-pictures/stale-directory");
+        stubProfilePictureStoreEcho();
+        doThrow(new IOException("stale")).when(storageService).delete(StorageContainer.PROFILE_PICTURES, "stale-directory");
         when(userRepository.save(user)).thenReturn(user);
 
         UserResponse response = userService.updateProfilePicture(
@@ -517,9 +520,6 @@ class UserServiceTest {
         );
 
         assertThat(response.profileImageUrl()).endsWith(".png");
-        Files.deleteIfExists(pathFromProfileImageUrl(response.profileImageUrl()));
-        Files.deleteIfExists(staleDirectory.resolve("nested.txt"));
-        Files.deleteIfExists(staleDirectory);
     }
 
     @Test
@@ -570,7 +570,8 @@ class UserServiceTest {
         when(file.getSize()).thenReturn(12L);
         when(file.getContentType()).thenReturn("image/png");
         when(file.getOriginalFilename()).thenReturn("avatar.png");
-        when(file.getInputStream()).thenThrow(new IOException("disk full"));
+        when(storageService.store(eq(StorageContainer.PROFILE_PICTURES), eq(file), anyString()))
+                .thenThrow(new IOException("disk full"));
 
         assertThatThrownBy(() -> userService.updateProfilePicture(TestData.principal(TestData.activeUser(1)), file))
                 .isInstanceOf(RuntimeException.class)
@@ -704,7 +705,18 @@ class UserServiceTest {
         return new UserProfileUpdateRequest(fullName, null, null, null, null, null, null, null, null);
     }
 
-    private static Path pathFromProfileImageUrl(String profileImageUrl) {
-        return Path.of(profileImageUrl.substring(1));
+    private void stubProfilePictureStoreEcho() throws IOException {
+        when(storageService.store(eq(StorageContainer.PROFILE_PICTURES), any(MultipartFile.class), anyString()))
+                .thenAnswer(invocation -> {
+                    MultipartFile file = invocation.getArgument(1);
+                    String filename = invocation.getArgument(2);
+                    return new StoredFile("profile-pictures/" + filename, filename, file.getContentType(), file.getSize());
+                });
+        when(storageService.publicUrl(eq(StorageContainer.PROFILE_PICTURES), anyString()))
+                .thenAnswer(invocation -> "/uploads/profile-pictures/" + invocation.getArgument(1));
+    }
+
+    private static String profileFilename(String profileImageUrl) {
+        return profileImageUrl.substring("/uploads/profile-pictures/".length());
     }
 }

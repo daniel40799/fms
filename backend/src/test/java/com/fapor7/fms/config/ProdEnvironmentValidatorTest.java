@@ -1,5 +1,6 @@
 package com.fapor7.fms.config;
 
+import com.fapor7.fms.storage.StorageProperties;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -10,7 +11,6 @@ class ProdEnvironmentValidatorTest {
     private static final String SAFE_SECRET = "prod-secret-at-least-thirty-two-bytes";
     private static final String SAFE_DB_URL = "jdbc:postgresql://fms-prod.postgres.database.azure.com:5432/fms?sslmode=require";
     private static final String SAFE_CORS = "https://fms.example.com,https://admin.fms.example.com";
-    private static final String SAFE_UPLOAD_PATH = "/mnt/fms/uploads";
 
     @Test
     void acceptsSafeProdConfiguration() {
@@ -18,7 +18,7 @@ class ProdEnvironmentValidatorTest {
                 SAFE_DB_URL,
                 SAFE_SECRET,
                 SAFE_CORS,
-                SAFE_UPLOAD_PATH
+                StorageProperties.StorageType.AZURE_BLOB
         );
 
         assertThatCode(() -> validator.run(null)).doesNotThrowAnyException();
@@ -30,7 +30,7 @@ class ProdEnvironmentValidatorTest {
                 "jdbc:postgresql://localhost:5432/fms?sslmode=require",
                 SAFE_SECRET,
                 SAFE_CORS,
-                SAFE_UPLOAD_PATH
+                StorageProperties.StorageType.AZURE_BLOB
         );
 
         assertThatThrownBy(() -> validator.run(null))
@@ -44,7 +44,7 @@ class ProdEnvironmentValidatorTest {
                 "jdbc:postgresql://fms-prod.postgres.database.azure.com:5432/fms",
                 SAFE_SECRET,
                 SAFE_CORS,
-                SAFE_UPLOAD_PATH
+                StorageProperties.StorageType.AZURE_BLOB
         );
 
         assertThatThrownBy(() -> validator.run(null))
@@ -58,7 +58,7 @@ class ProdEnvironmentValidatorTest {
                 SAFE_DB_URL,
                 SAFE_SECRET,
                 "https://fms.example.com,http://localhost:5173",
-                SAFE_UPLOAD_PATH
+                StorageProperties.StorageType.AZURE_BLOB
         );
 
         assertThatThrownBy(() -> validator.run(null))
@@ -68,30 +68,32 @@ class ProdEnvironmentValidatorTest {
     }
 
     @Test
-    void rejectsDefaultUploadPath() {
+    void rejectsLocalStorageType() {
         ProdEnvironmentValidator validator = validator(
                 SAFE_DB_URL,
                 SAFE_SECRET,
                 SAFE_CORS,
-                "uploads"
+                StorageProperties.StorageType.LOCAL
         );
 
         assertThatThrownBy(() -> validator.run(null))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("APP_UPLOAD_BASE_PATH");
+                .hasMessageContaining("APP_STORAGE_TYPE");
     }
 
     private ProdEnvironmentValidator validator(
             String datasourceUrl,
             String jwtSecret,
             String corsAllowedOrigins,
-            String uploadBasePath
+            StorageProperties.StorageType storageType
     ) {
+        StorageProperties storageProperties = new StorageProperties();
+        storageProperties.setType(storageType);
         return new ProdEnvironmentValidator(
                 datasourceUrl,
                 jwtSecret,
                 corsAllowedOrigins,
-                uploadBasePath,
+                storageProperties,
                 false,
                 false
         );

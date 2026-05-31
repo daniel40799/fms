@@ -73,7 +73,7 @@ The broader system roadmap includes:
 - Excel user import.
 - Event resources, sub-events, parallel sessions, ticket limits, and external registration forms.
 - Online payment gateway integration such as Maya Checkout, including webhook confirmation.
-- Azure Blob Storage for payment proof, resources, and generated certificates.
+- Azure Blob Storage for event resources and generated certificates.
 - Exhibitor QR scanning and participant-exhibitor interaction reports.
 - Evaluation and assessment completion tracking using external forms.
 - Digital certificate generation from eligibility criteria.
@@ -168,7 +168,24 @@ Backend configuration is split across:
 Select profiles with `SPRING_PROFILES_ACTIVE=local`, `SPRING_PROFILES_ACTIVE=dev`, or `SPRING_PROFILES_ACTIVE=prod`.
 
 Standard environment variables include `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_EXPIRATION_MS`, `CORS_ALLOWED_ORIGINS`, and `APP_UPLOAD_BASE_PATH`.
+For Azure dev/prod uploads, set `APP_STORAGE_TYPE=azure-blob`, `AZURE_STORAGE_CONNECTION_STRING`, and the four `AZURE_STORAGE_CONTAINER_*` settings documented below.
 See `docs/azure-environments.md` for Azure setup, GitHub Actions secrets, and production constraints.
+
+### Upload Storage
+
+Local development stores uploads on the filesystem under `APP_UPLOAD_BASE_PATH`.
+
+Azure `dev` and `prod` store uploaded payment proofs and profile pictures in private Azure Blob containers. Payment proofs are streamed through the authenticated registration payment-proof endpoint. Profile pictures keep the existing `/uploads/profile-pictures/<filename>` URL and are streamed by the backend; no SAS URLs are stored in the database.
+
+Required Azure App Settings:
+
+- `AZURE_STORAGE_CONNECTION_STRING`
+- `AZURE_STORAGE_CONTAINER_PAYMENT_PROOFS=payment-proofs`
+- `AZURE_STORAGE_CONTAINER_PROFILE_PICTURES=profile-pictures`
+- `AZURE_STORAGE_CONTAINER_EVENT_RESOURCES=event-resources`
+- `AZURE_STORAGE_CONTAINER_CERTIFICATES=certificates`
+
+Payment proof uploads default to a 10 MB maximum and accept JPG, PNG, or PDF files only. Override with `APP_PAYMENT_PROOF_MAX_SIZE_BYTES`, `APP_PAYMENT_PROOF_ALLOWED_CONTENT_TYPES`, and `APP_PAYMENT_PROOF_ALLOWED_EXTENSIONS` if needed.
 
 ## Database Migrations
 

@@ -1,0 +1,315 @@
+# FAPOR7/FMS Azure dev setup command draft
+#
+# This file is a copy-and-edit Azure CLI reference, not an executable script.
+# Do not run it as-is. Replace every <placeholder> and run commands manually.
+# Do not paste real secrets into source control, shell history captures, issue comments, or logs.
+#
+# Suggested shell: Azure Cloud Shell Bash.
+
+# ---------------------------------------------------------------------------
+# 0. Manual placeholders
+# ---------------------------------------------------------------------------
+
+RESOURCE_GROUP="<resource-group>"
+LOCATION="<azure-location>"
+
+POSTGRES_SERVER="<postgres-server-name>"
+POSTGRES_DATABASE="<database>"
+POSTGRES_ADMIN_USER="<postgres-admin-user>"
+POSTGRES_ADMIN_PASSWORD="<postgres-admin-password>"
+
+APP_SERVICE_PLAN="<app-service-plan-name>"
+BACKEND_APP="<backend-app-service-name>"
+
+STORAGE_ACCOUNT="<storage-account-name>"
+
+STATIC_WEB_APP="<static-web-app-name>"
+STATIC_WEB_APP_LOCATION="<static-web-app-location>"
+
+AFD_PROFILE="<front-door-profile-name>"
+AFD_ENDPOINT="<front-door-endpoint-name>"
+AFD_BACKEND_ORIGIN_GROUP="<front-door-backend-origin-group-name>"
+AFD_FRONTEND_ORIGIN_GROUP="<front-door-frontend-origin-group-name>"
+AFD_BACKEND_ORIGIN="<front-door-backend-origin-name>"
+AFD_FRONTEND_ORIGIN="<front-door-frontend-origin-name>"
+
+FRONT_DOOR_DEV_DOMAIN="<front-door-dev-domain>"
+BACKEND_HOST="${BACKEND_APP}.azurewebsites.net"
+STATIC_WEB_APP_HOST="<generated-static-web-app-host>.azurestaticapps.net"
+
+# ---------------------------------------------------------------------------
+# 1. Resource group
+# ---------------------------------------------------------------------------
+
+az group create \
+  --name "${RESOURCE_GROUP}" \
+  --location "${LOCATION}"
+
+# ---------------------------------------------------------------------------
+# 2. Azure PostgreSQL Flexible Server
+# ---------------------------------------------------------------------------
+
+# Choose the network model before running this. For shared dev, prefer restricted
+# firewall rules, VNet integration, or private endpoint over broad public access.
+az postgres flexible-server create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "${POSTGRES_SERVER}" \
+  --location "${LOCATION}" \
+  --admin-user "${POSTGRES_ADMIN_USER}" \
+  --admin-password "${POSTGRES_ADMIN_PASSWORD}" \
+  --version 16 \
+  --tier Burstable \
+  --sku-name Standard_B1ms \
+  --storage-size 32
+
+az postgres flexible-server db create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --server-name "${POSTGRES_SERVER}" \
+  --database-name "${POSTGRES_DATABASE}"
+
+# Example only: create narrowly scoped firewall rules that match the approved
+# App Service outbound IPs or VNet/private access design.
+# az postgres flexible-server firewall-rule create \
+#   --resource-group "${RESOURCE_GROUP}" \
+#   --name "${POSTGRES_SERVER}" \
+#   --rule-name "<rule-name>" \
+#   --start-ip-address "<approved-start-ip>" \
+#   --end-ip-address "<approved-end-ip>"
+
+# ---------------------------------------------------------------------------
+# 3. Azure App Service backend
+# ---------------------------------------------------------------------------
+
+az appservice plan create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "${APP_SERVICE_PLAN}" \
+  --location "${LOCATION}" \
+  --is-linux \
+  --sku B1
+
+# Verify the current Java 21 runtime name before creating the Web App:
+az webapp list-runtimes --os linux
+
+az webapp create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --plan "${APP_SERVICE_PLAN}" \
+  --name "${BACKEND_APP}" \
+  --runtime "<java-21-linux-runtime-from-az-webapp-list-runtimes>"
+
+# ---------------------------------------------------------------------------
+# 4. Azure Blob Storage
+# ---------------------------------------------------------------------------
+
+az storage account create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "${STORAGE_ACCOUNT}" \
+  --location "${LOCATION}" \
+  --sku Standard_LRS \
+  --kind StorageV2 \
+  --allow-blob-public-access false \
+  --min-tls-version TLS1_2
+
+az storage container create \
+  --account-name "${STORAGE_ACCOUNT}" \
+  --name payment-proofs \
+  --public-access off \
+  --auth-mode login
+
+az storage container create \
+  --account-name "${STORAGE_ACCOUNT}" \
+  --name profile-pictures \
+  --public-access off \
+  --auth-mode login
+
+az storage container create \
+  --account-name "${STORAGE_ACCOUNT}" \
+  --name event-resources \
+  --public-access off \
+  --auth-mode login
+
+az storage container create \
+  --account-name "${STORAGE_ACCOUNT}" \
+  --name certificates \
+  --public-access off \
+  --auth-mode login
+
+# This command prints a secret. Capture it privately, then set it in App Service
+# as AZURE_STORAGE_CONNECTION_STRING. Do not commit or log the value.
+# az storage account show-connection-string \
+#   --resource-group "${RESOURCE_GROUP}" \
+#   --name "${STORAGE_ACCOUNT}" \
+#   --query connectionString \
+#   --output tsv
+
+# ---------------------------------------------------------------------------
+# 5. Backend App Service Application Settings
+# ---------------------------------------------------------------------------
+
+az webapp config appsettings set \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "${BACKEND_APP}" \
+  --settings \
+    SPRING_PROFILES_ACTIVE="dev" \
+    SERVER_FORWARD_HEADERS_STRATEGY="framework" \
+    DB_URL="jdbc:postgresql://${POSTGRES_SERVER}.postgres.database.azure.com:5432/${POSTGRES_DATABASE}?sslmode=require" \
+    DB_USERNAME="<db-username>" \
+    DB_PASSWORD="<db-password>" \
+    JWT_SECRET="<strong-random-secret>" \
+    JWT_EXPIRATION_MS="86400000" \
+    CORS_ALLOWED_ORIGINS="https://${FRONT_DOOR_DEV_DOMAIN}" \
+    APP_STORAGE_TYPE="azure-blob" \
+    AZURE_STORAGE_CONNECTION_STRING="<storage-connection-string>" \
+    AZURE_STORAGE_CONTAINER_PAYMENT_PROOFS="payment-proofs" \
+    AZURE_STORAGE_CONTAINER_PROFILE_PICTURES="profile-pictures" \
+    AZURE_STORAGE_CONTAINER_EVENT_RESOURCES="event-resources" \
+    AZURE_STORAGE_CONTAINER_CERTIFICATES="certificates" \
+    APP_PAYMENT_PROOF_MAX_SIZE_BYTES="10485760" \
+    APP_PAYMENT_PROOF_ALLOWED_CONTENT_TYPES="image/jpeg,image/png,application/pdf" \
+    APP_PAYMENT_PROOF_ALLOWED_EXTENSIONS="jpg,jpeg,png,pdf"
+
+# Optional dev bootstrap settings. Use only if needed.
+# az webapp config appsettings set \
+#   --resource-group "${RESOURCE_GROUP}" \
+#   --name "${BACKEND_APP}" \
+#   --settings \
+#     INITIAL_ADMIN_EMAIL="<admin-email>" \
+#     INITIAL_ADMIN_PASSWORD="<temporary-admin-password>" \
+#     INITIAL_ADMIN_FULL_NAME="<admin-name>" \
+#     APP_DEV_SEED_ENABLED="false" \
+#     APP_2FA_EMAIL_ENABLED="false" \
+#     APP_2FA_EMAIL_LOG_CODES="false" \
+#     APP_2FA_SMS_ENABLED="false"
+
+# ---------------------------------------------------------------------------
+# 6. Azure Static Web App frontend
+# ---------------------------------------------------------------------------
+
+az staticwebapp create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "${STATIC_WEB_APP}" \
+  --location "${STATIC_WEB_APP_LOCATION}" \
+  --sku Standard
+
+# This command prints a deployment token. Store it as the GitHub Environment
+# secret AZURE_STATIC_WEB_APPS_API_TOKEN_DEV. Do not commit or log the value.
+# az staticwebapp secrets list \
+#   --resource-group "${RESOURCE_GROUP}" \
+#   --name "${STATIC_WEB_APP}" \
+#   --query "properties.apiKey" \
+#   --output tsv
+
+# ---------------------------------------------------------------------------
+# 7. Azure Front Door Standard/Premium
+# ---------------------------------------------------------------------------
+
+az afd profile create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --profile-name "${AFD_PROFILE}" \
+  --sku Standard_AzureFrontDoor
+
+az afd endpoint create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --profile-name "${AFD_PROFILE}" \
+  --endpoint-name "${AFD_ENDPOINT}" \
+  --enabled-state Enabled
+
+az afd origin-group create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --profile-name "${AFD_PROFILE}" \
+  --origin-group-name "${AFD_BACKEND_ORIGIN_GROUP}" \
+  --probe-path /api/health \
+  --probe-protocol Https \
+  --probe-request-type GET \
+  --probe-interval-in-seconds 100 \
+  --sample-size 4 \
+  --successful-samples-required 3
+
+az afd origin create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --profile-name "${AFD_PROFILE}" \
+  --origin-group-name "${AFD_BACKEND_ORIGIN_GROUP}" \
+  --origin-name "${AFD_BACKEND_ORIGIN}" \
+  --host-name "${BACKEND_HOST}" \
+  --origin-host-header "${BACKEND_HOST}" \
+  --http-port 80 \
+  --https-port 443 \
+  --priority 1 \
+  --weight 1000 \
+  --enabled-state Enabled
+
+az afd origin-group create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --profile-name "${AFD_PROFILE}" \
+  --origin-group-name "${AFD_FRONTEND_ORIGIN_GROUP}" \
+  --probe-path / \
+  --probe-protocol Https \
+  --probe-request-type GET \
+  --probe-interval-in-seconds 100 \
+  --sample-size 4 \
+  --successful-samples-required 3
+
+az afd origin create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --profile-name "${AFD_PROFILE}" \
+  --origin-group-name "${AFD_FRONTEND_ORIGIN_GROUP}" \
+  --origin-name "${AFD_FRONTEND_ORIGIN}" \
+  --host-name "${STATIC_WEB_APP_HOST}" \
+  --origin-host-header "${STATIC_WEB_APP_HOST}" \
+  --http-port 80 \
+  --https-port 443 \
+  --priority 1 \
+  --weight 1000 \
+  --enabled-state Enabled
+
+# Backend route. This must be more specific than the frontend catch-all route.
+az afd route create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --profile-name "${AFD_PROFILE}" \
+  --endpoint-name "${AFD_ENDPOINT}" \
+  --route-name backend-routes \
+  --origin-group "${AFD_BACKEND_ORIGIN_GROUP}" \
+  --patterns-to-match /api/* /uploads/* /oauth2/* /login/oauth2/* \
+  --supported-protocols Http Https \
+  --forwarding-protocol HttpsOnly \
+  --https-redirect Enabled \
+  --link-to-default-domain Enabled
+
+# Frontend catch-all route. Verify it does not mask backend paths.
+az afd route create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --profile-name "${AFD_PROFILE}" \
+  --endpoint-name "${AFD_ENDPOINT}" \
+  --route-name frontend-catch-all \
+  --origin-group "${AFD_FRONTEND_ORIGIN_GROUP}" \
+  --patterns-to-match /* \
+  --supported-protocols Http Https \
+  --forwarding-protocol HttpsOnly \
+  --https-redirect Enabled \
+  --link-to-default-domain Enabled
+
+# Optional later: add a dev custom domain to Front Door, enable managed TLS,
+# then set CORS_ALLOWED_ORIGINS and SSO_FRONTEND_SUCCESS_URI to that hostname.
+
+# ---------------------------------------------------------------------------
+# 8. GitHub Environment and secrets
+# ---------------------------------------------------------------------------
+
+# Configure these in GitHub UI under Settings > Environments > dev > Secrets:
+#   AZURE_WEBAPP_NAME_DEV
+#   AZURE_WEBAPP_PUBLISH_PROFILE_DEV
+#   AZURE_STATIC_WEB_APPS_API_TOKEN_DEV
+#
+# This command prints a publish profile secret. Store it privately as
+# AZURE_WEBAPP_PUBLISH_PROFILE_DEV if using the current workflow.
+# az webapp deployment list-publishing-profiles \
+#   --resource-group "${RESOURCE_GROUP}" \
+#   --name "${BACKEND_APP}" \
+#   --xml
+
+# ---------------------------------------------------------------------------
+# 9. Manual validation commands after deployment
+# ---------------------------------------------------------------------------
+
+# curl "https://${FRONT_DOOR_DEV_DOMAIN}/api/health"
+# Open "https://${FRONT_DOOR_DEV_DOMAIN}" in a browser.
+# Verify browser Network tab has no localhost requests.

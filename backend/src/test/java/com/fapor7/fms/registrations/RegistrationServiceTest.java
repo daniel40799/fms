@@ -8,29 +8,32 @@ import com.fapor7.fms.organizations.OrganizationEntity;
 import com.fapor7.fms.registrations.dto.RegistrationApprovalRequest;
 import com.fapor7.fms.registrations.dto.RegistrationCreateRequest;
 import com.fapor7.fms.registrations.dto.RegistrationResponse;
+import com.fapor7.fms.storage.StorageContainer;
+import com.fapor7.fms.storage.StorageService;
+import com.fapor7.fms.storage.StoredFile;
+import com.fapor7.fms.storage.StoredResource;
 import com.fapor7.fms.users.UserEntity;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,17 +45,14 @@ class RegistrationServiceTest {
     @Mock
     private EventRepository eventRepository;
 
+    @Mock
+    private StorageService storageService;
+
+    @Spy
+    private PaymentProofProperties paymentProofProperties = new PaymentProofProperties();
+
     @InjectMocks
     private RegistrationService registrationService;
-
-    private Path uploadedPath;
-
-    @AfterEach
-    void deleteUploadedFile() throws IOException {
-        if (uploadedPath != null) {
-            Files.deleteIfExists(uploadedPath);
-        }
-    }
 
     @Test
     void registerCreatesPendingPaymentRegistration() {
@@ -150,19 +150,20 @@ class RegistrationServiceTest {
     }
 
     @Test
-    void uploadPaymentProofStoresFileAndMarksRegistrationForReview() {
+    void uploadPaymentProofStoresFileAndMarksRegistrationForReview() throws IOException {
         UserEntity user = TestData.activeUser(1);
         RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), user, RegistrationStatus.PENDING_PAYMENT);
-        MockMultipartFile file = new MockMultipartFile("file", "proof.txt", "text/plain", "paid".getBytes());
+        MockMultipartFile file = new MockMultipartFile("file", "proof.pdf", "application/pdf", "paid".getBytes());
         when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+        when(storageService.store(eq(StorageContainer.PAYMENT_PROOFS), eq(file), anyString()))
+                .thenReturn(new StoredFile("payment-proofs/proof.pdf", "proof.pdf", "application/pdf", 4));
         when(registrationRepository.save(registration)).thenReturn(registration);
 
         RegistrationResponse response = registrationService.uploadPaymentProof(registration.getId(), "REF-1", file, TestData.principal(user));
 
-        uploadedPath = Path.of(response.paymentFilePath());
         assertThat(response.paymentReference()).isEqualTo("REF-1");
+        assertThat(response.paymentFilePath()).isEqualTo("payment-proofs/proof.pdf");
         assertThat(response.status()).isEqualTo("PAYMENT_UPLOADED");
-        assertThat(Files.exists(uploadedPath)).isTrue();
     }
 
     @Test
@@ -185,13 +186,62 @@ class RegistrationServiceTest {
     }
 
     @Test
+    void uploadPaymentProofRejectsOversizedFiles() {
+        UserEntity user = TestData.activeUser(1);
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), user, RegistrationStatus.PENDING_PAYMENT);
+        paymentProofProperties.setMaxSizeBytes(3);
+        MockMultipartFile file = new MockMultipartFile("file", "proof.pdf", "application/pdf", "paid".getBytes());
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        assertThatThrownBy(() -> registrationService.uploadPaymentProof(registration.getId(), "REF", file, TestData.principal(user)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Payment proof exceeds the maximum allowed size");
+    }
+
+    @Test
+    void uploadPaymentProofRejectsUnsupportedContentTypes() {
+        UserEntity user = TestData.activeUser(1);
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), user, RegistrationStatus.PENDING_PAYMENT);
+        MockMultipartFile file = new MockMultipartFile("file", "proof.pdf", "text/plain", "paid".getBytes());
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        assertThatThrownBy(() -> registrationService.uploadPaymentProof(registration.getId(), "REF", file, TestData.principal(user)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Payment proof must be a JPG, PNG, or PDF file");
+    }
+
+    @Test
+    void uploadPaymentProofRejectsUnsupportedExtensions() {
+        UserEntity user = TestData.activeUser(1);
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), user, RegistrationStatus.PENDING_PAYMENT);
+        MockMultipartFile file = new MockMultipartFile("file", "proof.gif", "image/png", "image".getBytes());
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        assertThatThrownBy(() -> registrationService.uploadPaymentProof(registration.getId(), "REF", file, TestData.principal(user)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Payment proof must use a JPG, PNG, or PDF file extension");
+    }
+
+    @Test
+    void uploadPaymentProofRejectsMismatchedExtensionsAndContentTypes() {
+        UserEntity user = TestData.activeUser(1);
+        RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), user, RegistrationStatus.PENDING_PAYMENT);
+        MockMultipartFile file = new MockMultipartFile("file", "proof.jpg", "application/pdf", "paid".getBytes());
+        when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+
+        assertThatThrownBy(() -> registrationService.uploadPaymentProof(registration.getId(), "REF", file, TestData.principal(user)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Payment proof file extension does not match its content type");
+    }
+
+    @Test
     void uploadPaymentProofWrapsStorageFailure() throws IOException {
         UserEntity user = TestData.activeUser(1);
         RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), user, RegistrationStatus.PENDING_PAYMENT);
-        MultipartFile file = mock(MultipartFile.class);
-        when(file.getOriginalFilename()).thenReturn("proof.txt");
-        when(file.getInputStream()).thenThrow(new IOException("disk full"));
+        MultipartFile file = new MockMultipartFile("file", "proof.pdf", "application/pdf", "paid".getBytes());
         when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+        when(storageService.store(eq(StorageContainer.PAYMENT_PROOFS), eq(file), anyString()))
+                .thenThrow(new IOException("disk full"));
 
         assertThatThrownBy(() -> registrationService.uploadPaymentProof(registration.getId(), "REF", file, TestData.principal(user)))
                 .isInstanceOf(RuntimeException.class)
@@ -200,17 +250,22 @@ class RegistrationServiceTest {
 
     @Test
     void downloadPaymentProofReturnsResource() throws IOException {
-        Path proof = Files.createTempFile("proof", ".txt");
-        Files.writeString(proof, "paid");
         RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), TestData.activeUser(1), RegistrationStatus.PAYMENT_UPLOADED);
-        registration.setPaymentFilePath(proof.toString());
+        registration.setPaymentFilePath("payment-proofs/proof.txt");
         when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+        when(storageService.load("payment-proofs/proof.txt"))
+                .thenReturn(new StoredResource(
+                        "payment-proofs/proof.txt",
+                        "proof.txt",
+                        "text/plain",
+                        4,
+                        new ByteArrayResource("paid".getBytes())
+                ));
 
         ResponseEntity<Resource> response = registrationService.downloadPaymentProof(registration.getId());
 
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getHeaders().getFirst("Content-Disposition")).contains(proof.getFileName().toString());
-        Files.deleteIfExists(proof);
+        assertThat(response.getHeaders().getFirst("Content-Disposition")).contains("proof.txt");
     }
 
     @Test
@@ -235,8 +290,13 @@ class RegistrationServiceTest {
     @Test
     void downloadPaymentProofWrapsMissingFile() {
         RegistrationEntity registration = TestData.registration(2, TestData.event(3, null, null), TestData.activeUser(1), RegistrationStatus.PAYMENT_UPLOADED);
-        registration.setPaymentFilePath("missing-proof-file.txt");
+        registration.setPaymentFilePath("payment-proofs/missing-proof-file.txt");
         when(registrationRepository.findById(registration.getId())).thenReturn(Optional.of(registration));
+        try {
+            when(storageService.load("payment-proofs/missing-proof-file.txt")).thenThrow(new IOException("missing"));
+        } catch (IOException exception) {
+            throw new AssertionError(exception);
+        }
 
         assertThatThrownBy(() -> registrationService.downloadPaymentProof(registration.getId()))
                 .isInstanceOf(RuntimeException.class)

@@ -18,6 +18,10 @@ app:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
   upload:
     base-path: ${APP_UPLOAD_BASE_PATH:uploads}
+  storage:
+    type: local
+    local:
+      base-path: ${APP_UPLOAD_BASE_PATH:uploads}
   jwt:
     secret: ${JWT_SECRET:local-development-jwt-secret-change-before-nonlocal-use}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}

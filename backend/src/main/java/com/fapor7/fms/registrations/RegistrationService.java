@@ -6,22 +6,28 @@ import com.fapor7.fms.events.EventRepository;
 import com.fapor7.fms.events.EventStatus;
 import com.fapor7.fms.registrations.dto.RegistrationCreateRequest;
 import com.fapor7.fms.registrations.dto.RegistrationResponse;
+import com.fapor7.fms.storage.StorageContainer;
+import com.fapor7.fms.storage.StorageFilenames;
+import com.fapor7.fms.storage.StorageService;
+import com.fapor7.fms.storage.StoredFile;
+import com.fapor7.fms.storage.StoredResource;
 import com.fapor7.fms.users.UserEntity;
 import com.fapor7.fms.users.UserOrganizationStatus;
 import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.List;
 import java.util.UUID;
 import com.fapor7.fms.registrations.dto.RegistrationApprovalRequest;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.nio.file.Files;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import java.nio.file.Path;
 
 /**
  * Implements event registration, payment proof, approval, and QR workflows.
@@ -36,16 +42,19 @@ public class RegistrationService {
 
     private final RegistrationRepository registrationRepository;
     private final EventRepository eventRepository;
-    private final Path uploadBasePath;
+    private final StorageService storageService;
+    private final PaymentProofProperties paymentProofProperties;
 
     public RegistrationService(
             RegistrationRepository registrationRepository,
             EventRepository eventRepository,
-            @Value("${app.upload.base-path:uploads}") String uploadBasePath
+            StorageService storageService,
+            PaymentProofProperties paymentProofProperties
     ) {
         this.registrationRepository = registrationRepository;
         this.eventRepository = eventRepository;
-        this.uploadBasePath = resolveUploadBasePath(uploadBasePath);
+        this.storageService = storageService;
+        this.paymentProofProperties = paymentProofProperties;
     }
 
     /**
@@ -147,18 +156,14 @@ public class RegistrationService {
             throw new RuntimeException("You can only upload payment proof for your own registration");
         }
 
+        validatePaymentProof(file);
+
         try {
-            Path uploadDir = uploadBasePath.resolve("payment-proofs").normalize();
-            Files.createDirectories(uploadDir);
-
-            String originalFilename = file.getOriginalFilename();
-            String safeFilename = registrationId + "_" + System.currentTimeMillis() + "_" + originalFilename;
-
-            Path targetPath = uploadDir.resolve(safeFilename);
-            Files.copy(file.getInputStream(), targetPath);
+            String filename = paymentProofFilename(registrationId, file.getOriginalFilename());
+            StoredFile storedFile = storageService.store(StorageContainer.PAYMENT_PROOFS, file, filename);
 
             registration.setPaymentReference(paymentReference);
-            registration.setPaymentFilePath(targetPath.toString());
+            registration.setPaymentFilePath(storedFile.reference());
             registration.setPaymentUploadedAt(LocalDateTime.now());
             registration.setStatus(RegistrationStatus.PAYMENT_UPLOADED);
             registration.setUpdatedAt(LocalDateTime.now());
@@ -185,19 +190,25 @@ public class RegistrationService {
         }
 
         try {
-            Path filePath = Path.of(registration.getPaymentFilePath());
-            Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+            StoredResource storedResource = storageService.load(registration.getPaymentFilePath());
+            ResponseEntity.BodyBuilder response = ResponseEntity.ok()
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            ContentDisposition.attachment()
+                                    .filename(storedResource.filename())
+                                    .build()
+                                    .toString()
+                    );
 
-            if (!resource.exists()) {
-                throw new RuntimeException("Payment proof file not found");
+            MediaType mediaType = contentType(storedResource.contentType());
+            if (mediaType != null) {
+                response.contentType(mediaType);
+            }
+            if (storedResource.contentLength() >= 0) {
+                response.contentLength(storedResource.contentLength());
             }
 
-            return ResponseEntity.ok()
-                    .header(
-                            "Content-Disposition",
-                            "attachment; filename=\"" + filePath.getFileName() + "\""
-                    )
-                    .body(resource);
+            return response.body(storedResource.resource());
         } catch (Exception e) {
             throw new RuntimeException("Failed to download payment proof", e);
         }
@@ -270,12 +281,73 @@ public class RegistrationService {
                 && "FAPOR7".equalsIgnoreCase(user.getOrganization().getCode()));
     }
 
-    private Path resolveUploadBasePath(String value) {
-        if (value == null || value.isBlank()) {
-            return Path.of("uploads");
+    private String paymentProofFilename(UUID registrationId, String originalFilename) {
+        return registrationId + "_" + System.currentTimeMillis() + "_" + StorageFilenames.sanitize(originalFilename);
+    }
+
+    private void validatePaymentProof(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("Payment proof is required");
         }
 
-        return Path.of(value);
+        if (file.getSize() > paymentProofProperties.getMaxSizeBytes()) {
+            throw new RuntimeException("Payment proof exceeds the maximum allowed size");
+        }
+
+        String contentType = normalizeContentType(file.getContentType());
+        if (contentType == null || !paymentProofProperties.getAllowedContentTypes().contains(contentType)) {
+            throw new RuntimeException("Payment proof must be a JPG, PNG, or PDF file");
+        }
+
+        String extension = paymentProofExtension(file.getOriginalFilename());
+        if (extension == null || !paymentProofProperties.getAllowedExtensions().contains(extension)) {
+            throw new RuntimeException("Payment proof must use a JPG, PNG, or PDF file extension");
+        }
+
+        if (!matchesContentType(extension, contentType)) {
+            throw new RuntimeException("Payment proof file extension does not match its content type");
+        }
+    }
+
+    private String paymentProofExtension(String originalFilename) {
+        String filename = StorageFilenames.sanitize(originalFilename);
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex < 0 || dotIndex == filename.length() - 1) {
+            return null;
+        }
+
+        return filename.substring(dotIndex + 1).toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizeContentType(String contentType) {
+        if (contentType == null || contentType.isBlank()) {
+            return null;
+        }
+
+        int parameterIndex = contentType.indexOf(';');
+        String normalized = parameterIndex >= 0 ? contentType.substring(0, parameterIndex) : contentType;
+        return normalized.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private boolean matchesContentType(String extension, String contentType) {
+        return switch (extension) {
+            case "jpg", "jpeg" -> "image/jpeg".equals(contentType);
+            case "png" -> "image/png".equals(contentType);
+            case "pdf" -> "application/pdf".equals(contentType);
+            default -> false;
+        };
+    }
+
+    private MediaType contentType(String contentType) {
+        if (contentType == null || contentType.isBlank()) {
+            return null;
+        }
+
+        try {
+            return MediaType.parseMediaType(contentType);
+        } catch (Exception exception) {
+            return null;
+        }
     }
 
 }
