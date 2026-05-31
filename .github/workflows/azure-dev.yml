@@ -12,11 +12,10 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
-  guard:
-    name: Validate Dev Deployment Branch
+  validate-dev-branch:
+    name: Validate Dev Branch
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,16 +29,15 @@ jobs:
       - name: Branch validated
         run: echo "Dev deployment branch validated."
 
-  backend:
-    name: Build, Test, and Deploy Backend to Dev
-    needs: guard
+  backend-test:
+    name: Backend Test
+    needs: validate-dev-branch
     runs-on: ubuntu-latest
-    environment: dev
     permissions:
       contents: read
-      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -56,9 +54,56 @@ jobs:
         working-directory: backend
         run: ./mvnw -B test
 
+  backend-package:
+    name: Backend Package
+    needs: validate-dev-branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Make Maven wrapper executable
+        working-directory: backend
+        run: chmod +x mvnw
+
       - name: Package backend
         working-directory: backend
         run: ./mvnw -B package -DskipTests
+
+      - name: Upload backend package
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-package
+          path: backend/target/*.jar
+          if-no-files-found: error
+          retention-days: 1
+
+  backend-deploy-dev:
+    name: Backend Deploy Dev
+    needs:
+      - validate-dev-branch
+      - backend-test
+      - backend-package
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download backend package
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-package
+          path: backend-package
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -71,17 +116,17 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME_DEV }}
-          package: backend/target/*.jar
+          package: backend-package/*.jar
 
-  frontend:
-    name: Build and Deploy Frontend to Dev
-    needs: guard
+  frontend-install-build:
+    name: Frontend Install and Build
+    needs: validate-dev-branch
     runs-on: ubuntu-latest
-    environment: dev
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -98,12 +143,36 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Upload frontend dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          if-no-files-found: error
+          retention-days: 1
+
+  frontend-deploy-dev:
+    name: Frontend Deploy Dev
+    needs:
+      - validate-dev-branch
+      - frontend-install-build
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+    steps:
+      - name: Download frontend dist
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend-dist
+
       - name: Deploy frontend to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_DEV }}
           action: upload
-          app_location: ./frontend/dist
+          app_location: ./frontend-dist
           api_location: ""
           output_location: ""
           skip_app_build: true

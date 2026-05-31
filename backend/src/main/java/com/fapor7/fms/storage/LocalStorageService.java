@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Optional;
 
 /**
  * Filesystem-backed storage for local development.
@@ -58,8 +59,9 @@ public class LocalStorageService implements StorageService {
 
     @Override
     public StoredResource load(String reference) throws IOException {
-        StorageReference storageReference = StorageReference.parse(reference)
-                .orElseGet(() -> legacyReference(reference));
+        StorageReference storageReference = legacyReference(reference)
+                .or(() -> StorageReference.parse(reference))
+                .orElseThrow(() -> new IOException("Invalid storage reference"));
         return load(storageReference);
     }
 
@@ -113,9 +115,9 @@ public class LocalStorageService implements StorageService {
         return filePath;
     }
 
-    private StorageReference legacyReference(String reference) {
+    private Optional<StorageReference> legacyReference(String reference) {
         if (reference == null || reference.isBlank()) {
-            return new StorageReference("", "");
+            return Optional.empty();
         }
 
         Path path = Path.of(reference).normalize();
@@ -125,14 +127,13 @@ public class LocalStorageService implements StorageService {
                 : Path.of("").toAbsolutePath().normalize().resolve(path).normalize();
 
         if (!absolutePath.startsWith(normalizedBasePath) || absolutePath.getNameCount() < normalizedBasePath.getNameCount() + 2) {
-            return new StorageReference("", "");
+            return Optional.empty();
         }
 
         Path relativePath = normalizedBasePath.relativize(absolutePath);
         String containerName = relativePath.getName(0).toString();
         String blobName = relativePath.subpath(1, relativePath.getNameCount()).toString().replace('\\', '/');
-        return StorageReference.parse(containerName + "/" + blobName)
-                .orElse(new StorageReference("", ""));
+        return StorageReference.parse(containerName + "/" + blobName);
     }
 
     private Path resolveBasePath(String value) {

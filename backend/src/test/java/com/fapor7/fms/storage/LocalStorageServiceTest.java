@@ -5,8 +5,12 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,10 +56,54 @@ class LocalStorageServiceTest {
     }
 
     @Test
+    void loadsLegacyRelativeFilesystemReferencesInsideRelativeUploadBasePath() throws IOException {
+        Path relativeUploadBasePath = Path.of("target", "local-storage-service-test", UUID.randomUUID().toString());
+        Path proofPath = relativeUploadBasePath.resolve("payment-proofs").resolve("proof.txt");
+
+        try {
+            Files.createDirectories(proofPath.getParent());
+            Files.writeString(proofPath, "paid");
+
+            LocalStorageService storageService = new LocalStorageService(relativeUploadBasePath);
+            StoredResource storedResource = storageService.load(proofPath.toString());
+
+            assertThat(storedResource.reference()).isEqualTo("payment-proofs/proof.txt");
+            assertThat(storedResource.filename()).isEqualTo("proof.txt");
+            assertThat(storedResource.contentLength()).isEqualTo(4);
+        } finally {
+            deleteRecursively(relativeUploadBasePath);
+        }
+    }
+
+    @Test
     void rejectsTraversalReferences() {
         LocalStorageService storageService = new LocalStorageService(uploadBasePath);
 
         assertThatThrownBy(() -> storageService.load("profile-pictures/../secret.txt"))
                 .isInstanceOf(IOException.class);
+    }
+
+    private static void deleteRecursively(Path path) throws IOException {
+        if (Files.notExists(path)) {
+            return;
+        }
+
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.deleteIfExists(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                if (exc != null) {
+                    throw exc;
+                }
+
+                Files.deleteIfExists(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }
