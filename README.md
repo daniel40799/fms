@@ -103,7 +103,7 @@ The broader system roadmap includes:
 - Axios
 - Tailwind CSS
 
-## Local Development
+## How to Run Locally
 
 ### Prerequisites
 
@@ -124,6 +124,8 @@ The local database defaults are:
 - Password: `fmspass`
 - Port: `5432`
 
+If you use a local PostgreSQL installation instead of Docker Compose, create the same database/user or set `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` before starting the backend.
+
 ### Run the Backend
 
 ```powershell
@@ -133,18 +135,35 @@ cd backend
 
 The Maven wrapper defaults `spring-boot:run` to the `local` profile through `backend/.mvn/maven.config`.
 The `local` profile uses a committed dummy JWT secret named `local-development-jwt-secret-change-before-nonlocal-use`; it is only for local development and is rejected by the `dev` and `prod` profiles.
+If you override the local profile, set `JWT_SECRET` manually or startup will fail with `JWT_SECRET must be configured`.
+Local uploads use filesystem storage under `backend/uploads` by default, not Azure Blob Storage.
 
-The API runs on `http://localhost:8080`.
+Expected backend URL: `http://localhost:8080`.
 
 ### Run the Frontend
 
 ```powershell
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
-The Vite development server prints the local frontend URL after startup.
+Expected frontend URL: `http://localhost:5173`.
+
+Leave `VITE_API_BASE_URL` blank or unset for local development. The frontend keeps using relative `/api/*`, `/uploads/*`, `/oauth2/*`, and `/login/oauth2/*` paths, and the Vite proxy in `frontend/vite.config.ts` forwards them to `http://localhost:8080`.
+
+Common local startup errors:
+
+- `Connection to localhost:5432 refused` means local PostgreSQL is not running. Start it with `docker compose up -d postgres` or start your local PostgreSQL service.
+- `JWT_SECRET must be configured` means the active backend profile does not have the local dummy JWT secret and you need to set `JWT_SECRET`.
+
+## Environment Routing Summary
+
+| Environment | Frontend behavior | Backend routing |
+| --- | --- | --- |
+| Local | Relative `/api/*`, `/uploads/*`, `/oauth2/*`, and `/login/oauth2/*`; `VITE_API_BASE_URL` blank/unset | Vite proxy forwards to `http://localhost:8080` |
+| Dev | Static Web App uses `VITE_API_BASE_URL` set to the backend App Service origin | Browser calls App Service directly; backend CORS must allow the SWA origin |
+| Prod | Relative same-origin paths; `VITE_API_BASE_URL` blank/unset | Front Door/custom domain later routes backend-owned paths to App Service |
 
 ## Important API Flow
 

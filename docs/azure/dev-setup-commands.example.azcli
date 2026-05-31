@@ -28,16 +28,10 @@ STORAGE_ACCOUNT="<storage-account-name>"
 STATIC_WEB_APP="<static-web-app-name>"
 STATIC_WEB_APP_LOCATION="<static-web-app-location>"
 
-AFD_PROFILE="<front-door-profile-name>"
-AFD_ENDPOINT="<front-door-endpoint-name>"
-AFD_BACKEND_ORIGIN_GROUP="<front-door-backend-origin-group-name>"
-AFD_FRONTEND_ORIGIN_GROUP="<front-door-frontend-origin-group-name>"
-AFD_BACKEND_ORIGIN="<front-door-backend-origin-name>"
-AFD_FRONTEND_ORIGIN="<front-door-frontend-origin-name>"
-
-FRONT_DOOR_DEV_DOMAIN="<front-door-dev-domain>"
 BACKEND_HOST="${BACKEND_APP}.azurewebsites.net"
-STATIC_WEB_APP_HOST="<generated-static-web-app-host>.azurestaticapps.net"
+BACKEND_ORIGIN="https://${BACKEND_HOST}"
+STATIC_WEB_APP_HOST="thankful-ground-077ba4800.7.azurestaticapps.net"
+STATIC_WEB_APP_ORIGIN="https://${STATIC_WEB_APP_HOST}"
 
 OIDC_APP_DISPLAY_NAME="github-fms-dev-deploy"
 OIDC_FEDERATED_CREDENTIAL_NAME="fms-dev-develop"
@@ -157,13 +151,12 @@ az webapp config appsettings set \
   --name "${BACKEND_APP}" \
   --settings \
     SPRING_PROFILES_ACTIVE="dev" \
-    SERVER_FORWARD_HEADERS_STRATEGY="framework" \
     DB_URL="jdbc:postgresql://${POSTGRES_SERVER}.postgres.database.azure.com:5432/${POSTGRES_DATABASE}?sslmode=require" \
     DB_USERNAME="<db-username>" \
     DB_PASSWORD="<db-password>" \
     JWT_SECRET="<strong-random-secret>" \
     JWT_EXPIRATION_MS="86400000" \
-    CORS_ALLOWED_ORIGINS="https://${FRONT_DOOR_DEV_DOMAIN}" \
+    CORS_ALLOWED_ORIGINS="${STATIC_WEB_APP_ORIGIN}" \
     APP_STORAGE_TYPE="azure-blob" \
     AZURE_STORAGE_CONNECTION_STRING="<storage-connection-string>" \
     AZURE_STORAGE_CONTAINER_PAYMENT_PROOFS="payment-proofs" \
@@ -206,96 +199,22 @@ az staticwebapp create \
 #   --output tsv
 
 # ---------------------------------------------------------------------------
-# 7. Azure Front Door Standard/Premium
+# 7. No Azure Front Door for dev
 # ---------------------------------------------------------------------------
 
-az afd profile create \
-  --resource-group "${RESOURCE_GROUP}" \
-  --profile-name "${AFD_PROFILE}" \
-  --sku Standard_AzureFrontDoor
-
-az afd endpoint create \
-  --resource-group "${RESOURCE_GROUP}" \
-  --profile-name "${AFD_PROFILE}" \
-  --endpoint-name "${AFD_ENDPOINT}" \
-  --enabled-state Enabled
-
-az afd origin-group create \
-  --resource-group "${RESOURCE_GROUP}" \
-  --profile-name "${AFD_PROFILE}" \
-  --origin-group-name "${AFD_BACKEND_ORIGIN_GROUP}" \
-  --probe-path /api/health \
-  --probe-protocol Https \
-  --probe-request-type GET \
-  --probe-interval-in-seconds 100 \
-  --sample-size 4 \
-  --successful-samples-required 3
-
-az afd origin create \
-  --resource-group "${RESOURCE_GROUP}" \
-  --profile-name "${AFD_PROFILE}" \
-  --origin-group-name "${AFD_BACKEND_ORIGIN_GROUP}" \
-  --origin-name "${AFD_BACKEND_ORIGIN}" \
-  --host-name "${BACKEND_HOST}" \
-  --origin-host-header "${BACKEND_HOST}" \
-  --http-port 80 \
-  --https-port 443 \
-  --priority 1 \
-  --weight 1000 \
-  --enabled-state Enabled
-
-az afd origin-group create \
-  --resource-group "${RESOURCE_GROUP}" \
-  --profile-name "${AFD_PROFILE}" \
-  --origin-group-name "${AFD_FRONTEND_ORIGIN_GROUP}" \
-  --probe-path / \
-  --probe-protocol Https \
-  --probe-request-type GET \
-  --probe-interval-in-seconds 100 \
-  --sample-size 4 \
-  --successful-samples-required 3
-
-az afd origin create \
-  --resource-group "${RESOURCE_GROUP}" \
-  --profile-name "${AFD_PROFILE}" \
-  --origin-group-name "${AFD_FRONTEND_ORIGIN_GROUP}" \
-  --origin-name "${AFD_FRONTEND_ORIGIN}" \
-  --host-name "${STATIC_WEB_APP_HOST}" \
-  --origin-host-header "${STATIC_WEB_APP_HOST}" \
-  --http-port 80 \
-  --https-port 443 \
-  --priority 1 \
-  --weight 1000 \
-  --enabled-state Enabled
-
-# Backend route. This must be more specific than the frontend catch-all route.
-az afd route create \
-  --resource-group "${RESOURCE_GROUP}" \
-  --profile-name "${AFD_PROFILE}" \
-  --endpoint-name "${AFD_ENDPOINT}" \
-  --route-name backend-routes \
-  --origin-group "${AFD_BACKEND_ORIGIN_GROUP}" \
-  --patterns-to-match /api/* /uploads/* /oauth2/* /login/oauth2/* \
-  --supported-protocols Http Https \
-  --forwarding-protocol HttpsOnly \
-  --https-redirect Enabled \
-  --link-to-default-domain Enabled
-
-# Frontend catch-all route. Verify it does not mask backend paths.
-az afd route create \
-  --resource-group "${RESOURCE_GROUP}" \
-  --profile-name "${AFD_PROFILE}" \
-  --endpoint-name "${AFD_ENDPOINT}" \
-  --route-name frontend-catch-all \
-  --origin-group "${AFD_FRONTEND_ORIGIN_GROUP}" \
-  --patterns-to-match /* \
-  --supported-protocols Http Https \
-  --forwarding-protocol HttpsOnly \
-  --https-redirect Enabled \
-  --link-to-default-domain Enabled
-
-# Optional later: add a dev custom domain to Front Door, enable managed TLS,
-# then set CORS_ALLOWED_ORIGINS and SSO_FRONTEND_SUCCESS_URI to that hostname.
+# Dev avoids Azure Front Door cost. The frontend build receives:
+#   VITE_API_BASE_URL="${BACKEND_ORIGIN}"
+#
+# Future prod can add Front Door/custom-domain routing:
+#   /api/*          -> Backend App Service
+#   /uploads/*      -> Backend App Service
+#   /oauth2/*       -> Backend App Service
+#   /login/oauth2/* -> Backend App Service
+#   /*              -> Static Web App
+# Then keep VITE_API_BASE_URL blank/unset for prod and set:
+#   CORS_ALLOWED_ORIGINS=https://<front-door-or-custom-domain>
+#   SSO_FRONTEND_SUCCESS_URI=https://<front-door-or-custom-domain>/
+#   SERVER_FORWARD_HEADERS_STRATEGY=framework
 
 # ---------------------------------------------------------------------------
 # 8. Azure OIDC deployment identity for GitHub Actions
@@ -349,12 +268,15 @@ az role assignment create \
 #   AZURE_WEBAPP_NAME_DEV
 #   AZURE_STATIC_WEB_APPS_API_TOKEN_DEV
 #
+# Configure this in GitHub UI under Settings > Environments > dev > Variables:
+#   VITE_API_BASE_URL_DEV = ${BACKEND_ORIGIN}
+#
 # Do not add AZURE_WEBAPP_PUBLISH_PROFILE_DEV for the dev workflow.
 
 # ---------------------------------------------------------------------------
 # 10. Manual validation commands after deployment
 # ---------------------------------------------------------------------------
 
-# curl "https://${FRONT_DOOR_DEV_DOMAIN}/api/health"
-# Open "https://${FRONT_DOOR_DEV_DOMAIN}" in a browser.
+# curl "${BACKEND_ORIGIN}/api/health"
+# Open "${STATIC_WEB_APP_ORIGIN}" in a browser.
 # Verify browser Network tab has no localhost requests.

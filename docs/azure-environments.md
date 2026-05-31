@@ -76,8 +76,8 @@ Set these in Azure App Service Application Settings, not in source control.
 | `DB_PASSWORD` | Required | `<db-password>` |
 | `JWT_SECRET` | Required | `<strong-dev-secret>` |
 | `JWT_EXPIRATION_MS` | Optional | `86400000` |
-| `SERVER_FORWARD_HEADERS_STRATEGY` | Required when using Front Door | `framework` |
-| `CORS_ALLOWED_ORIGINS` | Required | `https://<dev-front-door-or-custom-domain>` |
+| `SERVER_FORWARD_HEADERS_STRATEGY` | Optional; required when using Front Door | `framework` |
+| `CORS_ALLOWED_ORIGINS` | Required | `https://thankful-ground-077ba4800.7.azurestaticapps.net` |
 | `APP_STORAGE_TYPE` | Recommended explicit | `azure-blob` |
 | `AZURE_STORAGE_CONNECTION_STRING` | Required unless using account/key | `<dev-storage-connection-string>` |
 | `AZURE_STORAGE_ACCOUNT_NAME` | Alternative to connection string | `<dev-storage-account>` |
@@ -102,7 +102,7 @@ Set these in Azure App Service Application Settings, not in source control.
 | `INITIAL_ADMIN_PASSWORD` | Optional bootstrap | `<temporary-admin-password>` |
 | `INITIAL_ADMIN_FULL_NAME` | Optional bootstrap | `<admin-name>` |
 | `APP_SSO_ENABLED` | Optional when SSO profile active | `true` |
-| `SSO_FRONTEND_SUCCESS_URI` | Required if SSO enabled | `https://<dev-frontend-origin>/` |
+| `SSO_FRONTEND_SUCCESS_URI` | Required if SSO enabled | `https://thankful-ground-077ba4800.7.azurestaticapps.net/` |
 | `ENTRA_CLIENT_ID` | Required only for Entra SSO | `<entra-client-id>` |
 | `ENTRA_CLIENT_SECRET` | Required only for Entra SSO | `<entra-client-secret>` |
 | `ENTRA_TENANT_ID` | Required only for Entra SSO | `<tenant-id>` |
@@ -143,7 +143,7 @@ Set these in Azure App Service Application Settings, not in source control.
 | `INITIAL_ADMIN_PASSWORD` | One-time bootstrap unless admin exists | `<temporary-admin-password>` |
 | `INITIAL_ADMIN_FULL_NAME` | One-time bootstrap unless admin exists | `<admin-name>` |
 | `APP_SSO_ENABLED` | Optional when SSO profile active | `true` |
-| `SSO_FRONTEND_SUCCESS_URI` | Required if SSO enabled | `https://<prod-frontend-origin>/` |
+| `SSO_FRONTEND_SUCCESS_URI` | Required if SSO enabled | `https://<prod-front-door-or-custom-domain>/` |
 | `ENTRA_CLIENT_ID` | Required only for Entra SSO | `<entra-client-id>` |
 | `ENTRA_CLIENT_SECRET` | Required only for Entra SSO | `<entra-client-secret>` |
 | `ENTRA_TENANT_ID` | Required only for Entra SSO | `<tenant-id>` |
@@ -222,18 +222,56 @@ Payment proof upload defaults:
 
 Both content type and filename extension must be allowed and compatible.
 
-## 6. Static Web App Routing
+## 6. Frontend Backend URL Strategy
 
-The current frontend uses relative backend paths and has no `VITE_API_BASE_URL` setting:
+The frontend supports an optional Vite build-time setting:
+
+```text
+VITE_API_BASE_URL=<backend-origin>
+```
+
+When `VITE_API_BASE_URL` is blank or unset, backend-owned paths stay relative. When it is set, the frontend prefixes only these backend-owned path families:
 
 | Path | Backend purpose |
 | --- | --- |
 | `/api/**` | REST API, health, login, 2FA, users, organizations, events, registrations, payment-proof upload/download, attendance, and profile-picture upload |
-| `/uploads/profile-pictures/**` | Public-by-URL profile images streamed by the backend from local storage or private Blob Storage |
+| `/uploads/**` | Public-by-URL profile images streamed by the backend from local storage or private Blob Storage |
 | `/oauth2/**` | Spring Security SSO authorization entry points such as `/oauth2/authorization/entra` and `/oauth2/authorization/google` |
 | `/login/oauth2/**` | SSO provider callback paths such as `/login/oauth2/code/entra` and `/login/oauth2/code/google` |
 
-Local Vite proxies `/api`, `/uploads`, `/oauth2`, and `/login/oauth2` to `http://localhost:8080` in `frontend/vite.config.ts`.
+Environment behavior:
+
+| Environment | `VITE_API_BASE_URL` | Browser behavior |
+| --- | --- | --- |
+| Local | Blank/unset | Relative paths go through the Vite proxy to `http://localhost:8080` |
+| Dev | `https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net` | Static Web App calls the backend App Service directly |
+| Prod | Blank/unset | Relative paths stay same-origin for Front Door/custom-domain routing |
+
+Current dev origins:
+
+| Role | Origin |
+| --- | --- |
+| Frontend SWA | `https://thankful-ground-077ba4800.7.azurestaticapps.net` |
+| Backend App Service | `https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net` |
+
+The dev backend App Service must allow the direct SWA origin:
+
+```text
+CORS_ALLOWED_ORIGINS=https://thankful-ground-077ba4800.7.azurestaticapps.net
+```
+
+For dev SSO, provider redirect URIs use the backend App Service origin, for example:
+
+```text
+https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net/login/oauth2/code/entra
+https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net/login/oauth2/code/google
+```
+
+Set the backend success redirect to the frontend SWA:
+
+```text
+SSO_FRONTEND_SUCCESS_URI=https://thankful-ground-077ba4800.7.azurestaticapps.net/
+```
 
 Auth and session assumptions:
 
@@ -241,69 +279,17 @@ Auth and session assumptions:
 - Normal API auth does not depend on cookies.
 - SSO, when enabled, uses a temporary backend session during the provider redirect, then redirects to `SSO_FRONTEND_SUCCESS_URI#sso_token=<jwt>`.
 - Payment proofs stay under `/api/registrations/{id}/payment-proof` and remain JWT protected.
-- Profile images are rendered directly with `<img src="/uploads/profile-pictures/<filename>">`.
+- Profile images may be returned as `/uploads/profile-pictures/<filename>` and are rewritten by the frontend to the backend App Service origin in dev.
 
 Azure Static Web Apps API integration is practical for `/api/**`, but it does not cover this app's non-API backend paths. `staticwebapp.config.json` is still useful for SPA fallback and security headers, but it cannot replace a reverse proxy for arbitrary external App Service paths.
 
-### Routing Options
-
-Option A: Static Web App frontend + App Service backend + explicit backend base URL.
-
-| Area | Impact |
-| --- | --- |
-| Code changes | Add a frontend base URL setting such as `VITE_API_BASE_URL`; prefix all API/download/upload requests; return or compose absolute profile-image URLs; change SSO buttons to the backend origin. |
-| Azure changes | Static Web App and App Service only; backend App Service must be directly reachable. |
-| SSO impact | Provider redirect URIs use the App Service origin, for example `https://<backend>.azurewebsites.net/login/oauth2/code/entra`; `SSO_FRONTEND_SUCCESS_URI` points back to the Static Web App. |
-| CORS impact | Required. Set `CORS_ALLOWED_ORIGINS=https://<static-web-app>.azurestaticapps.net` plus any custom frontend domain. |
-| Upload/profile image impact | Payment proofs work through explicit API URLs. Profile image URLs must become absolute backend URLs or be rewritten in frontend code. |
-| Pros | Fewest Azure routing resources; straightforward to reason about. |
-| Cons | Requires frontend code/config changes; browser sees a separate backend origin; profile-image URLs expose the backend origin; SSO and upload URLs must be audited carefully. |
-
-Option B: Static Web App frontend + linked App Service API using `/api` only.
-
-| Area | Impact |
-| --- | --- |
-| Code changes | None for existing `/api/**` calls, but current `/uploads/**`, `/oauth2/**`, and `/login/oauth2/**` paths are not covered. Making this work would require moving profile-image and SSO routes under `/api` or changing the frontend to another URL strategy. |
-| Azure changes | Static Web App with linked App Service backend. |
-| SSO impact | Breaks current SSO entry and callback paths if only `/api` is routed. |
-| CORS impact | Minimal for `/api/**` because calls are same-origin through Static Web Apps. |
-| Upload/profile image impact | Payment-proof upload/download works under `/api`; profile image rendering breaks because the frontend uses `/uploads/profile-pictures/**`. |
-| Pros | Simple for pure `/api` applications. |
-| Cons | Not viable for the current codebase as-is. |
-
-Option C: Azure Front Door routes frontend and backend paths by URL path.
-
-| Area | Impact |
-| --- | --- |
-| Code changes | None for the current frontend/backend path model. |
-| Azure changes | Add Azure Front Door in front of the Static Web App and App Service. Route `/api/*`, `/uploads/*`, `/oauth2/*`, and `/login/oauth2/*` to App Service; route `/*` to Static Web Apps. |
-| SSO impact | Provider redirect URIs can use the final Front Door origin, for example `https://<app-domain>/login/oauth2/code/entra`; set `SSO_FRONTEND_SUCCESS_URI=https://<app-domain>/`. Configure forwarded headers if Spring resolves redirects with the internal App Service host. |
-| CORS impact | Browser calls are same-origin through Front Door. Set `CORS_ALLOWED_ORIGINS` to the final Front Door/custom HTTPS origin; add the direct Static Web App origin only if it will be used directly. |
-| Upload/profile image impact | Works as-is. Payment proofs stay protected under `/api`; profile images stay at `/uploads/profile-pictures/**` and are streamed by the backend. |
-| Pros | Safest no-code path for the current app; preserves relative URLs, SSO paths, and private Blob-backed uploads; avoids permanent SAS URLs. |
-| Cons | Adds a routing resource and routing rules; requires correct origin host headers, health probes, and optional custom-domain/TLS setup. |
-
-Option D: Host frontend and backend together under the App Service.
-
-| Area | Impact |
-| --- | --- |
-| Code changes | Requires changing the build/deploy model so the Vite `dist` output is served by Spring Boot or by the App Service alongside the backend, with SPA fallback configured. |
-| Azure changes | App Service can be the only web host; Static Web Apps becomes unnecessary. |
-| SSO impact | Same-origin SSO paths work naturally. |
-| CORS impact | Not needed for browser app calls when everything is same-origin. |
-| Upload/profile image impact | Works with current paths once static frontend hosting is configured. |
-| Pros | Simplest runtime routing shape. |
-| Cons | Not aligned with the current GitHub Actions and Static Web Apps deployment plan; loses Static Web Apps hosting features; requires packaging and static-resource changes. |
-
 ### Routing Decision
 
-Recommended dev strategy: use Option C with Azure Front Door if the dev environment must exercise the current frontend, profile images, uploads, and SSO without code changes.
+Dev uses the Static Web App frontend plus direct backend App Service calls to avoid Azure Front Door cost.
 
-Recommended prod strategy: use Option C with Azure Front Door or an equivalent path-aware reverse proxy. This keeps the browser-facing origin stable and avoids changing the application URL model before production.
+Prod should use Azure Front Door or an equivalent path-aware reverse proxy later. Keep `VITE_API_BASE_URL` blank/unset in prod so the browser uses same-origin relative paths.
 
-Do not use Option B for the current deployment unless the app is changed so every backend route the browser needs is under `/api/**`.
-
-Exact backend route rules for Option C:
+Future prod route rules:
 
 | Path pattern | Origin |
 | --- | --- |
@@ -313,18 +299,11 @@ Exact backend route rules for Option C:
 | `/login/oauth2/*` | Backend App Service |
 | `/*` | Static Web Apps |
 
-Exact frontend config changes for Option C: none.
-
-Exact backend App Service settings for Option C:
+Exact backend App Service settings for future prod Front Door/custom-domain routing:
 
 ```text
 CORS_ALLOWED_ORIGINS=https://<front-door-or-custom-domain>
 SSO_FRONTEND_SUCCESS_URI=https://<front-door-or-custom-domain>/
-```
-
-If Front Door or another reverse proxy is used for SSO and the generated provider redirect URI uses the internal App Service hostname instead of the public hostname, add:
-
-```text
 SERVER_FORWARD_HEADERS_STRATEGY=framework
 ```
 
@@ -371,7 +350,7 @@ Dev workflow:
 - Trigger: push to `develop` and manual `workflow_dispatch`.
 - Guard: manual dispatch fails unless run from `develop`.
 - Backend: tests, packages JAR, signs in with `azure/login@v2`, and deploys with `azure/webapps-deploy@v3`.
-- Frontend: builds Vite app, deploys `frontend/dist` with `Azure/static-web-apps-deploy@v1`.
+- Frontend: builds Vite app with `VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL_DEV }}`, then deploys `frontend/dist` with `Azure/static-web-apps-deploy@v1`.
 
 Required dev Azure OIDC setup:
 
@@ -392,6 +371,12 @@ Required dev GitHub secrets:
 | `AZURE_SUBSCRIPTION_ID_DEV` | Required for Azure OIDC |
 | `AZURE_WEBAPP_NAME_DEV` | Required |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_DEV` | Required |
+
+Required dev GitHub Environment variable:
+
+| Variable | Value |
+| --- | --- |
+| `VITE_API_BASE_URL_DEV` | `https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net` |
 
 `AZURE_WEBAPP_PUBLISH_PROFILE_DEV` is no longer used by the dev workflow.
 
@@ -422,11 +407,11 @@ Backend smoke test:
 
 - Confirm App Service starts with `SPRING_PROFILES_ACTIVE=dev`.
 - Check App Service logs for successful Flyway migration.
-- Call `GET https://<backend-origin>/api/health`.
+- Call `GET https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net/api/health`.
 - Create or bootstrap an admin.
-- Log in through `POST /api/auth/login`.
-- Call a JWT-protected endpoint such as `GET /api/me`.
-- Verify CORS from the frontend origin.
+- Log in through `POST https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net/api/auth/login`.
+- Call a JWT-protected endpoint such as `GET https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net/api/me`.
+- Verify CORS from `https://thankful-ground-077ba4800.7.azurestaticapps.net`.
 - Upload a payment proof using JPG, PNG, or PDF under 10 MB.
 - Download the payment proof as an event/main admin.
 - Upload a profile picture.
@@ -435,8 +420,9 @@ Backend smoke test:
 
 Frontend smoke test:
 
-- Open the Static Web App URL.
+- Open `https://thankful-ground-077ba4800.7.azurestaticapps.net`.
 - Confirm no browser network request goes to `localhost`.
+- Confirm `/api`, `/uploads`, and `/oauth2` browser requests go to `https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net`.
 - Log in from the frontend.
 - Navigate to protected pages.
 - Upload payment proof and profile picture through the UI.
@@ -458,7 +444,9 @@ Before first dev deployment:
 - Azure PostgreSQL dev database exists.
 - App Service dev Application Settings are complete.
 - Storage account dev exists with all four private containers.
-- Static Web App dev exists and has routing for all backend paths.
+- Static Web App dev exists.
+- Backend dev `CORS_ALLOWED_ORIGINS` contains `https://thankful-ground-077ba4800.7.azurestaticapps.net`.
+- GitHub `dev` Environment variable `VITE_API_BASE_URL_DEV` is set to `https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net`.
 - GitHub `dev` environment and secrets exist.
 - `develop` branch has the intended code.
 

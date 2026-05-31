@@ -1,3 +1,7 @@
+param(
+    [switch] $SkipBackendTests
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
@@ -60,6 +64,8 @@ try {
         Assert-WorkflowContains -Content $workflow -Expected "AZURE_CLIENT_ID_DEV"
         Assert-WorkflowContains -Content $workflow -Expected "AZURE_TENANT_ID_DEV"
         Assert-WorkflowContains -Content $workflow -Expected "AZURE_SUBSCRIPTION_ID_DEV"
+        Assert-WorkflowContains -Content $workflow -Expected "VITE_API_BASE_URL_DEV"
+        Assert-WorkflowContains -Content $workflow -Expected 'VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL_DEV }}'
 
         if ($workflow -notmatch "(?m)^\s*-\s*develop\s*$") {
             throw ".github/workflows/azure-dev.yml must trigger push deployments only from develop."
@@ -85,24 +91,28 @@ try {
         & $actionlintCommand $workflowPath
     }
 
-    Invoke-Step "Backend tests" {
-        Push-Location (Join-Path $repoRoot "backend")
-        try {
-            $isWindowsHost = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
-                [System.Runtime.InteropServices.OSPlatform]::Windows
-            )
+    if ($SkipBackendTests) {
+        Write-Warning "Skipping backend tests because -SkipBackendTests was provided."
+    } else {
+        Invoke-Step "Backend tests" {
+            Push-Location (Join-Path $repoRoot "backend")
+            try {
+                $isWindowsHost = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+                    [System.Runtime.InteropServices.OSPlatform]::Windows
+                )
 
-            if ($isWindowsHost) {
-                & ".\mvnw.cmd" test
-            } else {
-                if (Get-Command chmod -ErrorAction SilentlyContinue) {
-                    chmod +x ./mvnw
+                if ($isWindowsHost) {
+                    & ".\mvnw.cmd" test
+                } else {
+                    if (Get-Command chmod -ErrorAction SilentlyContinue) {
+                        chmod +x ./mvnw
+                    }
+
+                    & "./mvnw" test
                 }
-
-                & "./mvnw" test
+            } finally {
+                Pop-Location
             }
-        } finally {
-            Pop-Location
         }
     }
 

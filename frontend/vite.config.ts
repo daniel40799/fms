@@ -13,8 +13,9 @@ export default defineConfig({
     },
   },
   server: {
-    // Keep app calls relative (/api, /oauth2, /uploads). Azure deployments must route
-    // /api, /uploads, /oauth2, and /login/oauth2 to the backend, currently via Front Door.
+    // Local keeps backend calls relative and proxies them to the Spring Boot backend.
+    // Azure dev sets VITE_API_BASE_URL at build time; future prod should leave it blank
+    // and route these same paths through Front Door or an equivalent reverse proxy.
     proxy: {
       '/api': 'http://localhost:8080',
       '/oauth2': 'http://localhost:8080',

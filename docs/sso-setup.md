@@ -7,18 +7,22 @@ This repository has a Spring Security OpenID Connect scaffold for:
 
 The backend stays the source of authentication for the React app. Provider login starts at Spring Security, the provider redirects to the OAuth callback, the backend maps or provisions a local FAPOR7 user, and the frontend receives the existing FAPOR7 JWT in the URL fragment.
 
-## Local Redirect URIs
+## Redirect URIs
 
-The React login buttons use relative `/oauth2/authorization/...` paths. During Vite development, those paths and the callback path are proxied to the backend.
+The React login buttons use `/oauth2/authorization/...` backend paths. Local and future prod builds leave `VITE_API_BASE_URL` blank so those paths stay relative. Azure dev sets `VITE_API_BASE_URL` to the backend App Service origin, so the browser starts SSO on App Service directly.
+
+During Vite development, `/oauth2` and `/login/oauth2` are proxied to the backend.
 
 Register the exact callback URI used by the browser:
 
 - Microsoft Entra through Vite: `http://127.0.0.1:5173/login/oauth2/code/entra`
 - Microsoft Entra direct backend login: `http://localhost:8080/login/oauth2/code/entra`
+- Microsoft Entra Azure dev App Service: `https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net/login/oauth2/code/entra`
 - Google through Vite: `http://127.0.0.1:5173/login/oauth2/code/google`
 - Google direct backend login: `http://localhost:8080/login/oauth2/code/google`
+- Google Azure dev App Service: `https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net/login/oauth2/code/google`
 
-Use the production public origin and the same callback path when deployed. Redirect URIs must match the provider registration exactly.
+Use the production public Front Door/custom-domain origin and the same callback path when deployed to prod. Redirect URIs must match the provider registration exactly.
 
 ## Microsoft Entra ID
 
@@ -102,5 +106,5 @@ $env:SPRING_PROFILES_ACTIVE='local,sso,sso-entra,sso-google'
 $env:SSO_FRONTEND_SUCCESS_URI='https://<frontend-origin>/'
 ```
 
-4. Confirm app registration redirect URIs match the deployed login origin and callback path.
+4. Confirm app registration redirect URIs match the deployed login origin and callback path. Dev uses the backend App Service origin; prod should use the Front Door/custom-domain origin.
 5. Decide whether FAPOR7 administrator roles remain local or are mapped from Entra app roles or groups before enabling provider-driven role elevation.

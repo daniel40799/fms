@@ -1,4 +1,5 @@
 import type { AttendanceLog, EventPayload, EventRecord, FmsUser, Me, Organization, ProfilePayload, Registration, RoleName, UserAccountPayload } from '../types'
+import { backendUrl } from './backendPaths'
 import { ApiError, parseApiError } from './errors'
 
 const TOKEN_KEY = 'fapor7.jwt'
@@ -26,7 +27,7 @@ function authHeaders(options: RequestInit = {}) {
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   try {
-    const response = await fetch(path, { ...options, headers: authHeaders(options) })
+    const response = await fetch(backendUrl(path), { ...options, headers: authHeaders(options) })
     if (!response.ok) {
       throw await parseApiError(response)
     }
@@ -44,7 +45,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 async function download(path: string, forbiddenMessage?: string) {
   try {
-    const response = await fetch(path, { headers: authHeaders() })
+    const response = await fetch(backendUrl(path), { headers: authHeaders() })
     if (!response.ok) {
       throw await parseApiError(response, response.status === 403 ? forbiddenMessage : undefined)
     }

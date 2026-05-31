@@ -21,6 +21,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState, type ComponentType, type ReactNode, type SVGProps } from 'react'
+import { backendUrl } from '../../lib/backendPaths'
 import { roleLabels } from '../../lib/constants'
 import { pageTransition } from '../../lib/motion'
 import type { Me, View } from '../../types'
@@ -73,17 +74,18 @@ function SidebarIdentity({ me, collapsed }: { me: Me; collapsed: boolean }) {
   const isEndUser = me.roles.includes('END_USER')
   const organizationName = me.organization ?? me.organizationCode ?? 'No organization assigned'
   const profileTitle = isEndUser ? me.fullName : getPrimaryRoleLabel(me)
+  const profileImageUrl = backendUrl(me.profileImageUrl)
 
   return (
     <div className="flex w-full min-w-0 flex-col items-center gap-3 text-center">
       {isEndUser ? (
-        me.profileImageUrl ? (
+        profileImageUrl ? (
           <img
             className={classNames(
               'shrink-0 rounded-full border border-sky-100 object-cover shadow-sm ring-4 ring-sky-100/70 dark:border-sky-400/20 dark:ring-sky-400/10',
               collapsed ? 'h-12 w-12' : 'h-16 w-16',
             )}
-            src={me.profileImageUrl}
+            src={profileImageUrl}
             alt={`${me.fullName} profile`}
           />
         ) : (

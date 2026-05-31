@@ -3,6 +3,7 @@ import { DatePickerInput } from '../components/forms'
 import { Page } from '../components/layout'
 import { Button, Field, InlineError, Panel, Select } from '../components/ui'
 import { useAsyncAction } from '../hooks/useAsyncAction'
+import { backendUrl } from '../lib/backendPaths'
 import type { Me, ProfilePayload } from '../types'
 
 const mobileNumberMessage = 'Mobile number must be in 09XXXXXXXXX or +639XXXXXXXXX format.'
@@ -61,7 +62,7 @@ export function ProfilePage({
   })
   const set = <Key extends keyof typeof form>(key: Key, value: (typeof form)[Key]) =>
     setForm((current) => ({ ...current, [key]: value }))
-  const profileImageUrl = picturePreviewUrl || me.profileImageUrl || ''
+  const profileImageUrl = picturePreviewUrl || backendUrl(me.profileImageUrl)
 
   useEffect(() => () => {
     if (picturePreviewUrlRef.current) {

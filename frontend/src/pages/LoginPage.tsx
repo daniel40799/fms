@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Field } from '../components/ui';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { api } from '../lib/api';
+import { backendUrl } from '../lib/backendPaths';
 
 type TwoFactorChallenge = {
   challengeId: string
@@ -135,10 +136,10 @@ export function LoginPage({
                 {login.loading ? 'Signing in...' : 'Sign in'}
               </Button>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <Button type="button" variant="secondary" onClick={() => window.location.assign('/oauth2/authorization/entra')}>
+                <Button type="button" variant="secondary" onClick={() => window.location.assign(backendUrl('/oauth2/authorization/entra'))}>
                   Microsoft
                 </Button>
-                <Button type="button" variant="secondary" onClick={() => window.location.assign('/oauth2/authorization/google')}>
+                <Button type="button" variant="secondary" onClick={() => window.location.assign(backendUrl('/oauth2/authorization/google'))}>
                   Google
                 </Button>
               </div>

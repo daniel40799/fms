@@ -8,6 +8,7 @@ import {
 import type { ComponentType, ReactNode, SVGProps } from 'react'
 import fallbackHero from '../../assets/hero.png'
 import { useAsyncAction } from '../../hooks/useAsyncAction'
+import { backendUrl } from '../../lib/backendPaths'
 import { formatDateTime } from '../../lib/datetime'
 import type { EventRecord } from '../../types'
 import { Button, InlineError } from '../ui'
@@ -17,11 +18,19 @@ export function formatEventPrice(price: number) {
 }
 
 export function getEventPosterUrl(event: EventRecord, orientation: 'landscape' | 'portrait') {
-  if (orientation === 'portrait') {
-    return event.verticalPosterUrl || event.horizontalPosterUrl || fallbackHero
+  const posterUrl = orientation === 'portrait'
+    ? event.verticalPosterUrl || event.horizontalPosterUrl
+    : event.horizontalPosterUrl || event.verticalPosterUrl
+
+  if (posterUrl) {
+    return backendUrl(posterUrl)
   }
 
-  return event.horizontalPosterUrl || event.verticalPosterUrl || fallbackHero
+  if (orientation === 'portrait') {
+    return fallbackHero
+  }
+
+  return fallbackHero
 }
 
 export function EventRegisterButton({
