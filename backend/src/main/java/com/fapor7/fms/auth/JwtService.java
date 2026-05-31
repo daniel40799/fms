@@ -4,10 +4,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Date;
 import java.util.UUID;
 
@@ -20,12 +23,15 @@ import java.util.UUID;
 @Service
 public class JwtService {
 
+    private static final String LOCAL_DEVELOPMENT_SECRET = "local-development-jwt-secret-change-before-nonlocal-use";
+
     private final SecretKey secretKey;
     private final long expirationMs;
 
     public JwtService(
             @Value("${app.jwt.secret}") String secret,
-            @Value("${app.jwt.expiration-ms}") long expirationMs
+            @Value("${app.jwt.expiration-ms}") long expirationMs,
+            Environment environment
     ) {
         if (secret == null || secret.isBlank()) {
             throw new IllegalStateException("JWT_SECRET must be configured for the active Spring profile");
@@ -33,6 +39,10 @@ public class JwtService {
 
         if (secret.getBytes(StandardCharsets.UTF_8).length < 32) {
             throw new IllegalStateException("JWT_SECRET must be at least 32 bytes for HS256 signing");
+        }
+
+        if (usesStrictSecretProfile(environment) && isUnsafeNonLocalSecret(secret)) {
+            throw new IllegalStateException("JWT_SECRET must be a non-default secret for dev/prod profiles");
         }
 
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
@@ -91,5 +101,17 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    private boolean usesStrictSecretProfile(Environment environment) {
+        return Arrays.stream(environment.getActiveProfiles())
+                .anyMatch(profile -> "dev".equals(profile) || "prod".equals(profile));
+    }
+
+    private boolean isUnsafeNonLocalSecret(String secret) {
+        String normalized = secret.toLowerCase(Locale.ROOT);
+        return LOCAL_DEVELOPMENT_SECRET.equals(secret)
+                || normalized.contains("change_this")
+                || normalized.contains("change-before-nonlocal-use");
     }
 }

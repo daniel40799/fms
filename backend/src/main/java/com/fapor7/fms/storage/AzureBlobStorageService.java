@@ -7,6 +7,7 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobHttpHeaders;
 import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.common.StorageSharedKeyCredential;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -29,6 +30,7 @@ public class AzureBlobStorageService implements StorageService {
     private final StorageProperties properties;
     private final BlobServiceClient blobServiceClient;
 
+    @Autowired
     public AzureBlobStorageService(StorageProperties properties) {
         this(properties, buildClient(properties));
     }

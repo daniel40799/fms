@@ -128,9 +128,11 @@ The local database defaults are:
 
 ```powershell
 cd backend
-$env:SPRING_PROFILES_ACTIVE='local'
 .\mvnw.cmd spring-boot:run
 ```
+
+The Maven wrapper defaults `spring-boot:run` to the `local` profile through `backend/.mvn/maven.config`.
+The `local` profile uses a committed dummy JWT secret named `local-development-jwt-secret-change-before-nonlocal-use`; it is only for local development and is rejected by the `dev` and `prod` profiles.
 
 The API runs on `http://localhost:8080`.
 
@@ -166,9 +168,11 @@ Backend configuration is split across:
 - `backend/src/main/resources/application-prod.yml`
 
 Select profiles with `SPRING_PROFILES_ACTIVE=local`, `SPRING_PROFILES_ACTIVE=dev`, or `SPRING_PROFILES_ACTIVE=prod`.
+When running the backend through `.\mvnw.cmd spring-boot:run`, `local` is selected automatically unless you override `-Dspring-boot.run.profiles`.
 
 Standard environment variables include `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_EXPIRATION_MS`, `CORS_ALLOWED_ORIGINS`, and `APP_UPLOAD_BASE_PATH`.
-For Azure dev/prod uploads, set `APP_STORAGE_TYPE=azure-blob`, `AZURE_STORAGE_CONNECTION_STRING`, and the four `AZURE_STORAGE_CONTAINER_*` settings documented below.
+Local development can omit `JWT_SECRET`; Azure `dev` and `prod` must set a strong non-default `JWT_SECRET` in App Service settings.
+`APP_STORAGE_TYPE=local` uses filesystem storage. For Azure dev/prod uploads, set `APP_STORAGE_TYPE=azure-blob`, `AZURE_STORAGE_CONNECTION_STRING` or account/key credentials, and the four `AZURE_STORAGE_CONTAINER_*` settings documented below.
 See `docs/azure-environments.md` for Azure setup, GitHub Actions secrets, and production constraints.
 
 ### Upload Storage

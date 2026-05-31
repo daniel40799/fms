@@ -7,7 +7,8 @@ Use the companion command draft at `docs/azure/dev-setup-commands.example.azcli`
 ## Current Repo Requirements
 
 - Backend runtime profile: `SPRING_PROFILES_ACTIVE=dev`.
-- Backend storage type: `app.storage.type=azure-blob`, configured by `APP_STORAGE_TYPE=azure-blob` for clarity.
+- Backend storage type: `app.storage.type=azure-blob`, configured by `APP_STORAGE_TYPE=azure-blob` for clarity. `local` means filesystem storage; `azure-blob` means Azure Blob Storage.
+- Backend JWT secret: `JWT_SECRET` must be a strong non-default value. The committed local-only dummy secret is rejected by the `dev` profile.
 - Frontend uses relative paths only. There is no `VITE_API_BASE_URL`.
 - Local Vite proxies `/api`, `/uploads`, `/oauth2`, and `/login/oauth2` to `http://localhost:8080`.
 - Dev deployment workflow is `.github/workflows/azure-dev.yml`.
@@ -101,7 +102,7 @@ Required:
 | `DB_URL` | `jdbc:postgresql://<postgres-server-name>.postgres.database.azure.com:5432/<database>?sslmode=require` |
 | `DB_USERNAME` | `<db-username>` |
 | `DB_PASSWORD` | `<db-password>` |
-| `JWT_SECRET` | `<strong-random-secret>` |
+| `JWT_SECRET` | `<strong-random-secret-not-the-local-default>` |
 | `JWT_EXPIRATION_MS` | `86400000` |
 | `CORS_ALLOWED_ORIGINS` | `https://<front-door-dev-domain>` |
 | `APP_STORAGE_TYPE` | `azure-blob` |

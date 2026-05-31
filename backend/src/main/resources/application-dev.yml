@@ -30,7 +30,7 @@ app:
         event-resources: ${AZURE_STORAGE_CONTAINER_EVENT_RESOURCES:}
         certificates: ${AZURE_STORAGE_CONTAINER_CERTIFICATES:}
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   two-factor:
     email:

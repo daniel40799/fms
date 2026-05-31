@@ -11,8 +11,11 @@ Do not commit `spring.profiles.active`. Set it in the runtime environment.
 Local:
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE='local'
+cd backend
+.\mvnw.cmd spring-boot:run
 ```
+
+`spring-boot:run` activates the local profile by default from `backend/.mvn/maven.config`. If you run the packaged JAR locally instead, pass `SPRING_PROFILES_ACTIVE=local` or `--spring.profiles.active=local`.
 
 Dev App Service:
 
@@ -57,6 +60,7 @@ Common local settings:
 | `APP_DEV_SEED_PASSWORD` | Required if local seed enabled | `<local-seed-password>` |
 
 Local uploads are filesystem-backed under `APP_UPLOAD_BASE_PATH`. Profile pictures are served at `/uploads/profile-pictures/<filename>`. Payment proofs are downloaded through the authenticated registration payment-proof endpoint.
+The local profile provides the dummy secret `local-development-jwt-secret-change-before-nonlocal-use` when `JWT_SECRET` is unset. Do not copy that value to Azure.
 
 ## 3. Backend App Service Settings
 
@@ -146,16 +150,20 @@ Set these in Azure App Service Application Settings, not in source control.
 | `GOOGLE_CLIENT_ID` | Required only for Google SSO | `<google-client-id>` |
 | `GOOGLE_CLIENT_SECRET` | Required only for Google SSO | `<google-client-secret>` |
 
-Prod startup fails if:
+Dev and prod startup fail if:
 
-- `JWT_SECRET` is blank, local/default, or contains `change_this`.
+- `JWT_SECRET` is blank, the committed local-only value, or contains `change_this`.
+- Blob Storage credentials or any required container name are missing or invalid.
+
+Prod startup also fails if:
+
 - `DB_URL` is blank, points to localhost/loopback, or a PostgreSQL URL without `sslmode=require`.
 - `CORS_ALLOWED_ORIGINS` is blank, `*`, non-HTTPS, local, or malformed.
 - Storage is not `azure-blob`.
 - SQL logging is enabled.
 - 2FA email code logging is enabled.
 
-Dev and prod startup also fail if Blob Storage credentials or any required container name are missing or invalid.
+`APP_STORAGE_TYPE=local` means filesystem-backed uploads. `APP_STORAGE_TYPE=azure-blob` means Azure Blob Storage backed uploads through `AzureBlobStorageService`.
 
 ## 4. Azure PostgreSQL
 

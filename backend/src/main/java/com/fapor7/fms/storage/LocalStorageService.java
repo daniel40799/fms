@@ -1,5 +1,6 @@
 package com.fapor7.fms.storage;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -25,6 +26,7 @@ public class LocalStorageService implements StorageService {
 
     private final Path basePath;
 
+    @Autowired
     public LocalStorageService(StorageProperties properties) {
         this.basePath = resolveBasePath(properties.getLocal().getBasePath());
     }
