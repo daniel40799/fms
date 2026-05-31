@@ -12,13 +12,14 @@ Use the companion command draft at `docs/azure/dev-setup-commands.example.azcli`
 - Local Vite proxies `/api`, `/uploads`, `/oauth2`, and `/login/oauth2` to `http://localhost:8080`.
 - Dev deployment workflow is `.github/workflows/azure-dev.yml`.
 - The dev workflow deploys from `develop`; manual dispatch is blocked unless the selected ref is `develop`.
-- The dev workflow uses publish profiles and Static Web Apps deployment tokens, not OIDC.
+- The dev backend workflow uses Azure OIDC. The frontend workflow still uses a Static Web Apps deployment token.
+- The dev workflow does not use `AZURE_WEBAPP_PUBLISH_PROFILE_DEV`.
 - No `staticwebapp.config.json` is currently present.
 
 ## Dev Setup Order
 
 1. Resource group
-   - Create or identify the dev resource group.
+   - Create or identify the dev resource group. The shared dev deployment target is `rg-fms-dev`.
    - Verify the Azure region is acceptable for App Service, PostgreSQL, Storage, Static Web Apps, and Front Door.
 
 2. Azure PostgreSQL Flexible Server
@@ -63,21 +64,27 @@ Use the companion command draft at `docs/azure/dev-setup-commands.example.azcli`
      - `/*`
    - Verify backend-specific routes are not masked by the catch-all frontend route.
 
-7. GitHub secrets
+7. Azure OIDC deployment identity
+   - Create an app registration named `github-fms-dev-deploy`.
+   - Add a federated credential for the `develop` branch with subject `repo:daniel40799/fms:ref:refs/heads/develop`.
+   - Assign the service principal `Contributor` on resource group `rg-fms-dev`.
+   - Capture the app client ID, tenant ID, and subscription ID for GitHub Environment secrets.
+
+8. GitHub secrets
    - Create or update the `dev` GitHub Environment.
    - Add the required dev workflow secrets listed below.
    - Do not add App Service Application Settings as GitHub secrets unless the workflow is later changed to manage Azure settings.
 
-8. GitHub Environment: `dev`
+9. GitHub Environment: `dev`
    - Confirm `.github/workflows/azure-dev.yml` uses `environment: dev` for backend and frontend jobs.
    - Optional: add reviewers or deployment rules for the dev environment.
 
-9. First dev deployment
+10. First dev deployment
    - Push the intended code to `develop`, or run manual dispatch from `develop`.
    - Confirm backend test, package, and App Service deployment steps pass.
    - Confirm frontend install, build, and Static Web Apps deployment steps pass.
 
-10. Dev smoke test
+11. Dev smoke test
    - Use the Front Door dev domain as the browser entry point.
    - Run the smoke test checklist at the end of this document.
 
@@ -165,21 +172,33 @@ Recommended domain strategy:
 
 ## GitHub Dev Secrets
 
-The current dev workflow requires exactly these GitHub secrets in the `dev` Environment:
+The dev workflow requires exactly these GitHub secrets in the `dev` Environment:
 
 | Secret | Source |
 | --- | --- |
+| `AZURE_CLIENT_ID_DEV` | Application/client ID for app registration `github-fms-dev-deploy` |
+| `AZURE_TENANT_ID_DEV` | Azure tenant ID containing the app registration |
+| `AZURE_SUBSCRIPTION_ID_DEV` | Azure subscription ID containing `rg-fms-dev` |
 | `AZURE_WEBAPP_NAME_DEV` | Backend App Service name |
-| `AZURE_WEBAPP_PUBLISH_PROFILE_DEV` | Backend App Service publish profile |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_DEV` | Static Web Apps deployment token |
+
+Required Azure OIDC setup:
+
+| Azure item | Required value |
+| --- | --- |
+| App registration display name | `github-fms-dev-deploy` |
+| Federated credential subject | `repo:daniel40799/fms:ref:refs/heads/develop` |
+| Federated credential issuer | `https://token.actions.githubusercontent.com` |
+| Federated credential audience | `api://AzureADTokenExchange` |
+| Role assignment | `Contributor` on `rg-fms-dev` |
 
 Workflow behavior:
 
 - Pushes to `develop` deploy dev.
 - Manual `workflow_dispatch` is available, but the guard job fails unless the selected ref is `refs/heads/develop`.
-- Backend job runs Maven tests, packages the JAR, and deploys with `azure/webapps-deploy@v3`.
+- Backend job runs Maven tests, packages the JAR, signs in with `azure/login@v2`, and deploys with `azure/webapps-deploy@v3`.
 - Frontend job runs `npm ci`, `npm run build`, and deploys `frontend/dist` with `Azure/static-web-apps-deploy@v1`.
-- Current workflow expects publish profiles. OIDC is not wired.
+- `AZURE_WEBAPP_PUBLISH_PROFILE_DEV` is no longer used by the dev workflow.
 
 ## Dev Smoke Test Checklist
 

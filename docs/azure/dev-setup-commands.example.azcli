@@ -10,8 +10,10 @@
 # 0. Manual placeholders
 # ---------------------------------------------------------------------------
 
-RESOURCE_GROUP="<resource-group>"
+RESOURCE_GROUP="rg-fms-dev"
 LOCATION="<azure-location>"
+SUBSCRIPTION_ID="<azure-subscription-id>"
+TENANT_ID="<azure-tenant-id>"
 
 POSTGRES_SERVER="<postgres-server-name>"
 POSTGRES_DATABASE="<database>"
@@ -36,6 +38,11 @@ AFD_FRONTEND_ORIGIN="<front-door-frontend-origin-name>"
 FRONT_DOOR_DEV_DOMAIN="<front-door-dev-domain>"
 BACKEND_HOST="${BACKEND_APP}.azurewebsites.net"
 STATIC_WEB_APP_HOST="<generated-static-web-app-host>.azurestaticapps.net"
+
+OIDC_APP_DISPLAY_NAME="github-fms-dev-deploy"
+OIDC_FEDERATED_CREDENTIAL_NAME="fms-dev-develop"
+GITHUB_REPOSITORY="daniel40799/fms"
+GITHUB_BRANCH="develop"
 
 # ---------------------------------------------------------------------------
 # 1. Resource group
@@ -291,23 +298,61 @@ az afd route create \
 # then set CORS_ALLOWED_ORIGINS and SSO_FRONTEND_SUCCESS_URI to that hostname.
 
 # ---------------------------------------------------------------------------
-# 8. GitHub Environment and secrets
+# 8. Azure OIDC deployment identity for GitHub Actions
+# ---------------------------------------------------------------------------
+
+# The dev GitHub Actions workflow uses Azure OIDC for backend App Service
+# deployment. It does not use AZURE_WEBAPP_PUBLISH_PROFILE_DEV.
+#
+# Expected setup:
+#   App registration: github-fms-dev-deploy
+#   Federated credential subject: repo:daniel40799/fms:ref:refs/heads/develop
+#   Role assignment: Contributor on rg-fms-dev
+
+OIDC_APP_ID="$(az ad app create \
+  --display-name "${OIDC_APP_DISPLAY_NAME}" \
+  --query appId \
+  --output tsv)"
+
+az ad sp create \
+  --id "${OIDC_APP_ID}"
+
+az ad app federated-credential create \
+  --id "${OIDC_APP_ID}" \
+  --parameters "{
+    \"name\": \"${OIDC_FEDERATED_CREDENTIAL_NAME}\",
+    \"issuer\": \"https://token.actions.githubusercontent.com\",
+    \"subject\": \"repo:${GITHUB_REPOSITORY}:ref:refs/heads/${GITHUB_BRANCH}\",
+    \"description\": \"GitHub Actions dev deployments from ${GITHUB_REPOSITORY} ${GITHUB_BRANCH}\",
+    \"audiences\": [\"api://AzureADTokenExchange\"]
+  }"
+
+OIDC_SP_OBJECT_ID="$(az ad sp show \
+  --id "${OIDC_APP_ID}" \
+  --query id \
+  --output tsv)"
+
+az role assignment create \
+  --assignee-object-id "${OIDC_SP_OBJECT_ID}" \
+  --assignee-principal-type ServicePrincipal \
+  --role Contributor \
+  --scope "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}"
+
+# ---------------------------------------------------------------------------
+# 9. GitHub Environment and secrets
 # ---------------------------------------------------------------------------
 
 # Configure these in GitHub UI under Settings > Environments > dev > Secrets:
+#   AZURE_CLIENT_ID_DEV = value of OIDC_APP_ID
+#   AZURE_TENANT_ID_DEV = value of TENANT_ID
+#   AZURE_SUBSCRIPTION_ID_DEV = value of SUBSCRIPTION_ID
 #   AZURE_WEBAPP_NAME_DEV
-#   AZURE_WEBAPP_PUBLISH_PROFILE_DEV
 #   AZURE_STATIC_WEB_APPS_API_TOKEN_DEV
 #
-# This command prints a publish profile secret. Store it privately as
-# AZURE_WEBAPP_PUBLISH_PROFILE_DEV if using the current workflow.
-# az webapp deployment list-publishing-profiles \
-#   --resource-group "${RESOURCE_GROUP}" \
-#   --name "${BACKEND_APP}" \
-#   --xml
+# Do not add AZURE_WEBAPP_PUBLISH_PROFILE_DEV for the dev workflow.
 
 # ---------------------------------------------------------------------------
-# 9. Manual validation commands after deployment
+# 10. Manual validation commands after deployment
 # ---------------------------------------------------------------------------
 
 # curl "https://${FRONT_DOOR_DEV_DOMAIN}/api/health"

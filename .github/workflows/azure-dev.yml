@@ -10,10 +10,16 @@ concurrency:
   group: azure-dev-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   guard:
     name: Validate Dev Deployment Branch
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Require develop branch
         if: github.ref != 'refs/heads/develop'
@@ -31,6 +37,7 @@ jobs:
     environment: dev
     permissions:
       contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -53,13 +60,18 @@ jobs:
         working-directory: backend
         run: ./mvnw -B package -DskipTests
 
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_DEV }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID_DEV }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_DEV }}
+
       - name: Deploy backend to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME_DEV }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}
           package: backend/target/*.jar
-        # OIDC alternative: replace publish-profile with azure/login using explicit dev OIDC secrets.
 
   frontend:
     name: Build and Deploy Frontend to Dev

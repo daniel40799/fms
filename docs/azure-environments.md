@@ -345,7 +345,7 @@ Set `SSO_FRONTEND_SUCCESS_URI` to the frontend landing URL, usually `https://<fr
 
 ## 8. GitHub Actions
 
-Current workflows use publish profiles, not OIDC.
+The dev backend workflow uses Azure OIDC. The prod workflow still uses publish profiles until prod is explicitly migrated later.
 
 GitHub Environments:
 
@@ -362,16 +362,30 @@ Dev workflow:
 - File: `.github/workflows/azure-dev.yml`
 - Trigger: push to `develop` and manual `workflow_dispatch`.
 - Guard: manual dispatch fails unless run from `develop`.
-- Backend: tests, packages JAR, deploys with `azure/webapps-deploy@v3`.
+- Backend: tests, packages JAR, signs in with `azure/login@v2`, and deploys with `azure/webapps-deploy@v3`.
 - Frontend: builds Vite app, deploys `frontend/dist` with `Azure/static-web-apps-deploy@v1`.
+
+Required dev Azure OIDC setup:
+
+| Azure item | Required value |
+| --- | --- |
+| App registration display name | `github-fms-dev-deploy` |
+| Federated credential subject | `repo:daniel40799/fms:ref:refs/heads/develop` |
+| Federated credential issuer | `https://token.actions.githubusercontent.com` |
+| Federated credential audience | `api://AzureADTokenExchange` |
+| Role assignment | `Contributor` on `rg-fms-dev` |
 
 Required dev GitHub secrets:
 
 | Secret | Status |
 | --- | --- |
+| `AZURE_CLIENT_ID_DEV` | Required for Azure OIDC |
+| `AZURE_TENANT_ID_DEV` | Required for Azure OIDC |
+| `AZURE_SUBSCRIPTION_ID_DEV` | Required for Azure OIDC |
 | `AZURE_WEBAPP_NAME_DEV` | Required |
-| `AZURE_WEBAPP_PUBLISH_PROFILE_DEV` | Required for current workflow |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_DEV` | Required |
+
+`AZURE_WEBAPP_PUBLISH_PROFILE_DEV` is no longer used by the dev workflow.
 
 Prod workflow:
 
@@ -389,8 +403,8 @@ Required prod GitHub secrets:
 
 OIDC alternative:
 
-- Not currently wired.
-- To use OIDC, replace publish-profile deployment with `azure/login` and environment-scoped Azure client, tenant, subscription, and app identifiers.
+- Dev is now wired for OIDC.
+- Prod is not yet wired for OIDC; migrate it separately with prod-scoped Azure client, tenant, subscription, and app identifiers.
 
 Do not place database passwords, JWT secrets, Azure Storage keys, provider secrets, or App Service Application Settings in GitHub unless the workflow is explicitly changed to manage App Settings.
 
