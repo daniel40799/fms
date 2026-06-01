@@ -47,18 +47,23 @@ public class AuthService {
      *
      * @param request submitted email and raw password
      * @return response containing a signed JWT
-     * @throws RuntimeException when credentials are invalid or the account is inactive
+     * @throws AuthException when credentials are invalid or the account is inactive
      */
     public LoginResponse login(LoginRequest request) {
-        UserEntity user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+        String email = request.email() == null ? "" : request.email().trim().toLowerCase(Locale.ROOT);
+        UserEntity user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(AuthException::invalidCredentials);
 
         if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new RuntimeException("User account is not active");
+            throw AuthException.inactiveAccount();
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid email or password");
+            throw AuthException.invalidCredentials();
+        }
+
+        if (request.channel() != null) {
+            return startRequestedChallenge(user, request.channel());
         }
 
         if (twoFactorService.isEmailEnabled()) {
@@ -145,10 +150,28 @@ public class AuthService {
                 ));
 
         if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new RuntimeException("User account is not active");
+            throw AuthException.inactiveAccount();
         }
 
         return new LoginResponse(jwtService.generateToken(user.getId(), user.getEmail()));
+    }
+
+    private LoginResponse startRequestedChallenge(UserEntity user, TwoFactorChannel channel) {
+        if (channel == TwoFactorChannel.EMAIL) {
+            if (!twoFactorService.isEmailEnabled()) {
+                throw AuthException.verificationUnavailable("Email verification is not available.");
+            }
+            return twoFactorService.startEmailChallenge(user);
+        }
+
+        if (channel == TwoFactorChannel.SMS) {
+            if (!twoFactorService.isSmsEnabled()) {
+                throw AuthException.verificationUnavailable("SMS verification is not available.");
+            }
+            return twoFactorService.startSmsChallenge(user);
+        }
+
+        throw AuthException.verificationUnavailable("Verification channel is not available.");
     }
 
     private UserEntity provisionSsoUser(String email, String fullName) {

@@ -19,6 +19,7 @@ This repository currently contains:
 ### Authentication and Security
 
 - Email/password login through `POST /api/auth/login`.
+- Optional login OTP 2FA for email/password login through email or SMS challenge records.
 - JWT bearer tokens for stateless API authentication.
 - BCrypt password encoding.
 - Method-level role checks using Spring Security.
@@ -193,6 +194,37 @@ Standard environment variables include `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `
 Local development can omit `JWT_SECRET`; Azure `dev` and `prod` must set a strong non-default `JWT_SECRET` in App Service settings.
 `APP_STORAGE_TYPE=local` uses filesystem storage. For Azure dev/prod uploads, set `APP_STORAGE_TYPE=azure-blob`, `AZURE_STORAGE_CONNECTION_STRING` or account/key credentials, and the four `AZURE_STORAGE_CONTAINER_*` settings documented below.
 See `docs/azure-environments.md` for Azure setup, GitHub Actions secrets, and production constraints.
+
+### Local Password 2FA
+
+App-side OTP 2FA applies to local email/password login only. Microsoft Entra ID and Google SSO continue to issue the existing FAPOR7 JWT after provider authentication and rely on provider-side MFA or conditional access.
+
+When email or SMS 2FA is required, `POST /api/auth/login` returns a 2FA challenge response and does not return a JWT. The JWT is issued only after `POST /api/auth/2fa/verify` succeeds. `POST /api/auth/2fa/resend` reuses the same challenge record and enforces the configured cooldown and attempt limits.
+The frontend local login form lets users choose Email or SMS verification. Email uses the backend's default email-first behavior, and SMS sends `channel: "SMS"` on the login request.
+
+Local development can log email OTP codes when both `APP_2FA_EMAIL_ENABLED=true` and `APP_2FA_EMAIL_LOG_CODES=true`. Shared dev and prod should use a real sender and keep code logging disabled.
+
+2FA delivery settings:
+
+| Setting | Purpose |
+| --- | --- |
+| `APP_2FA_EMAIL_ENABLED` | Enables email OTP challenges for local password login |
+| `APP_2FA_EMAIL_LOG_CODES` | Logs email OTP codes for local development only |
+| `ACS_EMAIL_ENABLED` | Uses Azure Communication Services Email for email OTP delivery |
+| `ACS_EMAIL_CONNECTION_STRING` | ACS Email connection string, supplied through environment/App Service settings |
+| `ACS_EMAIL_SENDER_ADDRESS` | Verified ACS sender address |
+| `ACS_EMAIL_SUBJECT` | Optional email subject override |
+| `APP_2FA_SMS_ENABLED` | Enables SMS OTP challenges when requested by the login request |
+| `SEMAPHORE_API_KEY` | Semaphore API key, supplied through environment/App Service settings |
+| `SEMAPHORE_SENDER_NAME` | Semaphore sender name |
+| `SEMAPHORE_BASE_URL` | Optional Semaphore API URL override |
+| `APP_2FA_CODE_LENGTH` | OTP digit length |
+| `APP_2FA_EXPIRY_MINUTES` | OTP expiry window |
+| `APP_2FA_RESEND_COOLDOWN_SECONDS` | Minimum resend interval |
+| `APP_2FA_MAX_FAILED_ATTEMPTS` | Failed verification attempt limit |
+| `APP_2FA_MAX_CHALLENGES_PER_HOUR` | Challenge creation rate limit |
+
+Do not commit real ACS, Semaphore, JWT, database, or storage secrets. Supply them through local environment variables or Azure App Service Application Settings.
 
 ### Upload Storage
 

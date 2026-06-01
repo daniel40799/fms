@@ -1,6 +1,7 @@
 package com.fapor7.fms.auth;
 
 import com.fapor7.fms.users.dto.UserResponse;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -26,7 +27,7 @@ public class AuthController {
      * @return bearer token response for authenticated API calls
      */
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 
@@ -37,7 +38,7 @@ public class AuthController {
      * @return bearer token response
      */
     @PostMapping("/2fa/verify")
-    public LoginResponse verifyTwoFactor(@RequestBody VerifyTwoFactorRequest request) {
+    public LoginResponse verifyTwoFactor(@Valid @RequestBody VerifyTwoFactorRequest request) {
         return authService.verifyTwoFactor(request);
     }
 
@@ -48,7 +49,7 @@ public class AuthController {
      * @return updated challenge response
      */
     @PostMapping("/2fa/resend")
-    public LoginResponse resendTwoFactor(@RequestBody ResendTwoFactorRequest request) {
+    public LoginResponse resendTwoFactor(@Valid @RequestBody ResendTwoFactorRequest request) {
         return authService.resendTwoFactor(request);
     }
 
@@ -59,7 +60,7 @@ public class AuthController {
      * @return created user profile
      */
     @PostMapping("/register")
-    public UserResponse register(@RequestBody RegisterRequest request) {
+    public UserResponse register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 }

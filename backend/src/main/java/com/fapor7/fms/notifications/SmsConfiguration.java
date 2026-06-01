@@ -17,6 +17,10 @@ public class SmsConfiguration {
             return new NoOpSmsSender();
         }
 
+        if (!properties.hasRequiredSettings()) {
+            throw new IllegalStateException("Semaphore SMS is enabled but required settings are missing");
+        }
+
         // TODO: Verify Semaphore credentials, sender name approval, and production quota before enabling in production.
         return new SemaphoreSmsSender(properties);
     }

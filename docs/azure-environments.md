@@ -56,6 +56,14 @@ Common local settings:
 | `APP_STORAGE_TYPE` | Optional | `local` |
 | `APP_2FA_EMAIL_ENABLED` | Optional | `true` |
 | `APP_2FA_EMAIL_LOG_CODES` | Optional local only | `true` |
+| `ACS_EMAIL_ENABLED` | Optional local only | `false` |
+| `ACS_EMAIL_CONNECTION_STRING` | Required only if ACS Email enabled | `<acs-email-connection-string>` |
+| `ACS_EMAIL_SENDER_ADDRESS` | Required only if ACS Email enabled | `<sender@example.com>` |
+| `ACS_EMAIL_SUBJECT` | Optional | `Fapor7 verification code` |
+| `APP_2FA_SMS_ENABLED` | Optional | `false` |
+| `SEMAPHORE_API_KEY` | Required only if SMS enabled | `<semaphore-api-key>` |
+| `SEMAPHORE_SENDER_NAME` | Required only if SMS enabled | `<sender-name>` |
+| `SEMAPHORE_BASE_URL` | Optional | `https://api.semaphore.co/api/v4/messages` |
 | `APP_DEV_SEED_ENABLED` | Optional local only | `true` |
 | `APP_DEV_SEED_PASSWORD` | Required if local seed enabled | `<local-seed-password>` |
 
@@ -92,6 +100,10 @@ Set these in Azure App Service Application Settings, not in source control.
 | `APP_2FA_EMAIL_ENABLED` | Optional | `false` |
 | `APP_2FA_SMS_ENABLED` | Optional | `false` |
 | `APP_2FA_EMAIL_LOG_CODES` | Dev only, omit unless debugging | `false` |
+| `ACS_EMAIL_ENABLED` | Required if email 2FA is enabled | `true` |
+| `ACS_EMAIL_CONNECTION_STRING` | Required if ACS Email enabled | `<acs-email-connection-string>` |
+| `ACS_EMAIL_SENDER_ADDRESS` | Required if ACS Email enabled | `<verified-sender-address>` |
+| `ACS_EMAIL_SUBJECT` | Optional | `Fapor7 verification code` |
 | `APP_2FA_LOG_CODES` | Not used by current code | Omit |
 | `SEMAPHORE_API_KEY` | Required only if SMS enabled | `<semaphore-api-key>` |
 | `SEMAPHORE_SENDER_NAME` | Required only if SMS enabled | `<sender-name>` |
@@ -135,6 +147,10 @@ Set these in Azure App Service Application Settings, not in source control.
 | `APP_2FA_EMAIL_ENABLED` | Optional | `false` |
 | `APP_2FA_SMS_ENABLED` | Optional | `false` |
 | `APP_2FA_EMAIL_LOG_CODES` | Omit in prod | Prod profile forces false |
+| `ACS_EMAIL_ENABLED` | Required if email 2FA is enabled | `true` |
+| `ACS_EMAIL_CONNECTION_STRING` | Required if ACS Email enabled | `<acs-email-connection-string>` |
+| `ACS_EMAIL_SENDER_ADDRESS` | Required if ACS Email enabled | `<verified-sender-address>` |
+| `ACS_EMAIL_SUBJECT` | Optional | `Fapor7 verification code` |
 | `APP_2FA_LOG_CODES` | Not used by current code | Omit |
 | `SEMAPHORE_API_KEY` | Required only if SMS enabled | `<semaphore-api-key>` |
 | `SEMAPHORE_SENDER_NAME` | Required only if SMS enabled | `<sender-name>` |
@@ -162,6 +178,14 @@ Prod startup also fails if:
 - Storage is not `azure-blob`.
 - SQL logging is enabled.
 - 2FA email code logging is enabled.
+
+2FA delivery startup behavior:
+
+- Local email/password login is the only app-side OTP 2FA flow. Microsoft Entra ID and Google SSO keep relying on provider-side MFA or conditional access and still return the FAPOR7 JWT through `#sso_token=<jwt>`.
+- If `APP_2FA_EMAIL_ENABLED=true`, configure either local-only `APP_2FA_EMAIL_LOG_CODES=true` or ACS Email with `ACS_EMAIL_ENABLED=true`, `ACS_EMAIL_CONNECTION_STRING`, and `ACS_EMAIL_SENDER_ADDRESS`.
+- Do not enable `APP_2FA_EMAIL_LOG_CODES` in shared dev or prod. It writes OTP codes to logs.
+- If `APP_2FA_SMS_ENABLED=true`, configure Semaphore with `SEMAPHORE_API_KEY` and `SEMAPHORE_SENDER_NAME`. `SEMAPHORE_BASE_URL` can normally keep its default.
+- OTP tuning is controlled by `APP_2FA_CODE_LENGTH`, `APP_2FA_EXPIRY_MINUTES`, `APP_2FA_RESEND_COOLDOWN_SECONDS`, `APP_2FA_MAX_FAILED_ATTEMPTS`, and `APP_2FA_MAX_CHALLENGES_PER_HOUR`.
 
 `APP_STORAGE_TYPE=local` means filesystem-backed uploads. `APP_STORAGE_TYPE=azure-blob` means Azure Blob Storage backed uploads through `AzureBlobStorageService`.
 

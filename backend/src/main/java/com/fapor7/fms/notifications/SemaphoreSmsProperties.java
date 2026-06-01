@@ -44,4 +44,10 @@ public class SemaphoreSmsProperties {
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }
+
+    public boolean hasRequiredSettings() {
+        return apiKey != null && !apiKey.isBlank()
+                && senderName != null && !senderName.isBlank()
+                && baseUrl != null && !baseUrl.isBlank();
+    }
 }

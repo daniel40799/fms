@@ -4,6 +4,8 @@ import { ApiError, parseApiError } from './errors'
 
 const TOKEN_KEY = 'fapor7.jwt'
 
+export type TwoFactorChannel = 'EMAIL' | 'SMS'
+
 export const tokenStore = {
   get: () => localStorage.getItem(TOKEN_KEY),
   set: (token: string) => localStorage.setItem(TOKEN_KEY, token),
@@ -59,17 +61,17 @@ async function download(path: string, forbiddenMessage?: string) {
 
 export const api = {
   auth: {
-    login: (email: string, password: string) =>
+    login: (email: string, password: string, channel?: TwoFactorChannel) =>
       request<{
         token: string | null
         twoFactorRequired: boolean
         challengeId: string | null
-        channel: 'EMAIL' | 'SMS' | null
+        channel: TwoFactorChannel | null
         maskedDestination: string | null
         expiresAt: string | null
       }>('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, ...(channel ? { channel } : {}) }),
       }),
     verifyTwoFactor: (challengeId: string, code: string) =>
       request<{ token: string }>('/api/auth/2fa/verify', {
@@ -81,7 +83,7 @@ export const api = {
         token: string | null
         twoFactorRequired: boolean
         challengeId: string
-        channel: 'EMAIL' | 'SMS'
+        channel: TwoFactorChannel
         maskedDestination: string
         expiresAt: string
       }>('/api/auth/2fa/resend', {

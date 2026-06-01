@@ -43,6 +43,11 @@ app:
     email:
       enabled: ${APP_2FA_EMAIL_ENABLED:false}
       log-codes: false
+      acs:
+        enabled: ${ACS_EMAIL_ENABLED:false}
+        connection-string: ${ACS_EMAIL_CONNECTION_STRING:}
+        sender-address: ${ACS_EMAIL_SENDER_ADDRESS:}
+        subject: ${ACS_EMAIL_SUBJECT:Fapor7 verification code}
     code-length: ${APP_2FA_CODE_LENGTH:6}
     expiry-minutes: ${APP_2FA_EXPIRY_MINUTES:10}
     resend-cooldown-seconds: ${APP_2FA_RESEND_COOLDOWN_SECONDS:60}

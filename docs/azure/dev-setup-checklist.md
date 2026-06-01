@@ -120,6 +120,10 @@ Optional/dev:
 | `APP_DEV_SEED_PASSWORD` | Required only when dev seed is enabled |
 | `APP_2FA_EMAIL_ENABLED` | Enable email 2FA only after email delivery is configured |
 | `APP_2FA_EMAIL_LOG_CODES` | Dev debugging only; keep `false` for shared dev |
+| `ACS_EMAIL_ENABLED` | Enable Azure Communication Services Email delivery for email 2FA |
+| `ACS_EMAIL_CONNECTION_STRING` | Required only if ACS Email is enabled |
+| `ACS_EMAIL_SENDER_ADDRESS` | Required only if ACS Email is enabled |
+| `ACS_EMAIL_SUBJECT` | Optional email subject override |
 | `APP_2FA_SMS_ENABLED` | Enable SMS 2FA only after Semaphore settings are configured |
 | `SEMAPHORE_API_KEY` | Required only if SMS 2FA is enabled |
 | `SEMAPHORE_SENDER_NAME` | Required only if SMS 2FA is enabled |
@@ -243,6 +247,15 @@ SSO, if enabled:
 - Provider callback returns to `https://app-fms-api-dev-aaghd3bmg9gthcfe.southeastasia-01.azurewebsites.net/login/oauth2/code/<provider>`.
 - Success redirect returns to `https://thankful-ground-077ba4800.7.azurestaticapps.net/#sso_token=<jwt>`.
 - The frontend stores the JWT and loads the authenticated session.
+- App-side OTP 2FA is not applied to SSO. Enforce MFA for Entra or Google through the identity provider.
+
+2FA, if enabled:
+
+- Email/password login returns a 2FA challenge without a JWT.
+- `POST /api/auth/2fa/verify` returns the JWT after the OTP succeeds.
+- ACS Email sends email OTPs when `ACS_EMAIL_ENABLED=true`.
+- Semaphore sends SMS OTPs when `APP_2FA_SMS_ENABLED=true` and users have mobile numbers.
+- No real provider secrets are stored in source control or GitHub variables unless a workflow is explicitly changed to manage App Service settings.
 
 GitHub Actions:
 

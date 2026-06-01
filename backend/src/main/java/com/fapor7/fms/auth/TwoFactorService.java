@@ -1,6 +1,7 @@
 package com.fapor7.fms.auth;
 
 import com.fapor7.fms.notifications.EmailCodeSender;
+import com.fapor7.fms.notifications.SmsSender;
 import com.fapor7.fms.users.UserEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -20,10 +22,13 @@ public class TwoFactorService {
 
     private final TwoFactorVerificationRepository repository;
     private final EmailCodeSender emailCodeSender;
+    private final SmsSender smsSender;
     private final PasswordEncoder passwordEncoder;
     private final SecureRandom secureRandom = new SecureRandom();
     private final boolean emailEnabled;
+    private final boolean smsEnabled;
     private final int codeLength;
+    private final long expiryMinutes;
     private final Duration expiry;
     private final Duration resendCooldown;
     private final int maxFailedAttempts;
@@ -32,8 +37,10 @@ public class TwoFactorService {
     public TwoFactorService(
             TwoFactorVerificationRepository repository,
             EmailCodeSender emailCodeSender,
+            SmsSender smsSender,
             PasswordEncoder passwordEncoder,
             @Value("${app.two-factor.email.enabled:true}") boolean emailEnabled,
+            @Value("${app.sms.semaphore.enabled:false}") boolean smsEnabled,
             @Value("${app.two-factor.code-length:6}") int codeLength,
             @Value("${app.two-factor.expiry-minutes:10}") long expiryMinutes,
             @Value("${app.two-factor.resend-cooldown-seconds:60}") long resendCooldownSeconds,
@@ -42,9 +49,12 @@ public class TwoFactorService {
     ) {
         this.repository = repository;
         this.emailCodeSender = emailCodeSender;
+        this.smsSender = smsSender;
         this.passwordEncoder = passwordEncoder;
         this.emailEnabled = emailEnabled;
+        this.smsEnabled = smsEnabled;
         this.codeLength = codeLength;
+        this.expiryMinutes = expiryMinutes;
         this.expiry = Duration.ofMinutes(expiryMinutes);
         this.resendCooldown = Duration.ofSeconds(resendCooldownSeconds);
         this.maxFailedAttempts = maxFailedAttempts;
@@ -55,6 +65,10 @@ public class TwoFactorService {
         return emailEnabled;
     }
 
+    public boolean isSmsEnabled() {
+        return smsEnabled;
+    }
+
     /**
      * Starts an email verification challenge for a validated login.
      *
@@ -63,29 +77,51 @@ public class TwoFactorService {
      */
     @Transactional
     public LoginResponse startEmailChallenge(UserEntity user) {
+        if (!emailEnabled) {
+            throw AuthException.verificationUnavailable("Email verification is not available.");
+        }
+
+        return startChallenge(user, TwoFactorChannel.EMAIL, user.getEmail());
+    }
+
+    /**
+     * Starts an SMS verification challenge for a validated login.
+     *
+     * @param user authenticated user awaiting second factor
+     * @return challenge response without a JWT
+     */
+    @Transactional
+    public LoginResponse startSmsChallenge(UserEntity user) {
+        if (!smsEnabled) {
+            throw AuthException.verificationUnavailable("SMS verification is not available.");
+        }
+
+        String destination = user.getMobileNumber();
+        if (destination == null || destination.isBlank()) {
+            throw AuthException.verificationUnavailable("SMS verification is not available for this account.");
+        }
+
+        return startChallenge(user, TwoFactorChannel.SMS, destination);
+    }
+
+    private LoginResponse startChallenge(UserEntity user, TwoFactorChannel channel, String destination) {
         LocalDateTime now = LocalDateTime.now();
         long recentChallengeCount = repository.countByUserIdAndCreatedAtAfter(
                 user.getId(),
                 now.minusHours(1)
         );
         if (recentChallengeCount >= maxChallengesPerHour) {
-            throw new RuntimeException("Too many verification requests. Try again later.");
+            throw AuthException.tooManyVerificationAttempts();
         }
 
-        repository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(user.getId(), TwoFactorStatus.PENDING)
-                .filter(challenge -> challenge.getExpiresAt().isAfter(now))
-                .ifPresent(challenge -> {
-                    if (challenge.getLastSentAt().plus(resendCooldown).isAfter(now)) {
-                        throw new RuntimeException("Verification code was sent recently. Please wait before requesting another code.");
-                    }
-                });
+        expirePreviousPendingChallenges(user.getId(), now);
 
         String code = generateCode();
         TwoFactorVerificationEntity challenge = new TwoFactorVerificationEntity();
         challenge.setId(UUID.randomUUID());
         challenge.setUser(user);
-        challenge.setChannel(TwoFactorChannel.EMAIL);
-        challenge.setDestination(user.getEmail());
+        challenge.setChannel(channel);
+        challenge.setDestination(destination);
         challenge.setCodeHash(passwordEncoder.encode(code));
         challenge.setStatus(TwoFactorStatus.PENDING);
         challenge.setExpiresAt(now.plus(expiry));
@@ -94,7 +130,7 @@ public class TwoFactorService {
         challenge.setUpdatedAt(now);
 
         repository.save(challenge);
-        emailCodeSender.sendVerificationCode(user.getEmail(), code);
+        sendCode(challenge, code);
 
         return toChallengeResponse(challenge);
     }
@@ -111,14 +147,14 @@ public class TwoFactorService {
         LocalDateTime now = LocalDateTime.now();
 
         if (challenge.getLastSentAt().plus(resendCooldown).isAfter(now)) {
-            throw new RuntimeException("Verification code was sent recently. Please wait before requesting another code.");
+            throw AuthException.verificationCooldown();
         }
 
         if (challenge.getExpiresAt().isBefore(now)) {
             challenge.setStatus(TwoFactorStatus.EXPIRED);
             challenge.setUpdatedAt(now);
             repository.save(challenge);
-            throw new RuntimeException("Verification code expired. Sign in again.");
+            throw AuthException.invalidVerificationCode();
         }
 
         String code = generateCode();
@@ -127,7 +163,7 @@ public class TwoFactorService {
         challenge.setLastSentAt(now);
         challenge.setUpdatedAt(now);
         repository.save(challenge);
-        emailCodeSender.sendVerificationCode(challenge.getDestination(), code);
+        sendCode(challenge, code);
 
         return toChallengeResponse(challenge);
     }
@@ -145,26 +181,34 @@ public class TwoFactorService {
         LocalDateTime now = LocalDateTime.now();
 
         if (challenge.getConsumedAt() != null) {
-            throw new RuntimeException("Verification code was already used");
+            throw AuthException.invalidVerificationCode();
         }
 
         if (challenge.getExpiresAt().isBefore(now)) {
             challenge.setStatus(TwoFactorStatus.EXPIRED);
             challenge.setUpdatedAt(now);
             repository.save(challenge);
-            throw new RuntimeException("Verification code expired. Sign in again.");
+            throw AuthException.invalidVerificationCode();
         }
 
         if (challenge.getFailedAttemptCount() >= maxFailedAttempts) {
-            throw new RuntimeException("Too many invalid verification attempts. Sign in again.");
+            challenge.setStatus(TwoFactorStatus.EXPIRED);
+            challenge.setUpdatedAt(now);
+            repository.save(challenge);
+            throw AuthException.tooManyVerificationAttempts();
         }
 
         String code = submittedCode == null ? "" : submittedCode.trim();
         if (!passwordEncoder.matches(code, challenge.getCodeHash())) {
             challenge.setFailedAttemptCount(challenge.getFailedAttemptCount() + 1);
             challenge.setUpdatedAt(now);
+            if (challenge.getFailedAttemptCount() >= maxFailedAttempts) {
+                challenge.setStatus(TwoFactorStatus.EXPIRED);
+                repository.save(challenge);
+                throw AuthException.tooManyVerificationAttempts();
+            }
             repository.save(challenge);
-            throw new RuntimeException("Invalid verification code");
+            throw AuthException.invalidVerificationCode();
         }
 
         challenge.setStatus(TwoFactorStatus.VERIFIED);
@@ -178,14 +222,14 @@ public class TwoFactorService {
 
     private TwoFactorVerificationEntity requirePendingChallenge(UUID challengeId) {
         if (challengeId == null) {
-            throw new RuntimeException("Verification challenge is required");
+            throw AuthException.invalidVerificationCode();
         }
 
         TwoFactorVerificationEntity challenge = repository.findById(challengeId)
-                .orElseThrow(() -> new RuntimeException("Verification challenge not found"));
+                .orElseThrow(AuthException::invalidVerificationCode);
 
         if (challenge.getStatus() != TwoFactorStatus.PENDING) {
-            throw new RuntimeException("Verification challenge is no longer active");
+            throw AuthException.invalidVerificationCode();
         }
 
         return challenge;
@@ -197,9 +241,41 @@ public class TwoFactorService {
                 true,
                 challenge.getId(),
                 challenge.getChannel().name(),
-                maskDestination(challenge.getDestination()),
+                maskDestination(challenge.getChannel(), challenge.getDestination()),
                 challenge.getExpiresAt()
         );
+    }
+
+    private void expirePreviousPendingChallenges(UUID userId, LocalDateTime now) {
+        List<TwoFactorVerificationEntity> pendingChallenges = repository.findByUserIdAndStatus(userId, TwoFactorStatus.PENDING);
+        for (TwoFactorVerificationEntity pendingChallenge : pendingChallenges) {
+            if (pendingChallenge.getExpiresAt().isAfter(now)
+                    && pendingChallenge.getLastSentAt().plus(resendCooldown).isAfter(now)) {
+                throw AuthException.verificationCooldown();
+            }
+
+            pendingChallenge.setStatus(TwoFactorStatus.EXPIRED);
+            pendingChallenge.setUpdatedAt(now);
+            repository.save(pendingChallenge);
+        }
+    }
+
+    private void sendCode(TwoFactorVerificationEntity challenge, String code) {
+        try {
+            if (challenge.getChannel() == TwoFactorChannel.EMAIL) {
+                emailCodeSender.sendVerificationCode(challenge.getDestination(), code);
+                return;
+            }
+
+            smsSender.send(
+                    challenge.getDestination(),
+                    "Your Fapor7 verification code is " + code + ". It expires in " + expiryMinutes + " minutes."
+            );
+        } catch (AuthException exception) {
+            throw exception;
+        } catch (RuntimeException exception) {
+            throw AuthException.deliveryFailure();
+        }
     }
 
     private String generateCode() {
@@ -209,12 +285,28 @@ public class TwoFactorService {
         return String.valueOf(minimum + secureRandom.nextInt(bound - minimum));
     }
 
-    private String maskDestination(String email) {
+    private String maskDestination(TwoFactorChannel channel, String destination) {
+        if (channel == TwoFactorChannel.SMS) {
+            return maskSmsDestination(destination);
+        }
+
+        return maskEmailDestination(destination);
+    }
+
+    private String maskEmailDestination(String email) {
         int atIndex = email.indexOf('@');
         if (atIndex <= 1) {
             return "***" + email.substring(Math.max(atIndex, 0));
         }
 
         return email.charAt(0) + "***" + email.substring(atIndex);
+    }
+
+    private String maskSmsDestination(String mobileNumber) {
+        if (mobileNumber == null || mobileNumber.length() <= 4) {
+            return "****";
+        }
+
+        return "*******" + mobileNumber.substring(mobileNumber.length() - 4);
     }
 }

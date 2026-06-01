@@ -1,14 +1,20 @@
 import { useState } from 'react';
 import { Button, Field } from '../components/ui';
 import { useAsyncAction } from '../hooks/useAsyncAction';
-import { api } from '../lib/api';
+import { api, type TwoFactorChannel } from '../lib/api';
 import { backendUrl } from '../lib/backendPaths';
 
 type TwoFactorChallenge = {
   challengeId: string
-  channel: 'EMAIL' | 'SMS'
+  channel: TwoFactorChannel
   maskedDestination: string
   expiresAt: string
+}
+
+type VerificationMethod = TwoFactorChannel
+
+function formatChannel(channel: TwoFactorChannel) {
+  return channel === 'SMS' ? 'SMS' : 'email'
 }
 
 export function LoginPage({
@@ -26,10 +32,11 @@ export function LoginPage({
 }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>('EMAIL')
   const [verificationCode, setVerificationCode] = useState('')
   const [challenge, setChallenge] = useState<TwoFactorChallenge | null>(null)
   const login = useAsyncAction(async () => {
-    const response = await api.auth.login(email, password)
+    const response = await api.auth.login(email, password, verificationMethod === 'SMS' ? 'SMS' : undefined)
     if (response.twoFactorRequired && response.challengeId && response.channel && response.maskedDestination && response.expiresAt) {
       setChallenge({
         challengeId: response.challengeId,
@@ -94,7 +101,7 @@ export function LoginPage({
             <>
               <div className="mt-6 space-y-4">
                 <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200">
-                  Verification code sent to {challenge.maskedDestination}.
+                  Verification code sent by {formatChannel(challenge.channel)} to {challenge.maskedDestination}.
                 </div>
                 <Field label="Verification code">
                   <input
@@ -131,6 +138,31 @@ export function LoginPage({
                 <Field label="Password">
                   <input className="input" value={password} onChange={(event) => setPassword(event.target.value)} type="password" required />
                 </Field>
+                <div>
+                  <span className="text-sm font-medium text-slate-800 dark:text-slate-200">Verification method</span>
+                  <div role="radiogroup" aria-label="Verification method" className="mt-1 grid grid-cols-2 overflow-hidden rounded-md border border-slate-300 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    {(['EMAIL', 'SMS'] as VerificationMethod[]).map((method) => {
+                      const active = verificationMethod === method
+
+                      return (
+                        <button
+                          key={method}
+                          type="button"
+                          role="radio"
+                          aria-checked={active}
+                          disabled={login.loading || loading}
+                          onClick={() => {
+                            setVerificationMethod(method)
+                            login.setError('')
+                          }}
+                          className={`min-h-10 px-3 py-2 font-semibold transition-colors duration-150 ease-out focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 disabled:cursor-not-allowed disabled:opacity-60 dark:focus-visible:outline-sky-400 motion-reduce:transition-none ${method === 'SMS' ? 'border-l border-slate-300 dark:border-slate-700' : ''} ${active ? 'bg-sky-50 text-sky-800 dark:bg-sky-400/10 dark:text-sky-200' : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/10'}`}
+                        >
+                          {method === 'SMS' ? 'SMS' : 'Email'}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
               <Button className="mt-6 w-full justify-center" loading={loading || login.loading}>
                 {login.loading ? 'Signing in...' : 'Sign in'}

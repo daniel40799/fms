@@ -22,7 +22,9 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +51,7 @@ class AuthServiceTest {
     @Test
     void loginReturnsTokenForActiveUserWithMatchingPassword() {
         UserEntity user = TestData.activeUser(1);
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("secret", user.getPasswordHash())).thenReturn(true);
         when(jwtService.generateToken(user.getId(), user.getEmail())).thenReturn("jwt-token");
 
@@ -60,33 +62,96 @@ class AuthServiceTest {
     }
 
     @Test
+    void loginWithTwoFactorEnabledReturnsChallengeWithoutJwt() {
+        UserEntity user = TestData.activeUser(11);
+        LoginResponse challenge = new LoginResponse(
+                null,
+                true,
+                TestData.uuid(12),
+                "EMAIL",
+                "u***@example.test",
+                java.time.LocalDateTime.now().plusMinutes(10)
+        );
+        when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("secret", user.getPasswordHash())).thenReturn(true);
+        when(twoFactorService.isEmailEnabled()).thenReturn(true);
+        when(twoFactorService.startEmailChallenge(user)).thenReturn(challenge);
+
+        LoginResponse response = authService.login(new LoginRequest(user.getEmail(), "secret"));
+
+        assertThat(response).isSameAs(challenge);
+        assertThat(response.token()).isNull();
+        assertThat(response.twoFactorRequired()).isTrue();
+        verify(jwtService, never()).generateToken(user.getId(), user.getEmail());
+    }
+
+    @Test
+    void loginWithSmsChannelReturnsSmsChallengeWithoutJwt() {
+        UserEntity user = TestData.activeUser(12);
+        user.setMobileNumber("+639171234567");
+        LoginResponse challenge = new LoginResponse(
+                null,
+                true,
+                TestData.uuid(13),
+                "SMS",
+                "*******4567",
+                java.time.LocalDateTime.now().plusMinutes(10)
+        );
+        when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("secret", user.getPasswordHash())).thenReturn(true);
+        when(twoFactorService.isSmsEnabled()).thenReturn(true);
+        when(twoFactorService.startSmsChallenge(user)).thenReturn(challenge);
+
+        LoginResponse response = authService.login(new LoginRequest(user.getEmail(), "secret", TwoFactorChannel.SMS));
+
+        assertThat(response).isSameAs(challenge);
+        assertThat(response.token()).isNull();
+        assertThat(response.channel()).isEqualTo("SMS");
+        verify(jwtService, never()).generateToken(user.getId(), user.getEmail());
+    }
+
+    @Test
     void loginRejectsUnknownEmail() {
-        when(userRepository.findByEmail("missing@example.test")).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase("missing@example.test")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> authService.login(new LoginRequest("missing@example.test", "secret")))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Invalid email or password");
+                .isInstanceOf(AuthException.class)
+                .hasMessage("Invalid credentials.");
     }
 
     @Test
     void loginRejectsInactiveUser() {
         UserEntity user = TestData.user(2, "inactive@example.test", "Inactive", UserStatus.INACTIVE);
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
 
         assertThatThrownBy(() -> authService.login(new LoginRequest(user.getEmail(), "secret")))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("User account is not active");
+                .isInstanceOf(AuthException.class)
+                .hasMessage("User account is not active.");
     }
 
     @Test
     void loginRejectsBadPassword() {
         UserEntity user = TestData.activeUser(3);
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrong", user.getPasswordHash())).thenReturn(false);
 
         assertThatThrownBy(() -> authService.login(new LoginRequest(user.getEmail(), "wrong")))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Invalid email or password");
+                .isInstanceOf(AuthException.class)
+                .hasMessage("Invalid credentials.");
+    }
+
+    @Test
+    void verifyTwoFactorReturnsJwtAfterChallengeVerification() {
+        UserEntity user = TestData.activeUser(13);
+        VerifyTwoFactorRequest request = new VerifyTwoFactorRequest(TestData.uuid(14), "123456");
+        when(twoFactorService.verify(request.challengeId(), request.code())).thenReturn(user);
+        when(jwtService.generateToken(user.getId(), user.getEmail())).thenReturn("verified-token");
+
+        LoginResponse response = authService.verifyTwoFactor(request);
+
+        assertThat(response.token()).isEqualTo("verified-token");
+        assertThat(response.twoFactorRequired()).isFalse();
+        verify(jwtService).generateToken(user.getId(), user.getEmail());
     }
 
     @Test
@@ -160,8 +225,8 @@ class AuthServiceTest {
         when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
 
         assertThatThrownBy(() -> authService.loginSso(oauth2User))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("User account is not active");
+                .isInstanceOf(AuthException.class)
+                .hasMessage("User account is not active.");
     }
 
     @Test
@@ -184,5 +249,6 @@ class AuthServiceTest {
         assertThat(captor.getValue().email()).isEqualTo("sso.user@example.test");
         assertThat(captor.getValue().fullName()).isEqualTo("SSO User");
         assertThat(captor.getValue().roles()).isNull();
+        verifyNoInteractions(twoFactorService);
     }
 }
