@@ -224,6 +224,19 @@ Local development can log email OTP codes when both `APP_2FA_EMAIL_ENABLED=true`
 | `APP_2FA_MAX_FAILED_ATTEMPTS` | Failed verification attempt limit |
 | `APP_2FA_MAX_CHALLENGES_PER_HOUR` | Challenge creation rate limit |
 
+Email 2FA environment variables bind to these backend properties:
+
+| Environment variable | Spring property |
+| --- | --- |
+| `APP_2FA_EMAIL_ENABLED` | `app.two-factor.email.enabled` |
+| `APP_2FA_EMAIL_LOG_CODES` | `app.two-factor.email.log-codes` |
+| `ACS_EMAIL_ENABLED` | `app.two-factor.email.acs.enabled` |
+| `ACS_EMAIL_CONNECTION_STRING` | `app.two-factor.email.acs.connection-string` |
+| `ACS_EMAIL_SENDER_ADDRESS` | `app.two-factor.email.acs.sender-address` |
+| `ACS_EMAIL_SUBJECT` | `app.two-factor.email.acs.subject` |
+
+Backend startup logs include `Email 2FA startup diagnostics` with active profiles, effective 2FA/ACS flags, whether the ACS connection string is present, sender address, and subject. ACS send failures log `ACS Email 2FA send failed` with the exception class, safe message, and Azure status/error code when available. The ACS connection string, access keys, and OTP code are not logged by the ACS sender.
+
 Do not commit real ACS, Semaphore, JWT, database, or storage secrets. Supply them through local environment variables or Azure App Service Application Settings.
 
 ### Upload Storage

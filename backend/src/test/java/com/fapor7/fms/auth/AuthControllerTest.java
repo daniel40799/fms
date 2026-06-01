@@ -123,6 +123,25 @@ class AuthControllerTest {
     }
 
     @Test
+    void loginDeliveryFailureReturnsStructuredSafeAuthError() throws Exception {
+        AuthService authService = mock(AuthService.class);
+        AuthController controller = new AuthController(authService);
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .setControllerAdvice(new AuthExceptionHandler())
+                .build();
+        when(authService.login(org.mockito.ArgumentMatchers.any(LoginRequest.class)))
+                .thenThrow(AuthException.deliveryFailure());
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"user@example.test\",\"password\":\"secret\",\"channel\":\"EMAIL\"}"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value("VERIFICATION_DELIVERY_FAILED"))
+                .andExpect(jsonPath("$.message").value("Unable to send verification code."));
+    }
+
+    @Test
     void verifyTwoFactorRouteReturnsTokenResponseShape() throws Exception {
         AuthService authService = mock(AuthService.class);
         AuthController controller = new AuthController(authService);

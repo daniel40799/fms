@@ -206,8 +206,23 @@ class TwoFactorServiceTest {
     }
 
     @Test
-    void smsDeliveryFailureUsesStructuredAuthException() {
+    void emailDeliveryFailureUsesStructuredAuthException() {
         UserEntity user = TestData.activeUser(12);
+        TwoFactorService service = service(true, false);
+        when(repository.countByUserIdAndCreatedAtAfter(eq(user.getId()), any(LocalDateTime.class))).thenReturn(0L);
+        when(repository.findByUserIdAndStatus(user.getId(), TwoFactorStatus.PENDING)).thenReturn(List.of());
+        doThrow(new RuntimeException("provider down")).when(emailCodeSender).sendVerificationCode(eq(user.getEmail()), any());
+
+        assertThatThrownBy(() -> service.startEmailChallenge(user))
+                .isInstanceOf(AuthException.class)
+                .hasMessage("Unable to send verification code.")
+                .extracting("code")
+                .isEqualTo("VERIFICATION_DELIVERY_FAILED");
+    }
+
+    @Test
+    void smsDeliveryFailureUsesStructuredAuthException() {
+        UserEntity user = TestData.activeUser(13);
         user.setMobileNumber("+639171234567");
         TwoFactorService service = service(false, true);
         when(repository.countByUserIdAndCreatedAtAfter(eq(user.getId()), any(LocalDateTime.class))).thenReturn(0L);
